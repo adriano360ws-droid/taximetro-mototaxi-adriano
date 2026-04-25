@@ -4,8 +4,11 @@ self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll([
-        "/",
-        "/index.html"
+        "./",
+        "./index.html",
+        "./manifest.json",
+        "./icone-192.png",
+        "./icone-512.png"
       ]);
     })
   );
