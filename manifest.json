@@ -1,7 +1,7 @@
 {
-  "name": "Moto Táxi Adriano",
-  "short_name": "MotoTáxi",
-  "start_url": "/index.html",
+  "name": "Moto Táxi Adriano PRO",
+  "short_name": "Moto Táxi PRO",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#0e0e0e",
   "theme_color": "#00c853",
