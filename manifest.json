@@ -1,22 +1,20 @@
 {
   "name": "Moto Táxi Adriano PRO",
-  "short_name": "Moto Táxi",
+  "short_name": "Moto Taxi",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#0e0e0e",
   "theme_color": "#00c853",
   "icons": [
     {
-      "src": "icone-192.png",
+      "src": "./icone-192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
-      "src": "icone-512.png",
+      "src": "./icone-512.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ]
 }
