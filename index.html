@@ -145,6 +145,11 @@ if ('serviceWorker' in navigator) {
     .then(() => console.log("App pronto para instalar"))
     .catch(err => console.log("Erro:", err));
 }
+ self.addEventListener("install", () => {
+  self.skipWaiting();
+});
+
+self.addEventListener("fetch", () => {});
 </script>
 
 </body>
