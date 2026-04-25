@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#00c853">
+<link rel="icon" href="icons/icon-192.png">
+<title>Taxímetro Pro + Maps</title>
+
+<style>
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background: #1a1a1a; color: #fff; margin: 0; padding: 10px; }
+.container { max-width: 400px; margin: auto; }
+.box { background: #333; margin: 10px 0; padding: 15px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); text-align: left; }
+h2 { margin: 10px 0; text-align: center; }
+#valorDisplay { color: #0f0; font-size: 3.5em; font-weight: bold; text-align: center; }
+.info { font-size: 1.1em; margin: 8px 0; display: flex; justify-content: space-between; }
+.label { color: #aaa; }
+button { padding: 15px; font-size: 1em; margin: 5px 2%; border: none; border-radius: 5px; width: 46%; }
+.btn-start { background: #28a745; color: white; }
+.btn-stop { background: #dc3545; color: white; }
+.btn-maps { background: #4285F4; color: white; width: 96%; margin-top: 10px; }
+input { padding: 10px; font-size: 1em; width: 95%; margin-bottom: 10px; border-radius: 5px; border: none; }
+</style>
+</head>
+
+<body>
+<div class="container">
+<h2>Taxímetro Pro</h2>
+
+<div class="box">
+<div id="valorDisplay">R$ 0,00</div>
+<div class="info"><span class="label">Distância:</span> <span id="distancia">0.00 km</span></div>
+<div class="info"><span class="label">Tempo:</span> <span id="tempo">00:00</span></div>
+<div class="info"><span class="label">Tarifa:</span> <span id="tipoTarifa">-</span></div>
+</div>
+
+<button class="btn-start" onclick="iniciar()">INICIAR</button>
+<button class="btn-stop" onclick="parar()">PARAR</button>
+
+<div class="box">
+
+<input type="text" id="destino" placeholder="Digite o destino (ex: Hospital, Centro...)">
+
+<button class="btn-maps" onclick="abrirMaps()">🗺️ Abrir no Google Maps</button>
+
+<p style="font-size:12px;color:#ccc;">
+📍 Digite o destino e abra no Maps<br>
+🧾 Esse destino será usado no comprovante
+</p>
+
+</div>
+
+</div>
+
+<script>
+let timer;
+let segundos = 0;
+let km = 0;
+let rodando = false;
+
+function iniciar(){
+ if(rodando) return;
+ rodando = true;
+ segundos = 0;
+ km = 0;
+
+ timer = setInterval(()=>{
+  segundos++;
+  km += (0.5 / 60);
+  atualizarDisplay();
+ },1000);
+}
+
+function parar(){
+ rodando = false;
+ clearInterval(timer);
+}
+
+function atualizarDisplay(){
+
+ let base, valorKm, tipo;
+
+ if(km <= 5){
+  base = 2.5;
+  valorKm = 1.0;
+  tipo = "🔵 Econômica";
+ }
+ else if(km <= 15){
+  base = 3.0;
+  valorKm = 1.1;
+  tipo = "🟡 Padrão";
+ }
+ else{
+  base = 4.0;
+  valorKm = 1.3;
+  tipo = "🔴 Premium";
+ }
+
+ let total = base + (km * valorKm);
+
+ const hora = new Date().getHours();
+ let minimo = (hora >= 18 || hora < 6) ? 8 : 7;
+
+ if(total < minimo){
+  total = minimo;
+ }
+
+ total = Math.ceil(total * 10) / 10;
+
+ let tempoFormatado =
+ Math.floor(segundos/60) + ":" + String(segundos%60).padStart(2,"0");
+
+ document.getElementById("valorDisplay").innerText =
+ "R$ " + total.toFixed(2).replace(".",",");
+
+ document.getElementById("distancia").innerText =
+ km.toFixed(2) + " km";
+
+ document.getElementById("tempo").innerText =
+ tempoFormatado;
+
+ document.getElementById("tipoTarifa").innerText =
+ tipo;
+}
+
+// 🔥 ABRE MAPS COM DESTINO
+function abrirMaps(){
+ let destino = document.getElementById("destino").value;
+
+ if(!destino){
+  // abre direto o Maps sem destino
+  window.location.href = "geo:0,0?q=";
+  return;
+ }
+
+ // abre com destino já preenchido
+ let url = "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(destino);
+
+ window.location.href = url;
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js')
+    .then(() => console.log("App pronto para instalar"))
+    .catch(err => console.log("Erro:", err));
+}
+</script>
+
+</body>
+</html>
