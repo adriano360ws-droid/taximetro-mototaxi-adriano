@@ -22,6 +22,17 @@ button { padding: 15px; font-size: 1em; margin: 5px 2%; border: none; border-rad
 .btn-stop { background: #dc3545; color: white; }
 .btn-maps { background: #4285F4; color: white; width: 96%; margin-top: 10px; }
 input { padding: 10px; font-size: 1em; width: 95%; margin-bottom: 10px; border-radius: 5px; border: none; }
+
+#comprovante {
+  display:none;
+  background:#222;
+  padding:15px;
+  margin-top:10px;
+  border-radius:10px;
+}
+#comprovante p {
+  margin:5px 0;
+}
 </style>
 </head>
 
@@ -52,6 +63,20 @@ input { padding: 10px; font-size: 1em; width: 95%; margin-bottom: 10px; border-r
 
 </div>
 
+<!-- 🧾 COMPROVANTE -->
+<div id="comprovante">
+  <h3>🧾 Comprovante</h3>
+  <p id="compDestino"></p>
+  <p id="compValor"></p>
+  <p id="compKm"></p>
+  <p id="compTempo"></p>
+  <p id="compTarifa"></p>
+
+  <button onclick="compartilhar()" style="width:100%;background:#00c853;color:white;">
+    📤 Compartilhar
+  </button>
+</div>
+
 </div>
 
 <script>
@@ -66,6 +91,8 @@ function iniciar(){
  segundos = 0;
  km = 0;
 
+ document.getElementById("comprovante").style.display = "none";
+
  timer = setInterval(()=>{
   segundos++;
   km += (0.5 / 60);
@@ -76,6 +103,7 @@ function iniciar(){
 function parar(){
  rodando = false;
  clearInterval(timer);
+ gerarComprovante();
 }
 
 function atualizarDisplay(){
@@ -125,32 +153,58 @@ function atualizarDisplay(){
  tipo;
 }
 
-// 🔥 ABRE MAPS COM DESTINO
+// 🧾 GERAR COMPROVANTE
+function gerarComprovante(){
+ let destino = document.getElementById("destino").value || "Não informado";
+
+ document.getElementById("compDestino").innerText = "Destino: " + destino;
+ document.getElementById("compValor").innerText = "Valor: " + document.getElementById("valorDisplay").innerText;
+ document.getElementById("compKm").innerText = "Distância: " + document.getElementById("distancia").innerText;
+ document.getElementById("compTempo").innerText = "Tempo: " + document.getElementById("tempo").innerText;
+ document.getElementById("compTarifa").innerText = "Tarifa: " + document.getElementById("tipoTarifa").innerText;
+
+ document.getElementById("comprovante").style.display = "block";
+}
+
+// 📤 COMPARTILHAR
+function compartilhar(){
+ let texto =
+  "🧾 Comprovante Moto Táxi\n\n" +
+  document.getElementById("compDestino").innerText + "\n" +
+  document.getElementById("compValor").innerText + "\n" +
+  document.getElementById("compKm").innerText + "\n" +
+  document.getElementById("compTempo").innerText + "\n" +
+  document.getElementById("compTarifa").innerText;
+
+ if(navigator.share){
+  navigator.share({
+    title: "Comprovante Moto Táxi",
+    text: texto
+  });
+ } else {
+  alert(texto);
+ }
+}
+
+// 📍 ABRIR MAPS
 function abrirMaps(){
  let destino = document.getElementById("destino").value;
 
  if(!destino){
-  // abre direto o Maps sem destino
-  window.location.href = "geo:0,0?q=";
+  window.location.href = "https://www.google.com/maps";
   return;
  }
 
- // abre com destino já preenchido
  let url = "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(destino);
-
  window.location.href = url;
 }
 
+// ✅ SERVICE WORKER
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('service-worker.js')
-    .then(() => console.log("App pronto para instalar"))
+    .then(() => console.log("App pronto"))
     .catch(err => console.log("Erro:", err));
 }
- self.addEventListener("install", () => {
-  self.skipWaiting();
-});
-
-self.addEventListener("fetch", () => {});
 </script>
 
 </body>
