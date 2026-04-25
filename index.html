@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#00c853">
 <link rel="icon" href="icone-192.png">
 <link rel="apple-touch-icon" href="icone-192.png">
-<title>Taxímetro Pro + Maps</title>
+<title>Taxímetro Pro</title>
 
 <style>
 body { font-family: Arial; background:#1a1a1a; color:#fff; text-align:center; }
@@ -20,7 +20,6 @@ button { padding:15px; margin:5px; border:none; border-radius:5px; }
 .btn-maps { background:#4285F4; color:#fff; width:95%; }
 .btn-pix { background:#00c853; color:#fff; width:95%; }
 input { width:95%; padding:10px; margin:10px 0; border-radius:5px; border:none; }
-
 #comprovante { display:none; background:#222; padding:15px; margin-top:10px; border-radius:10px; }
 textarea { width:95%; height:80px; border-radius:5px; margin-top:10px; }
 </style>
@@ -47,6 +46,7 @@ textarea { width:95%; height:80px; border-radius:5px; margin-top:10px; }
 <button class="btn-maps" onclick="abrirMaps()">Abrir no Google Maps</button>
 </div>
 
+<!-- COMPROVANTE -->
 <div id="comprovante">
 <h3>Comprovante</h3>
 <p id="compDestino"></p>
@@ -61,37 +61,23 @@ Compartilhar
 
 <!-- PIX -->
 <button class="btn-pix" onclick="gerarPixTela()">💰 Gerar Pix</button>
-<textarea id="pixCode" readonly placeholder="Código Pix aparece aqui"></textarea>
+<textarea id="pixCode" readonly></textarea>
 <button class="btn-pix" onclick="copiarPix()">📋 Copiar Pix</button>
 <img id="qrPix" style="width:200px;margin:10px auto;display:block;border-radius:10px;" />
-<div id="historico" class="box">
-<h3>📊 Histórico de Corridas</h3>
-
-<p id="totalDia"></p>
-<p id="totalMes"></p>
-
-<div id="listaHistorico"></div>
-
-<button onclick="limparHistorico()" style="background:#555;color:#fff;width:100%;">
-🧹 Limpar Histórico
-</button>
-
 </div>
-
-<!-- FIM DO COMPROVANTE -->
 
 <!-- HISTÓRICO -->
 <div id="historico" class="box">
-<h3>📊 Histórico de Corridas</h3>
-
+<h3>📊 Histórico</h3>
 <p id="totalDia"></p>
 <p id="totalMes"></p>
-
 <div id="listaHistorico"></div>
 
 <button onclick="limparHistorico()" style="background:#555;color:#fff;width:100%;">
-🧹 Limpar Histórico
+🧹 Limpar
 </button>
+</div>
+
 </div>
 
 <script>
@@ -100,16 +86,15 @@ let timer;
 let segundos = 0;
 let km = 0;
 let rodando = false;
-
 let ultimaPosicao = null;
 let watchId = null;
 
-// CONFIG PIX
+// PIX
 const PIX_KEY = "+5586981291332";
 const NOME = "MOTO TAXI ADRIANO".substring(0,25);
 const CIDADE = "TERESINA".substring(0,15);
 
-// 🚀 INICIAR
+// INICIAR
 function iniciar(){
  if(rodando) return;
 
@@ -125,99 +110,83 @@ function iniciar(){
   atualizarDisplay();
  },1000);
 
- if(navigator.geolocation){
-   watchId = navigator.geolocation.watchPosition(pos => {
+ watchId = navigator.geolocation.watchPosition(pos => {
 
-     let lat = pos.coords.latitude;
-     let lon = pos.coords.longitude;
-     let precisao = pos.coords.accuracy;
+   if(!rodando) return;
 
-     if(precisao > 30) return;
+   let lat = pos.coords.latitude;
+   let lon = pos.coords.longitude;
 
-     if(ultimaPosicao){
-       let distancia = calcularDistancia(
-         ultimaPosicao.lat,
-         ultimaPosicao.lon,
-         lat,
-         lon
-       );
+   if(pos.coords.accuracy > 30) return;
 
-       if(distancia > 0.03){
-         km += distancia;
-       }
+   if(ultimaPosicao){
+     let distancia = calcularDistancia(
+       ultimaPosicao.lat,
+       ultimaPosicao.lon,
+       lat,
+       lon
+     );
+
+     if(distancia > 0.05){ // 🔥 corrigido
+       km += distancia;
      }
+   }
 
-     ultimaPosicao = {lat, lon};
+   ultimaPosicao = {lat, lon};
 
-   });
- }
+ });
 }
 
-// 🛑 PARAR
+// PARAR
 function parar(){
+ if(!rodando) return;
+
  rodando = false;
  clearInterval(timer);
 
  if(watchId){
    navigator.geolocation.clearWatch(watchId);
+   watchId = null;
  }
 
  gerarComprovante();
 }
 
-// 📏 DISTÂNCIA
+// DISTÂNCIA
 function calcularDistancia(lat1, lon1, lat2, lon2){
  const R = 6371;
-
  let dLat = (lat2 - lat1) * Math.PI/180;
  let dLon = (lon2 - lon1) * Math.PI/180;
 
- let a =
-   Math.sin(dLat/2)**2 +
-   Math.cos(lat1*Math.PI/180) *
-   Math.cos(lat2*Math.PI/180) *
-   Math.sin(dLon/2)**2;
+ let a = Math.sin(dLat/2)**2 +
+ Math.cos(lat1*Math.PI/180) *
+ Math.cos(lat2*Math.PI/180) *
+ Math.sin(dLon/2)**2;
 
- let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
- return R * c;
+ return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
 }
 
-// 💰 VALOR
+// VALOR
 function atualizarDisplay(){
 
  let base, valorKm, tipo;
 
- if(km <= 5){
-  base = 2.5; valorKm = 1.0; tipo = "Econômica";
- }
- else if(km <= 15){
-  base = 3.0; valorKm = 1.1; tipo = "Padrão";
- }
- else{
-  base = 4.0; valorKm = 1.3; tipo = "Premium";
- }
+ if(km <= 5){ base=2.5; valorKm=1.0; tipo="Econômica"; }
+ else if(km <= 15){ base=3.0; valorKm=1.1; tipo="Padrão"; }
+ else{ base=4.0; valorKm=1.3; tipo="Premium"; }
 
- let total = base + (km * valorKm);
- if(total < 8) total = 8;
-
- let tempoFormatado =
- Math.floor(segundos/60) + ":" + String(segundos%60).padStart(2,"0");
+ let total = Math.max(8, base + km * valorKm);
 
  document.getElementById("valorDisplay").innerText =
  "R$ " + total.toFixed(2).replace(".",",");
 
- document.getElementById("distancia").innerText =
- km.toFixed(2) + " km";
-
+ document.getElementById("distancia").innerText = km.toFixed(2)+" km";
  document.getElementById("tempo").innerText =
- tempoFormatado;
-
- document.getElementById("tipoTarifa").innerText =
- tipo;
+ Math.floor(segundos/60)+":"+String(segundos%60).padStart(2,"0");
+ document.getElementById("tipoTarifa").innerText = tipo;
 }
 
-// 🧾 COMPROVANTE + HISTÓRICO
+// COMPROVANTE + HISTÓRICO
 function gerarComprovante(){
 
  let destino = document.getElementById("destino").value || "Não informado";
@@ -229,29 +198,19 @@ function gerarComprovante(){
 
  let agora = new Date();
 
- let data = agora.toLocaleDateString();
- let hora = agora.toLocaleTimeString();
-
  let registro = {
-   destino,
-   valor,
-   distancia,
-   tempo,
-   tarifa,
-   data,
-   hora,
+   destino, valor, distancia, tempo, tarifa,
+   data: agora.toLocaleDateString(),
+   hora: agora.toLocaleTimeString(),
    timestamp: agora.getTime()
  };
 
- // SALVAR
  let historico = JSON.parse(localStorage.getItem("corridas") || "[]");
  historico.unshift(registro);
  localStorage.setItem("corridas", JSON.stringify(historico));
 
- // MOSTRAR HISTÓRICO
  mostrarHistorico();
 
- // COMPROVANTE
  document.getElementById("compDestino").innerText = "Destino: " + destino;
  document.getElementById("compValor").innerText = "Valor: " + valor;
  document.getElementById("compKm").innerText = "Distância: " + distancia;
@@ -261,55 +220,31 @@ function gerarComprovante(){
  document.getElementById("comprovante").style.display = "block";
 }
 
-// 📊 HISTÓRICO
+// HISTÓRICO
 function mostrarHistorico(){
 
  let historico = JSON.parse(localStorage.getItem("corridas") || "[]");
-
  let lista = document.getElementById("listaHistorico");
- if(!lista) return;
-
  lista.innerHTML = "";
 
  let hoje = new Date().toLocaleDateString();
- let mesAtual = new Date().getMonth();
+ let mes = new Date().getMonth();
 
- let totalDia = 0;
- let totalMes = 0;
+ let totalDia=0, totalMes=0;
 
- historico.forEach(c => {
+ historico.forEach(c=>{
+   let v = parseFloat(c.valor.replace("R$","").replace(",","."));
 
-   let valorNum = parseFloat(c.valor.replace("R$","").replace(",","."));
+   if(c.data===hoje) totalDia+=v;
+   if(new Date(c.timestamp).getMonth()===mes) totalMes+=v;
 
-   if(c.data === hoje){
-     totalDia += valorNum;
-   }
-
-   let dataObj = new Date(c.timestamp);
-   if(dataObj.getMonth() === mesAtual){
-     totalMes += valorNum;
-   }
-
-   let item = document.createElement("div");
-   item.style.borderBottom = "1px solid #555";
-   item.style.margin = "5px";
-   item.style.padding = "5px";
-
-   item.innerHTML =
-     `<b>${c.destino}</b><br>
-      ${c.valor} | ${c.data} ${c.hora}`;
-
+   let item=document.createElement("div");
+   item.innerHTML=`<b>${c.destino}</b><br>${c.valor} | ${c.data} ${c.hora}`;
    lista.appendChild(item);
  });
 
- let totalDiaEl = document.getElementById("totalDia");
- let totalMesEl = document.getElementById("totalMes");
-
- if(totalDiaEl)
-   totalDiaEl.innerText = "💰 Hoje: R$ " + totalDia.toFixed(2);
-
- if(totalMesEl)
-   totalMesEl.innerText = "📅 Mês: R$ " + totalMes.toFixed(2);
+ document.getElementById("totalDia").innerText="💰 Hoje: R$ "+totalDia.toFixed(2);
+ document.getElementById("totalMes").innerText="📅 Mês: R$ "+totalMes.toFixed(2);
 }
 
 function limparHistorico(){
@@ -317,98 +252,51 @@ function limparHistorico(){
  mostrarHistorico();
 }
 
-// 📤 WHATSAPP
+// WHATSAPP
 function compartilhar(){
- let texto =
- "Comprovante Moto Táxi\n\n" +
- document.getElementById("compDestino").innerText + "\n" +
- document.getElementById("compValor").innerText + "\n" +
- document.getElementById("compKm").innerText + "\n" +
- document.getElementById("compTempo").innerText + "\n" +
- document.getElementById("compTarifa").innerText;
-
- window.location.href = "https://wa.me/?text=" + encodeURIComponent(texto);
+ let texto = document.getElementById("comprovante").innerText;
+ window.location.href="https://wa.me/?text="+encodeURIComponent(texto);
 }
 
-// 🗺️ MAPS
+// MAPS
 function abrirMaps(){
- let destino = document.getElementById("destino").value;
-
- if(!destino){
-  window.location.href = "https://www.google.com/maps";
-  return;
- }
-
- window.location.href =
- "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(destino);
+ let d=document.getElementById("destino").value;
+ window.location.href = d
+ ? "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(d)
+ : "https://www.google.com/maps";
 }
 
-// 🔥 PIX (NÃO ALTERADO)
-function campo(id, valor){
- return id + valor.length.toString().padStart(2,'0') + valor;
-}
-
-function crc16(payload){
- let crc = 0xFFFF;
- for (let i = 0; i < payload.length; i++){
-  crc ^= payload.charCodeAt(i) << 8;
-  for (let j = 0; j < 8; j++){
-   crc = (crc & 0x8000) ? (crc << 1) ^ 0x1021 : crc << 1;
-  }
- }
- return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4,"0");
-}
-
+// PIX (intacto)
+function campo(id,v){return id+v.length.toString().padStart(2,'0')+v;}
+function crc16(p){let c=0xFFFF;for(let i=0;i<p.length;i++){c^=p.charCodeAt(i)<<8;for(let j=0;j<8;j++){c=(c&0x8000)?(c<<1)^0x1021:c<<1;}}return(c&0xFFFF).toString(16).toUpperCase().padStart(4,"0");}
 function gerarPIX(valor){
- const valorStr = valor.toFixed(2);
- const txid = "MTX" + Date.now().toString().slice(-6);
-
- let payload =
- "000201"+
- campo("26", campo("00","BR.GOV.BCB.PIX")+campo("01",PIX_KEY))+
- "52040000"+
- "5303986"+
- campo("54",valorStr)+
- "5802BR"+
- campo("59",NOME)+
- campo("60",CIDADE)+
- campo("62",campo("05",txid));
-
- payload += "6304"+crc16(payload);
- return payload;
+ let v=valor.toFixed(2);
+ let txid="MTX"+Date.now().toString().slice(-6);
+ let p="000201"+campo("26",campo("00","BR.GOV.BCB.PIX")+campo("01",PIX_KEY))+"52040000"+"5303986"+campo("54",v)+"5802BR"+campo("59",NOME)+campo("60",CIDADE)+campo("62",campo("05",txid));
+ return p+"6304"+crc16(p);
 }
 
 function gerarPixTela(){
- let valor = parseFloat(
-  document.getElementById("valorDisplay").innerText
-   .replace("R$","")
-   .replace(",",".")
- );
-
- let pix = gerarPIX(valor);
- document.getElementById("pixCode").value = pix;
-
- let qr = document.getElementById("qrPix");
- qr.src = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(pix);
+ let v=parseFloat(document.getElementById("valorDisplay").innerText.replace("R$","").replace(",","."));
+ let pix=gerarPIX(v);
+ document.getElementById("pixCode").value=pix;
+ document.getElementById("qrPix").src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data="+encodeURIComponent(pix);
 }
 
 function copiarPix(){
- let campo = document.getElementById("pixCode");
- campo.select();
- document.execCommand("copy");
+ let c=document.getElementById("pixCode");
+ c.select(); document.execCommand("copy");
  alert("Pix copiado!");
 }
 
-// 🔄 CARREGAR HISTÓRICO AO ABRIR
-window.onload = function(){
- mostrarHistorico();
-};
+// INIT
+window.onload=mostrarHistorico;
 
-// SERVICE WORKER
 if ('serviceWorker' in navigator) {
  navigator.serviceWorker.register('service-worker.js');
 }
 
 </script>
+
 </body>
 </html>
