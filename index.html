@@ -10,132 +10,166 @@
 <title>Taxímetro Pro + Maps</title>
 
 <style>
-body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background: #1a1a1a; color: #fff; margin: 0; padding: 10px; }
-.container { max-width: 400px; margin: auto; }
-.box { background: #333; margin: 10px 0; padding: 15px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); text-align: left; }
-h2 { margin: 10px 0; text-align: center; }
-#valorDisplay { color: #0f0; font-size: 3.5em; font-weight: bold; text-align: center; }
-.info { font-size: 1.1em; margin: 8px 0; display: flex; justify-content: space-between; }
-.label { color: #aaa; }
-button { padding: 15px; font-size: 1em; margin: 5px 2%; border: none; border-radius: 5px; width: 46%; }
-.btn-start { background: #28a745; color: white; }
-.btn-stop { background: #dc3545; color: white; }
-.btn-maps { background: #4285F4; color: white; width: 96%; margin-top: 10px; }
-input { padding: 10px; font-size: 1em; width: 95%; margin-bottom: 10px; border-radius: 5px; border: none; }
+body { font-family: Arial; background:#1a1a1a; color:#fff; text-align:center; }
+.container { max-width:400px; margin:auto; }
+.box { background:#333; padding:15px; margin:10px; border-radius:10px; }
+#valorDisplay { color:#0f0; font-size:3em; }
+button { padding:15px; margin:5px; border:none; border-radius:5px; }
+.btn-start { background:green; color:#fff; width:45%; }
+.btn-stop { background:red; color:#fff; width:45%; }
+.btn-maps { background:#4285F4; color:#fff; width:95%; }
+input { width:95%; padding:10px; margin:10px 0; border-radius:5px; border:none; }
 
-#comprovante {
-  display:none;
-  background:#222;
-  padding:15px;
-  margin-top:10px;
-  border-radius:10px;
-}
-#comprovante p {
-  margin:5px 0;
-}
+#comprovante { display:none; background:#222; padding:15px; margin-top:10px; border-radius:10px; }
 </style>
 </head>
 
 <body>
+
 <div class="container">
+
 <h2>Taxímetro Pro</h2>
 
 <div class="box">
 <div id="valorDisplay">R$ 0,00</div>
-<div class="info"><span class="label">Distância:</span> <span id="distancia">0.00 km</span></div>
-<div class="info"><span class="label">Tempo:</span> <span id="tempo">00:00</span></div>
-<div class="info"><span class="label">Tarifa:</span> <span id="tipoTarifa">-</span></div>
+<p>Distância: <span id="distancia">0.00 km</span></p>
+<p>Tempo: <span id="tempo">00:00</span></p>
+<p>Tarifa: <span id="tipoTarifa">-</span></p>
 </div>
 
 <button class="btn-start" onclick="iniciar()">INICIAR</button>
 <button class="btn-stop" onclick="parar()">PARAR</button>
 
 <div class="box">
+<input type="text" id="destino" placeholder="Digite o destino">
 
-<input type="text" id="destino" placeholder="Digite o destino (ex: Hospital, Centro...)">
-
-<button class="btn-maps" onclick="abrirMaps()">🗺️ Abrir no Google Maps</button>
-
-<p style="font-size:12px;color:#ccc;">
-📍 Digite o destino e abra no Maps<br>
-🧾 Esse destino será usado no comprovante
-</p>
-
+<button class="btn-maps" onclick="abrirMaps()">Abrir no Google Maps</button>
 </div>
 
-<!-- 🧾 COMPROVANTE -->
 <div id="comprovante">
-  <h3>🧾 Comprovante</h3>
-  <p id="compDestino"></p>
-  <p id="compValor"></p>
-  <p id="compKm"></p>
-  <p id="compTempo"></p>
-  <p id="compTarifa"></p>
+<h3>Comprovante</h3>
+<p id="compDestino"></p>
+<p id="compValor"></p>
+<p id="compKm"></p>
+<p id="compTempo"></p>
+<p id="compTarifa"></p>
 
-  <button onclick="compartilhar()" style="width:100%;background:#00c853;color:white;">
-    📤 Compartilhar
-  </button>
+<button onclick="compartilhar()" style="width:100%;background:#00c853;color:white;">
+Compartilhar
+</button>
 </div>
 
 </div>
 
 <script>
+
 let timer;
 let segundos = 0;
 let km = 0;
 let rodando = false;
 
+let ultimaPosicao = null;
+let watchId = null;
+
+// 🚀 INICIAR
 function iniciar(){
  if(rodando) return;
+
  rodando = true;
  segundos = 0;
  km = 0;
+ ultimaPosicao = null;
 
  document.getElementById("comprovante").style.display = "none";
 
  timer = setInterval(()=>{
   segundos++;
-  km += (0.5 / 60);
   atualizarDisplay();
  },1000);
+
+ if(navigator.geolocation){
+   watchId = navigator.geolocation.watchPosition(pos => {
+
+     let lat = pos.coords.latitude;
+     let lon = pos.coords.longitude;
+     let precisao = pos.coords.accuracy;
+
+     // 🔥 ignora GPS ruim
+     if(precisao > 30) return;
+
+     if(ultimaPosicao){
+       let distancia = calcularDistancia(
+         ultimaPosicao.lat,
+         ultimaPosicao.lon,
+         lat,
+         lon
+       );
+
+       // 🔥 só soma se mover mesmo
+       if(distancia > 0.03){
+         km += distancia;
+       }
+     }
+
+     ultimaPosicao = {lat, lon};
+
+   }, erro => {
+     alert("Ative o GPS");
+   }, {
+     enableHighAccuracy: true,
+     maximumAge: 0,
+     timeout: 10000
+   });
+ }
 }
 
+// 🛑 PARAR
 function parar(){
  rodando = false;
  clearInterval(timer);
+
+ if(watchId){
+   navigator.geolocation.clearWatch(watchId);
+ }
+
  gerarComprovante();
 }
 
+// 📏 DISTÂNCIA
+function calcularDistancia(lat1, lon1, lat2, lon2){
+ const R = 6371;
+
+ let dLat = (lat2 - lat1) * Math.PI/180;
+ let dLon = (lon2 - lon1) * Math.PI/180;
+
+ let a =
+   Math.sin(dLat/2)**2 +
+   Math.cos(lat1*Math.PI/180) *
+   Math.cos(lat2*Math.PI/180) *
+   Math.sin(dLon/2)**2;
+
+ let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+ return R * c;
+}
+
+// 💰 VALOR
 function atualizarDisplay(){
 
  let base, valorKm, tipo;
 
  if(km <= 5){
-  base = 2.5;
-  valorKm = 1.0;
-  tipo = "🔵 Econômica";
+  base = 2.5; valorKm = 1.0; tipo = "Econômica";
  }
  else if(km <= 15){
-  base = 3.0;
-  valorKm = 1.1;
-  tipo = "🟡 Padrão";
+  base = 3.0; valorKm = 1.1; tipo = "Padrão";
  }
  else{
-  base = 4.0;
-  valorKm = 1.3;
-  tipo = "🔴 Premium";
+  base = 4.0; valorKm = 1.3; tipo = "Premium";
  }
 
  let total = base + (km * valorKm);
-
- const hora = new Date().getHours();
- let minimo = (hora >= 18 || hora < 6) ? 8 : 7;
-
- if(total < minimo){
-  total = minimo;
- }
-
- total = Math.ceil(total * 10) / 10;
+ if(total < 8) total = 8;
 
  let tempoFormatado =
  Math.floor(segundos/60) + ":" + String(segundos%60).padStart(2,"0");
@@ -153,7 +187,7 @@ function atualizarDisplay(){
  tipo;
 }
 
-// 🧾 GERAR COMPROVANTE
+// 🧾 COMPROVANTE
 function gerarComprovante(){
  let destino = document.getElementById("destino").value || "Não informado";
 
@@ -166,27 +200,20 @@ function gerarComprovante(){
  document.getElementById("comprovante").style.display = "block";
 }
 
-// 📤 COMPARTILHAR
+// 📤 WHATSAPP
 function compartilhar(){
  let texto =
-  "🧾 Comprovante Moto Táxi\n\n" +
-  document.getElementById("compDestino").innerText + "\n" +
-  document.getElementById("compValor").innerText + "\n" +
-  document.getElementById("compKm").innerText + "\n" +
-  document.getElementById("compTempo").innerText + "\n" +
-  document.getElementById("compTarifa").innerText;
+ "Comprovante Moto Táxi\n\n" +
+ document.getElementById("compDestino").innerText + "\n" +
+ document.getElementById("compValor").innerText + "\n" +
+ document.getElementById("compKm").innerText + "\n" +
+ document.getElementById("compTempo").innerText + "\n" +
+ document.getElementById("compTarifa").innerText;
 
- if(navigator.share){
-  navigator.share({
-    title: "Comprovante Moto Táxi",
-    text: texto
-  });
- } else {
-  alert(texto);
- }
+ window.location.href = "https://wa.me/?text=" + encodeURIComponent(texto);
 }
 
-// 📍 ABRIR MAPS
+// 🗺️ MAPS
 function abrirMaps(){
  let destino = document.getElementById("destino").value;
 
@@ -195,16 +222,15 @@ function abrirMaps(){
   return;
  }
 
- let url = "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(destino);
- window.location.href = url;
+ window.location.href =
+ "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(destino);
 }
 
-// ✅ SERVICE WORKER
+// SERVICE WORKER
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.js')
-    .then(() => console.log("App pronto"))
-    .catch(err => console.log("Erro:", err));
+ navigator.serviceWorker.register('service-worker.js');
 }
+
 </script>
 
 </body>
