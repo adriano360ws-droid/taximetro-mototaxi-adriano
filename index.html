@@ -18,9 +18,11 @@ button { padding:15px; margin:5px; border:none; border-radius:5px; }
 .btn-start { background:green; color:#fff; width:45%; }
 .btn-stop { background:red; color:#fff; width:45%; }
 .btn-maps { background:#4285F4; color:#fff; width:95%; }
+.btn-pix { background:#00c853; color:#fff; width:95%; }
 input { width:95%; padding:10px; margin:10px 0; border-radius:5px; border:none; }
 
 #comprovante { display:none; background:#222; padding:15px; margin-top:10px; border-radius:10px; }
+textarea { width:95%; height:80px; border-radius:5px; margin-top:10px; }
 </style>
 </head>
 
@@ -42,7 +44,6 @@ input { width:95%; padding:10px; margin:10px 0; border-radius:5px; border:none; 
 
 <div class="box">
 <input type="text" id="destino" placeholder="Digite o destino">
-
 <button class="btn-maps" onclick="abrirMaps()">Abrir no Google Maps</button>
 </div>
 
@@ -57,8 +58,40 @@ input { width:95%; padding:10px; margin:10px 0; border-radius:5px; border:none; 
 <button onclick="compartilhar()" style="width:100%;background:#00c853;color:white;">
 Compartilhar
 </button>
+
+<!-- PIX -->
+<button class="btn-pix" onclick="gerarPixTela()">💰 Gerar Pix</button>
+<textarea id="pixCode" readonly placeholder="Código Pix aparece aqui"></textarea>
+<button class="btn-pix" onclick="copiarPix()">📋 Copiar Pix</button>
+<img id="qrPix" style="width:200px;margin:10px auto;display:block;border-radius:10px;" />
+<div id="historico" class="box">
+<h3>📊 Histórico de Corridas</h3>
+
+<p id="totalDia"></p>
+<p id="totalMes"></p>
+
+<div id="listaHistorico"></div>
+
+<button onclick="limparHistorico()" style="background:#555;color:#fff;width:100%;">
+🧹 Limpar Histórico
+</button>
+
 </div>
 
+<!-- FIM DO COMPROVANTE -->
+
+<!-- HISTÓRICO -->
+<div id="historico" class="box">
+<h3>📊 Histórico de Corridas</h3>
+
+<p id="totalDia"></p>
+<p id="totalMes"></p>
+
+<div id="listaHistorico"></div>
+
+<button onclick="limparHistorico()" style="background:#555;color:#fff;width:100%;">
+🧹 Limpar Histórico
+</button>
 </div>
 
 <script>
@@ -70,6 +103,11 @@ let rodando = false;
 
 let ultimaPosicao = null;
 let watchId = null;
+
+// CONFIG PIX
+const PIX_KEY = "+5586981291332";
+const NOME = "MOTO TAXI ADRIANO".substring(0,25);
+const CIDADE = "TERESINA".substring(0,15);
 
 // 🚀 INICIAR
 function iniciar(){
@@ -94,7 +132,6 @@ function iniciar(){
      let lon = pos.coords.longitude;
      let precisao = pos.coords.accuracy;
 
-     // 🔥 ignora GPS ruim
      if(precisao > 30) return;
 
      if(ultimaPosicao){
@@ -105,7 +142,6 @@ function iniciar(){
          lon
        );
 
-       // 🔥 só soma se mover mesmo
        if(distancia > 0.03){
          km += distancia;
        }
@@ -113,12 +149,6 @@ function iniciar(){
 
      ultimaPosicao = {lat, lon};
 
-   }, erro => {
-     alert("Ative o GPS");
-   }, {
-     enableHighAccuracy: true,
-     maximumAge: 0,
-     timeout: 10000
    });
  }
 }
@@ -187,17 +217,104 @@ function atualizarDisplay(){
  tipo;
 }
 
-// 🧾 COMPROVANTE
+// 🧾 COMPROVANTE + HISTÓRICO
 function gerarComprovante(){
+
  let destino = document.getElementById("destino").value || "Não informado";
 
+ let valor = document.getElementById("valorDisplay").innerText;
+ let distancia = document.getElementById("distancia").innerText;
+ let tempo = document.getElementById("tempo").innerText;
+ let tarifa = document.getElementById("tipoTarifa").innerText;
+
+ let agora = new Date();
+
+ let data = agora.toLocaleDateString();
+ let hora = agora.toLocaleTimeString();
+
+ let registro = {
+   destino,
+   valor,
+   distancia,
+   tempo,
+   tarifa,
+   data,
+   hora,
+   timestamp: agora.getTime()
+ };
+
+ // SALVAR
+ let historico = JSON.parse(localStorage.getItem("corridas") || "[]");
+ historico.unshift(registro);
+ localStorage.setItem("corridas", JSON.stringify(historico));
+
+ // MOSTRAR HISTÓRICO
+ mostrarHistorico();
+
+ // COMPROVANTE
  document.getElementById("compDestino").innerText = "Destino: " + destino;
- document.getElementById("compValor").innerText = "Valor: " + document.getElementById("valorDisplay").innerText;
- document.getElementById("compKm").innerText = "Distância: " + document.getElementById("distancia").innerText;
- document.getElementById("compTempo").innerText = "Tempo: " + document.getElementById("tempo").innerText;
- document.getElementById("compTarifa").innerText = "Tarifa: " + document.getElementById("tipoTarifa").innerText;
+ document.getElementById("compValor").innerText = "Valor: " + valor;
+ document.getElementById("compKm").innerText = "Distância: " + distancia;
+ document.getElementById("compTempo").innerText = "Tempo: " + tempo;
+ document.getElementById("compTarifa").innerText = "Tarifa: " + tarifa;
 
  document.getElementById("comprovante").style.display = "block";
+}
+
+// 📊 HISTÓRICO
+function mostrarHistorico(){
+
+ let historico = JSON.parse(localStorage.getItem("corridas") || "[]");
+
+ let lista = document.getElementById("listaHistorico");
+ if(!lista) return;
+
+ lista.innerHTML = "";
+
+ let hoje = new Date().toLocaleDateString();
+ let mesAtual = new Date().getMonth();
+
+ let totalDia = 0;
+ let totalMes = 0;
+
+ historico.forEach(c => {
+
+   let valorNum = parseFloat(c.valor.replace("R$","").replace(",","."));
+
+   if(c.data === hoje){
+     totalDia += valorNum;
+   }
+
+   let dataObj = new Date(c.timestamp);
+   if(dataObj.getMonth() === mesAtual){
+     totalMes += valorNum;
+   }
+
+   let item = document.createElement("div");
+   item.style.borderBottom = "1px solid #555";
+   item.style.margin = "5px";
+   item.style.padding = "5px";
+
+   item.innerHTML =
+     `<b>${c.destino}</b><br>
+      ${c.valor} | ${c.data} ${c.hora}`;
+
+   lista.appendChild(item);
+ });
+
+ let totalDiaEl = document.getElementById("totalDia");
+ let totalMesEl = document.getElementById("totalMes");
+
+ if(totalDiaEl)
+   totalDiaEl.innerText = "💰 Hoje: R$ " + totalDia.toFixed(2);
+
+ if(totalMesEl)
+   totalMesEl.innerText = "📅 Mês: R$ " + totalMes.toFixed(2);
+}
+
+function limparHistorico(){
+ localStorage.removeItem("corridas");
+ mostrarHistorico();
 }
 
 // 📤 WHATSAPP
@@ -226,12 +343,72 @@ function abrirMaps(){
  "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(destino);
 }
 
+// 🔥 PIX (NÃO ALTERADO)
+function campo(id, valor){
+ return id + valor.length.toString().padStart(2,'0') + valor;
+}
+
+function crc16(payload){
+ let crc = 0xFFFF;
+ for (let i = 0; i < payload.length; i++){
+  crc ^= payload.charCodeAt(i) << 8;
+  for (let j = 0; j < 8; j++){
+   crc = (crc & 0x8000) ? (crc << 1) ^ 0x1021 : crc << 1;
+  }
+ }
+ return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4,"0");
+}
+
+function gerarPIX(valor){
+ const valorStr = valor.toFixed(2);
+ const txid = "MTX" + Date.now().toString().slice(-6);
+
+ let payload =
+ "000201"+
+ campo("26", campo("00","BR.GOV.BCB.PIX")+campo("01",PIX_KEY))+
+ "52040000"+
+ "5303986"+
+ campo("54",valorStr)+
+ "5802BR"+
+ campo("59",NOME)+
+ campo("60",CIDADE)+
+ campo("62",campo("05",txid));
+
+ payload += "6304"+crc16(payload);
+ return payload;
+}
+
+function gerarPixTela(){
+ let valor = parseFloat(
+  document.getElementById("valorDisplay").innerText
+   .replace("R$","")
+   .replace(",",".")
+ );
+
+ let pix = gerarPIX(valor);
+ document.getElementById("pixCode").value = pix;
+
+ let qr = document.getElementById("qrPix");
+ qr.src = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(pix);
+}
+
+function copiarPix(){
+ let campo = document.getElementById("pixCode");
+ campo.select();
+ document.execCommand("copy");
+ alert("Pix copiado!");
+}
+
+// 🔄 CARREGAR HISTÓRICO AO ABRIR
+window.onload = function(){
+ mostrarHistorico();
+};
+
 // SERVICE WORKER
 if ('serviceWorker' in navigator) {
  navigator.serviceWorker.register('service-worker.js');
 }
 
 </script>
-
 </body>
 </html>
