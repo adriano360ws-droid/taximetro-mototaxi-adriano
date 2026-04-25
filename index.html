@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#00c853">
-<link rel="icon" href="icone-192.png">
-<link rel="apple-touch-icon" href="icone-192.png">
 <title>Taxímetro Pro</title>
 
 <style>
@@ -46,7 +44,6 @@ textarea { width:95%; height:80px; border-radius:5px; margin-top:10px; }
 <button class="btn-maps" onclick="abrirMaps()">Abrir no Google Maps</button>
 </div>
 
-<!-- COMPROVANTE -->
 <div id="comprovante">
 <h3>Comprovante</h3>
 <p id="compDestino"></p>
@@ -59,14 +56,12 @@ textarea { width:95%; height:80px; border-radius:5px; margin-top:10px; }
 Compartilhar
 </button>
 
-<!-- PIX -->
 <button class="btn-pix" onclick="gerarPixTela()">💰 Gerar Pix</button>
 <textarea id="pixCode" readonly></textarea>
 <button class="btn-pix" onclick="copiarPix()">📋 Copiar Pix</button>
 <img id="qrPix" style="width:200px;margin:10px auto;display:block;border-radius:10px;" />
 </div>
 
-<!-- HISTÓRICO -->
 <div id="historico" class="box">
 <h3>📊 Histórico</h3>
 <p id="totalDia"></p>
@@ -94,7 +89,7 @@ const PIX_KEY = "+5586981291332";
 const NOME = "MOTO TAXI ADRIANO".substring(0,25);
 const CIDADE = "TERESINA".substring(0,15);
 
-// INICIAR
+// 🚀 INICIAR
 function iniciar(){
  if(rodando) return;
 
@@ -116,8 +111,14 @@ function iniciar(){
 
    let lat = pos.coords.latitude;
    let lon = pos.coords.longitude;
+   let precisao = pos.coords.accuracy;
+   let velocidade = pos.coords.speed;
 
-   if(pos.coords.accuracy > 30) return;
+   // 🔥 ignora GPS ruim
+   if(precisao > 25) return;
+
+   // 🔥 ignora se parado (menos de 2 m/s ≈ 7 km/h)
+   if(velocidade !== null && velocidade < 2) return;
 
    if(ultimaPosicao){
      let distancia = calcularDistancia(
@@ -127,17 +128,22 @@ function iniciar(){
        lon
      );
 
-     if(distancia > 0.05){ // 🔥 corrigido
+     // 🔥 ignora micro movimento
+     if(distancia > 0.08){
        km += distancia;
      }
    }
 
    ultimaPosicao = {lat, lon};
 
+ }, {
+   enableHighAccuracy: true,
+   maximumAge: 0,
+   timeout: 5000
  });
 }
 
-// PARAR
+// 🛑 PARAR
 function parar(){
  if(!rodando) return;
 
@@ -152,7 +158,7 @@ function parar(){
  gerarComprovante();
 }
 
-// DISTÂNCIA
+// 📏 DISTÂNCIA
 function calcularDistancia(lat1, lon1, lat2, lon2){
  const R = 6371;
  let dLat = (lat2 - lat1) * Math.PI/180;
@@ -166,7 +172,7 @@ function calcularDistancia(lat1, lon1, lat2, lon2){
  return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
 }
 
-// VALOR
+// 💰 VALOR
 function atualizarDisplay(){
 
  let base, valorKm, tipo;
@@ -186,7 +192,7 @@ function atualizarDisplay(){
  document.getElementById("tipoTarifa").innerText = tipo;
 }
 
-// COMPROVANTE + HISTÓRICO
+// 🧾 COMPROVANTE
 function gerarComprovante(){
 
  let destino = document.getElementById("destino").value || "Não informado";
@@ -220,7 +226,7 @@ function gerarComprovante(){
  document.getElementById("comprovante").style.display = "block";
 }
 
-// HISTÓRICO
+// 📊 HISTÓRICO
 function mostrarHistorico(){
 
  let historico = JSON.parse(localStorage.getItem("corridas") || "[]");
@@ -252,13 +258,13 @@ function limparHistorico(){
  mostrarHistorico();
 }
 
-// WHATSAPP
+// 📤 WHATSAPP
 function compartilhar(){
  let texto = document.getElementById("comprovante").innerText;
  window.location.href="https://wa.me/?text="+encodeURIComponent(texto);
 }
 
-// MAPS
+// 🗺️ MAPS
 function abrirMaps(){
  let d=document.getElementById("destino").value;
  window.location.href = d
@@ -266,7 +272,7 @@ function abrirMaps(){
  : "https://www.google.com/maps";
 }
 
-// PIX (intacto)
+// PIX (mantido)
 function campo(id,v){return id+v.length.toString().padStart(2,'0')+v;}
 function crc16(p){let c=0xFFFF;for(let i=0;i<p.length;i++){c^=p.charCodeAt(i)<<8;for(let j=0;j<8;j++){c=(c&0x8000)?(c<<1)^0x1021:c<<1;}}return(c&0xFFFF).toString(16).toUpperCase().padStart(4,"0");}
 function gerarPIX(valor){
