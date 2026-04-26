@@ -54,7 +54,6 @@ textarea { width:95%; height:80px; border-radius:5px; margin-top:10px; }
 <p id="compValor"></p>
 <p id="compKm"></p>
 <p id="compTempo"></p>
-<p id="compTarifa"></p>
 
 <button onclick="compartilhar()" style="width:100%;background:#00c853;color:white;">
 📲 Compartilhar
@@ -66,24 +65,18 @@ textarea { width:95%; height:80px; border-radius:5px; margin-top:10px; }
 <img id="qrPix" style="width:200px;margin:10px auto;display:block;border-radius:10px;" />
 </div>
 
-<div class="box">
-<h3>📊 Histórico</h3>
-<div id="listaHistorico"></div>
-<button onclick="limparHistorico()" style="background:#555;color:#fff;width:100%;">
-🧹 Limpar
-</button>
-</div>
-
 </div>
 
 <script>
 
 let timer, segundos=0, km=0, rodando=false;
 let ultimaPosicao=null, watchId=null;
+let tarifaAtual="";
 
+// PIX
 const PIX_KEY="+5586981291332";
-const NOME="MOTO TAXI ADRIANO".substring(0,25);
-const CIDADE="TERESINA".substring(0,15);
+const NOME="ADRIANO";
+const CIDADE="TERESINA";
 
 // INICIAR
 function iniciar(){
@@ -105,10 +98,8 @@ function iniciar(){
    let {latitude:lat, longitude:lon, accuracy}=pos.coords;
    if(accuracy>20) return;
 
-   let agora=Date.now();
-
    if(!ultimaPosicao){
-     ultimaPosicao={lat,lon,tempo:agora};
+     ultimaPosicao={lat,lon};
      return;
    }
 
@@ -116,10 +107,9 @@ function iniciar(){
      ultimaPosicao.lat, ultimaPosicao.lon, lat, lon
    );
 
-   if(distancia<0.02) return;
+   if(distancia>0.02) km+=distancia;
 
-   km+=distancia;
-   ultimaPosicao={lat,lon,tempo:agora};
+   ultimaPosicao={lat,lon};
 
  },{enableHighAccuracy:true});
 }
@@ -152,112 +142,123 @@ function calcularDistancia(lat1, lon1, lat2, lon2){
  return R*(2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
 }
 
-// VALOR
+// 🔥 VALOR + TARIFA INTELIGENTE
 function atualizarDisplay(){
- let base,valorKm,tipo;
 
- if(km<=5){base=2.5;valorKm=1;tipo="Econômica";}
- else if(km<=15){base=3;valorKm=1.1;tipo="Padrão";}
- else{base=4;valorKm=1.3;tipo="Premium";}
+ let hora = new Date().getHours();
 
- let total=Math.max(8,base+km*valorKm);
+ let minimo, tipo;
 
- document.getElementById("valorDisplay").innerText="R$ "+total.toFixed(2).replace(".",",");
- document.getElementById("distancia").innerText=km.toFixed(2)+" km";
- document.getElementById("tempo").innerText=
- Math.floor(segundos/60)+":"+String(segundos%60).padStart(2,"0");
- document.getElementById("tipoTarifa").innerText=tipo;
+ if(hora < 7){
+  minimo = 7;
+  tipo = "Madrugada";
+}
+ else if(hora < 19){
+   minimo = 8;
+   tipo = "Dia";
+ }
+ else{
+   minimo = 9;
+   tipo = "Noturna";
+ }
+
+ // som ao mudar
+ if(tarifaAtual && tarifaAtual !== tipo){
+   tocarSom();
+ }
+ tarifaAtual = tipo;
+
+ let total = Math.max(minimo, 2.5 + km*1.2);
+
+ document.getElementById("valorDisplay").innerText =
+ "R$ " + total.toFixed(2).replace(".",",");
+
+ document.getElementById("distancia").innerText =
+ km.toFixed(2)+" km";
+
+ document.getElementById("tempo").innerText =
+ Math.floor(segundos/60)+":"+
+ String(segundos%60).padStart(2,"0");
+
+ document.getElementById("tipoTarifa").innerText = tipo;
+
+ // cores
+ let cor = "#00e676";
+ if(tipo==="Madrugada") cor="#ff3b3b";
+ if(tipo==="Noturna") cor="#ffc107";
+
+ document.getElementById("valorDisplay").style.color = cor;
+}
+
+// 🔊 SOM
+function tocarSom(){
+ let audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
+ audio.play();
 }
 
 // COMPROVANTE
 function gerarComprovante(){
 
- let origem=document.getElementById("origem").value||"Não informado";
- let destino=document.getElementById("destino").value||"Não informado";
+ let origem = document.getElementById("origem").value || "Não informado";
+ let destino = document.getElementById("destino").value || "Não informado";
 
  let valor=document.getElementById("valorDisplay").innerText;
  let distancia=document.getElementById("distancia").innerText;
  let tempo=document.getElementById("tempo").innerText;
- let tarifa=document.getElementById("tipoTarifa").innerText;
-
- let agora=new Date();
- let data=agora.toLocaleDateString();
- let hora=agora.toLocaleTimeString();
-
- let registro={origem,destino,valor};
- let historico=JSON.parse(localStorage.getItem("corridas")||"[]");
- historico.unshift(registro);
- localStorage.setItem("corridas",JSON.stringify(historico));
-
- mostrarHistorico();
 
  document.getElementById("compOrigem").innerText="Saída: "+origem;
  document.getElementById("compDestino").innerText="Destino: "+destino;
  document.getElementById("compValor").innerText="Valor: "+valor;
  document.getElementById("compKm").innerText="Distância: "+distancia;
  document.getElementById("compTempo").innerText="Tempo: "+tempo;
- document.getElementById("compTarifa").innerText="Tarifa: "+tarifa;
 
  document.getElementById("comprovante").style.display="block";
 
- window.textoCorrida=
-`🚖 *COMPROVANTE DE CORRIDA*
+ window.textoCorrida = 
+`🚖 COMPROVANTE
 
-📍 Saída: ${origem}
-📍 Destino: ${destino}
+Saída: ${origem}
+Destino: ${destino}
 
-📅 ${data} ⏰ ${hora}
-
-📏 ${distancia}
-⏱ ${tempo}
-
-💼 ${tarifa}
-
-💰 *${valor}*`;
-}
-
-// HISTÓRICO
-function mostrarHistorico(){
- let h=JSON.parse(localStorage.getItem("corridas")||"[]");
- let lista=document.getElementById("listaHistorico");
- lista.innerHTML="";
-
- h.forEach(c=>{
-   let item=document.createElement("div");
-   item.innerHTML=`${c.origem} ➜ ${c.destino} - ${c.valor}`;
-   lista.appendChild(item);
- });
-}
-
-function limparHistorico(){
- localStorage.removeItem("corridas");
- mostrarHistorico();
-}
-
-// WHATSAPP
-function compartilhar(){
- let texto=window.textoCorrida||"Corrida não disponível";
- window.open("https://wa.me/?text="+encodeURIComponent(texto));
+Valor: ${valor}
+Distância: ${distancia}
+Tempo: ${tempo}`;
 }
 
 // MAPS
 function abrirMaps(){
  let d=document.getElementById("destino").value;
- window.open(d
- ? "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(d)
- : "https://www.google.com/maps");
+ window.open("https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(d));
 }
 
-// PIX (corrigido)
+// PIX
+function campo(id,v){return id+v.length.toString().padStart(2,'0')+v;}
+function crc16(p){let c=0xFFFF;for(let i=0;i<p.length;i++){c^=p.charCodeAt(i)<<8;for(let j=0;j<8;j++){c=(c&0x8000)?(c<<1)^0x1021:c<<1;}}return(c&0xFFFF).toString(16).toUpperCase().padStart(4,"0");}
+
+function gerarPIX(valor){
+ let v=valor.toFixed(2);
+ let txid="MTX"+Date.now().toString().slice(-6);
+
+ let payload=
+ "000201"+
+ campo("26",campo("00","BR.GOV.BCB.PIX")+campo("01",PIX_KEY))+
+ "52040000"+
+ "5303986"+
+ campo("54",v)+
+ "5802BR"+
+ campo("59",NOME)+
+ campo("60",CIDADE)+
+ campo("62",campo("05",txid));
+
+ return payload+"6304"+crc16(payload);
+}
+
 function gerarPixTela(){
- let valor = document.getElementById("valorDisplay").innerText;
- valor = valor.replace("R$","").replace(",",".").trim();
+ let v=parseFloat(document.getElementById("valorDisplay").innerText.replace("R$","").replace(",","."));
+ let pix=gerarPIX(v);
 
- let pix = `00020126580014BR.GOV.BCB.PIX0136${PIX_KEY}52040000530398654${valor.length.toString().padStart(2,"0")}${valor}5802BR5913ADRIANO6010TERESINA62070503***6304`;
-
- document.getElementById("pixCode").value = pix;
- document.getElementById("qrPix").src =
- "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(pix);
+ document.getElementById("pixCode").value=pix;
+ document.getElementById("qrPix").src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data="+encodeURIComponent(pix);
 }
 
 function copiarPix(){
@@ -267,8 +268,12 @@ function copiarPix(){
  alert("Pix copiado!");
 }
 
-window.onload=mostrarHistorico;
+function compartilhar(){
+ let texto = window.textoCorrida || "Corrida não disponível";
+ window.location.href = "whatsapp://send?text=" + encodeURIComponent(texto);
+}
 
+// SERVICE WORKER
 if ('serviceWorker' in navigator) {
  navigator.serviceWorker.register('service-worker.js');
 }
