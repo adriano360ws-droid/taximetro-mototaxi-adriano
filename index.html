@@ -11,9 +11,23 @@ body { font-family: Arial; background:#1a1a1a; color:#fff; text-align:center; }
 .container { max-width:400px; margin:auto; }
 .box { background:#333; padding:15px; margin:10px; border-radius:10px; }
 
-#valorDisplay { font-size: 5em; font-weight: bold; }
+/* VALOR TOTAL BEM GRANDE */
+#valorDisplay { font-size: 6em; font-weight: bold; }
 
-button { padding:15px; margin:5px; border:none; border-radius:5px; font-size: 1em;}
+/* AUMENTEI MUITO A FONTE DA DISTÂNCIA E TEMPO */
+#distancia, #tempo { 
+    font-size: 3.5em; 
+    font-weight: bold;
+    color: #00e676;
+}
+
+/* TARIFA TAMBÉM UM POUCO MAIOR */
+#tipoTarifa {
+    font-size: 1.8em;
+    font-weight: bold;
+}
+
+button { padding:15px; margin:5px; border:none; border-radius:5px; font-size: 1.2em; font-weight: bold;}
 .btn-start { background:green; color:#fff; width:45%; }
 .btn-stop { background:red; color:#fff; width:45%; }
 .btn-maps { background:#4285F4; color:#fff; width:95%; }
@@ -21,13 +35,13 @@ button { padding:15px; margin:5px; border:none; border-radius:5px; font-size: 1e
 
 input {
   width:95%;
-  padding:10px;
+  padding:15px;
   margin:10px 0;
   border-radius:5px;
   border:none;
   background:#fff;
   color:#000;
-  font-size: 1em;
+  font-size: 1.2em;
 }
 
 #comprovante {
@@ -50,13 +64,15 @@ textarea {
 
 <div class="container">
 
-<h2>🚖 Taxímetro Pro</h2>
+<h2 style="font-size: 2em;">🚖 Taxímetro Pro</h2>
 
 <div class="box">
 <div id="valorDisplay">R$ 0,00</div>
-<p>Distância: <span id="distancia">0.00 km</span></p>
-<p>Tempo: <span id="tempo">00:00</span></p>
-<p>Tarifa: <span id="tipoTarifa">-</span></p>
+
+<p style="font-size: 1.2em; margin: 10px 0 0 0;">Distância: <span id="distancia">0.00 km</span></p>
+<p style="font-size: 1.2em; margin: 10px 0 0 0;">Tempo: <span id="tempo">00:00</span></p>
+
+<p style="margin-top:15px;">Tarifa: <span id="tipoTarifa">-</span></p>
 </div>
 
 <button class="btn-start" onclick="iniciar()">INICIAR</button>
