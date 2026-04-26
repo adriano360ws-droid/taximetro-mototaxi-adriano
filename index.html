@@ -3,20 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#00c853">
-
 <title>Taxímetro Pro</title>
-
 <style>
 body { font-family: Arial; background:#1a1a1a; color:#fff; text-align:center; }
 .container { max-width:400px; margin:auto; }
 .box { background:#333; padding:15px; margin:10px; border-radius:10px; }
 
-#valorDisplay { font-size:3em; }
+#valorDisplay { font-size: 5em; font-weight: bold; }
 
-button { padding:15px; margin:5px; border:none; border-radius:5px; }
+button { padding:15px; margin:5px; border:none; border-radius:5px; font-size: 1em;}
 .btn-start { background:green; color:#fff; width:45%; }
 .btn-stop { background:red; color:#fff; width:45%; }
 .btn-maps { background:#4285F4; color:#fff; width:95%; }
@@ -30,6 +27,7 @@ input {
   border:none;
   background:#fff;
   color:#000;
+  font-size: 1em;
 }
 
 #comprovante {
@@ -48,7 +46,6 @@ textarea {
 }
 </style>
 </head>
-
 <body>
 
 <div class="container">
@@ -97,6 +94,12 @@ let timer, segundos=0, km=0, rodando=false;
 let ultimaPosicao=null, watchId=null;
 let tarifaAtual="";
 
+// DADOS DO MOTOTAXISTA
+const NOME_MOTO = "Adriano Souza";
+const TELEFONE = "(86) 98129-1332";
+const VEICULO = "Fan CG 125 Preta";
+const PLACA = "QRP-5G89";
+
 // PIX
 const PIX_KEY="+5586981291332";
 const NOME="ADRIANO";
@@ -107,7 +110,9 @@ function iniciar(){
  if(rodando) return;
 
  rodando=true;
- segundos=0; km=0; ultimaPosicao=null;
+ segundos=0; 
+ km=0; 
+ ultimaPosicao=null;
 
  document.getElementById("comprovante").style.display="none";
 
@@ -136,29 +141,16 @@ function iniciar(){
     lon
   );
 
-  // filtro melhorado (IMPORTANTE)
-  if(distancia > 0.001 && distancia < 1){
+  if(distancia > 0.001 && distancia < 2){
     km += distancia;
   }
 
   ultimaPosicao = { lat, lon };
 
-}, {
-  enableHighAccuracy: true,
-  maximumAge: 2000,
-  timeout: 10000
-});
-  // evita erro de GPS (salto falso)
-if(distancia > 0.001 && distancia < 1){
-  km += distancia;
-}
-
-  ultimaPosicao = { lat, lon };
-
  }, {
   enableHighAccuracy: true,
-  maximumAge: 0,
-  timeout: 5000
+  maximumAge: 1000,
+  timeout: 10000
  });
 }
 
@@ -177,7 +169,7 @@ function parar(){
  gerarComprovante();
 }
 
-// DISTÂNCIA
+// CÁLCULO DE DISTÂNCIA
 function calcularDistancia(lat1, lon1, lat2, lon2){
  const R=6371;
  let dLat=(lat2-lat1)*Math.PI/180;
@@ -190,31 +182,42 @@ function calcularDistancia(lat1, lon1, lat2, lon2){
  return R*(2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
 }
 
-// VALOR + TARIFA
+// ATUALIZAR VALORES NA TELA
 function atualizarDisplay(){
 
  let hora = new Date().getHours();
- let minimo, tipo;
+ let minimo, bandeirada, valorKm, tipo, cor;
 
+ // === TABELA DE PREÇOS ===
  if(hora < 7){
-   minimo = 7;
+   minimo = 10.00; 
+   bandeirada = 4.00;
+   valorKm = 1.15;
    tipo = "Madrugada";
+   cor = "#ff3b3b";
  }
  else if(hora < 19){
-   minimo = 8;
+   minimo = 8.00;
+   bandeirada = 3.00;
+   valorKm = 1.20;
    tipo = "Dia";
+   cor = "#00e676";
  }
- else{
-   minimo = 9;
+ else {
+   minimo = 9.00;
+   bandeirada = 4.00;
+   valorKm = 1.30;
    tipo = "Noturna";
+   cor = "#ffc107";
  }
+ // =======================
 
  if(tarifaAtual && tarifaAtual !== tipo){
    tocarSom();
  }
  tarifaAtual = tipo;
 
- let total = Math.max(minimo, 2.5 + km*1.2);
+ let total = Math.max(minimo, bandeirada + (km * valorKm));
 
  document.getElementById("valorDisplay").innerText =
  "R$ " + total.toFixed(2).replace(".",",");
@@ -227,21 +230,18 @@ function atualizarDisplay(){
  String(segundos%60).padStart(2,"0");
 
  document.getElementById("tipoTarifa").innerText = tipo;
-
- let cor = "#00e676";
- if(tipo==="Madrugada") cor="#ff3b3b";
- if(tipo==="Noturna") cor="#ffc107";
-
  document.getElementById("valorDisplay").style.color = cor;
 }
 
 // SOM
 function tocarSom(){
- let audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
- audio.play();
+ try {
+    let audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
+    audio.play();
+ } catch(e){}
 }
 
-// COMPROVANTE
+// GERAR COMPROVANTE
 function gerarComprovante(){
 
  let origem = document.getElementById("origem").value || "Não informado";
@@ -251,6 +251,16 @@ function gerarComprovante(){
  let distancia=document.getElementById("distancia").innerText;
  let tempo=document.getElementById("tempo").innerText;
 
+ // PEGAR DATA ATUAL
+ let data = new Date();
+ let dia = data.getDate().toString().padStart(2,'0');
+ let mes = (data.getMonth()+1).toString().padStart(2,'0');
+ let ano = data.getFullYear();
+ 
+ let diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
+ let diaSemana = diasSemana[data.getDay()];
+ let dataFormatada = `${dia} de ${mes}/${ano} - ${diaSemana}`;
+
  document.getElementById("compOrigem").innerText="Saída: "+origem;
  document.getElementById("compDestino").innerText="Destino: "+destino;
  document.getElementById("compValor").innerText="Valor: "+valor;
@@ -259,24 +269,37 @@ function gerarComprovante(){
 
  document.getElementById("comprovante").style.display="block";
 
+ // TEXTO PARA O WHATSAPP COMPLETO E BONITO
  window.textoCorrida = 
-`🚖 COMPROVANTE
+`🛵 COMPROVANTE DE CORRIDA
 
-Saída: ${origem}
-Destino: ${destino}
+📅 ${dataFormatada}
+⏰ Horário: ${data.toLocaleTimeString('pt-BR')}
 
-Valor: ${valor}
-Distância: ${distancia}
-Tempo: ${tempo}`;
+🚏 Saída: ${origem}
+📍 Destino: ${destino}
+
+💰 Valor: ${valor}
+📏 Distância: ${distancia}
+⏱ Tempo: ${tempo}
+
+👤 Mototaxista: ${NOME_MOTO}
+📞 Contato: ${TELEFONE}
+🏍 Veículo: ${VEICULO}
+🔤 Placa: ${PLACA}
+
+✅ Obrigado pela preferência!
+Volte sempre que precisar, foi um prazer te levar com segurança e agilidade.
+Deus abençoe seu passeio! 🙏🚀`;
 }
 
-// MAPS
+// MAPAS
 function abrirMaps(){
  let d=document.getElementById("destino").value;
  window.open("https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(d));
 }
 
-// PIX
+// FUNÇÕES PIX
 function campo(id,v){return id+v.length.toString().padStart(2,'0')+v;}
 function crc16(p){let c=0xFFFF;for(let i=0;i<p.length;i++){c^=p.charCodeAt(i)<<8;for(let j=0;j<8;j++){c=(c&0x8000)?(c<<1)^0x1021:c<<1;}}return(c&0xFFFF).toString(16).toUpperCase().padStart(4,"0");}
 
