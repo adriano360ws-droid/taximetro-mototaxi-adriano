@@ -7,7 +7,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#00c853">
 
-<title>TaxÃ­metro Pro</title>
+<title>Taxímetro Pro</title>
 
 <style>
 body { font-family: Arial; background:#1a1a1a; color:#fff; text-align:center; }
@@ -29,11 +29,11 @@ textarea { width:95%; height:80px; border-radius:5px; margin-top:10px; }
 
 <div class="container">
 
-<h2>ðŸš– TaxÃ­metro Pro</h2>
+<h2>🚖 Taxímetro Pro</h2>
 
 <div class="box">
 <div id="valorDisplay">R$ 0,00</div>
-<p>DistÃ¢ncia: <span id="distancia">0.00 km</span></p>
+<p>Distância: <span id="distancia">0.00 km</span></p>
 <p>Tempo: <span id="tempo">00:00</span></p>
 <p>Tarifa: <span id="tipoTarifa">-</span></p>
 </div>
@@ -42,12 +42,14 @@ textarea { width:95%; height:80px; border-radius:5px; margin-top:10px; }
 <button class="btn-stop" onclick="parar()">PARAR</button>
 
 <div class="box">
+<input type="text" id="origem" placeholder="Local de saída">
 <input type="text" id="destino" placeholder="Digite o destino">
 <button class="btn-maps" onclick="abrirMaps()">Abrir no Google Maps</button>
 </div>
 
 <div id="comprovante">
 <h3>Comprovante</h3>
+<p id="compOrigem"></p>
 <p id="compDestino"></p>
 <p id="compValor"></p>
 <p id="compKm"></p>
@@ -55,20 +57,20 @@ textarea { width:95%; height:80px; border-radius:5px; margin-top:10px; }
 <p id="compTarifa"></p>
 
 <button onclick="compartilhar()" style="width:100%;background:#00c853;color:white;">
-ðŸ“² Compartilhar
+📲 Compartilhar
 </button>
 
-<button class="btn-pix" onclick="gerarPixTela()">ðŸ’° Gerar Pix</button>
+<button class="btn-pix" onclick="gerarPixTela()">💰 Gerar Pix</button>
 <textarea id="pixCode" readonly></textarea>
-<button class="btn-pix" onclick="copiarPix()">ðŸ“‹ Copiar Pix</button>
+<button class="btn-pix" onclick="copiarPix()">📋 Copiar Pix</button>
 <img id="qrPix" style="width:200px;margin:10px auto;display:block;border-radius:10px;" />
 </div>
 
 <div class="box">
-<h3>ðŸ“Š HistÃ³rico</h3>
+<h3>📊 Histórico</h3>
 <div id="listaHistorico"></div>
 <button onclick="limparHistorico()" style="background:#555;color:#fff;width:100%;">
-ðŸ§¹ Limpar
+🧹 Limpar
 </button>
 </div>
 
@@ -79,10 +81,9 @@ textarea { width:95%; height:80px; border-radius:5px; margin-top:10px; }
 let timer, segundos=0, km=0, rodando=false;
 let ultimaPosicao=null, watchId=null;
 
-// PIX
 const PIX_KEY="+5586981291332";
-const NOME="MOTO TAXI ADRIANO";
-const CIDADE="TERESINA";
+const NOME="MOTO TAXI ADRIANO".substring(0,25);
+const CIDADE="TERESINA".substring(0,15);
 
 // INICIAR
 function iniciar(){
@@ -138,7 +139,7 @@ function parar(){
  gerarComprovante();
 }
 
-// DISTÃ‚NCIA
+// DISTÂNCIA
 function calcularDistancia(lat1, lon1, lat2, lon2){
  const R=6371;
  let dLat=(lat2-lat1)*Math.PI/180;
@@ -155,8 +156,8 @@ function calcularDistancia(lat1, lon1, lat2, lon2){
 function atualizarDisplay(){
  let base,valorKm,tipo;
 
- if(km<=5){base=2.5;valorKm=1;tipo="EconÃ´mica";}
- else if(km<=15){base=3;valorKm=1.1;tipo="PadrÃ£o";}
+ if(km<=5){base=2.5;valorKm=1;tipo="Econômica";}
+ else if(km<=15){base=3;valorKm=1.1;tipo="Padrão";}
  else{base=4;valorKm=1.3;tipo="Premium";}
 
  let total=Math.max(8,base+km*valorKm);
@@ -170,7 +171,10 @@ function atualizarDisplay(){
 
 // COMPROVANTE
 function gerarComprovante(){
- let destino=document.getElementById("destino").value||"NÃ£o informado";
+
+ let origem=document.getElementById("origem").value||"Não informado";
+ let destino=document.getElementById("destino").value||"Não informado";
+
  let valor=document.getElementById("valorDisplay").innerText;
  let distancia=document.getElementById("distancia").innerText;
  let tempo=document.getElementById("tempo").innerText;
@@ -180,48 +184,39 @@ function gerarComprovante(){
  let data=agora.toLocaleDateString();
  let hora=agora.toLocaleTimeString();
 
- let kmNum=parseFloat(distancia);
- let base,valorKm;
-
- if(kmNum<=5){base=2.5;valorKm=1;}
- else if(kmNum<=15){base=3;valorKm=1.1;}
- else{base=4;valorKm=1.3;}
-
- let calculo=`Base R$ ${base.toFixed(2)} + (${kmNum.toFixed(2)} km x R$ ${valorKm.toFixed(2)})`;
-
- let registro={destino,valor};
+ let registro={origem,destino,valor};
  let historico=JSON.parse(localStorage.getItem("corridas")||"[]");
  historico.unshift(registro);
  localStorage.setItem("corridas",JSON.stringify(historico));
 
  mostrarHistorico();
 
+ document.getElementById("compOrigem").innerText="Saída: "+origem;
  document.getElementById("compDestino").innerText="Destino: "+destino;
  document.getElementById("compValor").innerText="Valor: "+valor;
- document.getElementById("compKm").innerText="DistÃ¢ncia: "+distancia;
+ document.getElementById("compKm").innerText="Distância: "+distancia;
  document.getElementById("compTempo").innerText="Tempo: "+tempo;
  document.getElementById("compTarifa").innerText="Tarifa: "+tarifa;
 
  document.getElementById("comprovante").style.display="block";
 
  window.textoCorrida=
-`ðŸš– *COMPROVANTE DE CORRIDA*
+`🚖 *COMPROVANTE DE CORRIDA*
 
-ðŸ‘¤ Moto TÃ¡xi: ADRIANO
-ðŸ“ Destino: ${destino}
+📍 Saída: ${origem}
+📍 Destino: ${destino}
 
-ðŸ“… ${data} â° ${hora}
+📅 ${data} ⏰ ${hora}
 
-ðŸ“ ${distancia}
-â± ${tempo}
+📏 ${distancia}
+⏱ ${tempo}
 
-ðŸ’¼ ${tarifa}
-ðŸ§® ${calculo}
+💼 ${tarifa}
 
-ðŸ’° *${valor}*`;
+💰 *${valor}*`;
 }
 
-// HISTÃ“RICO
+// HISTÓRICO
 function mostrarHistorico(){
  let h=JSON.parse(localStorage.getItem("corridas")||"[]");
  let lista=document.getElementById("listaHistorico");
@@ -229,7 +224,7 @@ function mostrarHistorico(){
 
  h.forEach(c=>{
    let item=document.createElement("div");
-   item.innerHTML=`${c.destino} - ${c.valor}`;
+   item.innerHTML=`${c.origem} ➜ ${c.destino} - ${c.valor}`;
    lista.appendChild(item);
  });
 }
@@ -241,7 +236,7 @@ function limparHistorico(){
 
 // WHATSAPP
 function compartilhar(){
- let texto=window.textoCorrida||"Corrida nÃ£o disponÃ­vel";
+ let texto=window.textoCorrida||"Corrida não disponível";
  window.open("https://wa.me/?text="+encodeURIComponent(texto));
 }
 
@@ -253,52 +248,27 @@ function abrirMaps(){
  : "https://www.google.com/maps");
 }
 
-// PIX
-function campo(id,v){return id+v.length.toString().padStart(2,'0')+v;}
-function crc16(p){let c=0xFFFF;for(let i=0;i<p.length;i++){c^=p.charCodeAt(i)<<8;for(let j=0;j<8;j++){c=(c&0x8000)?(c<<1)^0x1021:c<<1;}}return(c&0xFFFF).toString(16).toUpperCase().padStart(4,"0");}
-
-function gerarPIX(valor){
-
- let v = valor.toFixed(2);
-
- let txid = "MTX" + Date.now().toString().slice(-6);
-
- let payload =
- "000201" +
- campo("26",
-   campo("00","BR.GOV.BCB.PIX") +
-   campo("01", PIX_KEY)
- ) +
- "52040000" +
- "5303986" +
- campo("54", v) +
- "5802BR" +
- campo("59", NOME) +
- campo("60", CIDADE) +
- campo("62",
-   campo("05", txid)
- );
-
- return payload + "6304" + crc16(payload);
-}
-
+// PIX (corrigido)
 function gerarPixTela(){
- let v=parseFloat(document.getElementById("valorDisplay").innerText.replace("R$","").replace(",","."));
- let pix=gerarPIX(v);
- document.getElementById("pixCode").value=pix;
- document.getElementById("qrPix").src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data="+encodeURIComponent(pix);
+ let valor = document.getElementById("valorDisplay").innerText;
+ valor = valor.replace("R$","").replace(",",".").trim();
+
+ let pix = `00020126580014BR.GOV.BCB.PIX0136${PIX_KEY}52040000530398654${valor.length.toString().padStart(2,"0")}${valor}5802BR5913ADRIANO6010TERESINA62070503***6304`;
+
+ document.getElementById("pixCode").value = pix;
+ document.getElementById("qrPix").src =
+ "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(pix);
 }
 
 function copiarPix(){
  let c=document.getElementById("pixCode");
- c.select();document.execCommand("copy");
+ c.select();
+ document.execCommand("copy");
  alert("Pix copiado!");
 }
 
-// INIT
 window.onload=mostrarHistorico;
 
-// SERVICE WORKER
 if ('serviceWorker' in navigator) {
  navigator.serviceWorker.register('service-worker.js');
 }
