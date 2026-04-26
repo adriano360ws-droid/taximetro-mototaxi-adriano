@@ -11,20 +11,20 @@ body { font-family: Arial; background:#1a1a1a; color:#fff; text-align:center; }
 .container { max-width:400px; margin:auto; }
 .box { background:#333; padding:15px; margin:10px; border-radius:10px; }
 
-/* VALOR TOTAL BEM GRANDE */
+/* VALOR TOTAL */
 #valorDisplay { font-size: 6em; font-weight: bold; }
 
-/* AUMENTEI MUITO A FONTE DA DISTÂNCIA E TEMPO */
+/* AUMENTEI MUITO A FONTE AQUI AGORA - GARANTIDO */
 #distancia, #tempo { 
-    font-size: 3.5em; 
-    font-weight: bold;
-    color: #00e676;
+    font-size: 4em !important; 
+    font-weight: bold !important;
+    color: #00e676 !important;
 }
 
-/* TARIFA TAMBÉM UM POUCO MAIOR */
+/* TARIFA COM BOLINHA VERDE */
 #tipoTarifa {
-    font-size: 1.8em;
-    font-weight: bold;
+    font-size: 2.5em !important;
+    font-weight: bold !important;
 }
 
 button { padding:15px; margin:5px; border:none; border-radius:5px; font-size: 1.2em; font-weight: bold;}
@@ -50,6 +50,7 @@ input {
   padding:15px;
   margin-top:10px;
   border-radius:10px;
+  font-size: 1.2em;
 }
 
 textarea {
@@ -69,10 +70,10 @@ textarea {
 <div class="box">
 <div id="valorDisplay">R$ 0,00</div>
 
-<p style="font-size: 1.2em; margin: 10px 0 0 0;">Distância: <span id="distancia">0.00 km</span></p>
-<p style="font-size: 1.2em; margin: 10px 0 0 0;">Tempo: <span id="tempo">00:00</span></p>
+<p style="font-size: 1.2em; margin: 15px 0 0 0;">Distância: <span id="distancia">0.00 km</span></p>
+<p style="font-size: 1.2em; margin: 15px 0 0 0;">Tempo: <span id="tempo">00:00</span></p>
 
-<p style="margin-top:15px;">Tarifa: <span id="tipoTarifa">-</span></p>
+<p style="font-size: 1.5em; margin-top:20px;">Tarifa: <span id="tipoTarifa">-</span></p>
 </div>
 
 <button class="btn-start" onclick="iniciar()">INICIAR</button>
@@ -209,21 +210,21 @@ function atualizarDisplay(){
    minimo = 10.00; 
    bandeirada = 4.00;
    valorKm = 1.15;
-   tipo = "Madrugada";
+   tipo = "🔴 Madrugada";
    cor = "#ff3b3b";
  }
  else if(hora < 19){
    minimo = 8.00;
    bandeirada = 3.00;
    valorKm = 1.20;
-   tipo = "Dia";
+   tipo = "🟢 Dia";
    cor = "#00e676";
  }
  else {
    minimo = 9.00;
    bandeirada = 4.00;
    valorKm = 1.30;
-   tipo = "Noturna";
+   tipo = "🟡 Noturna";
    cor = "#ffc107";
  }
  // =======================
@@ -238,6 +239,8 @@ function atualizarDisplay(){
  document.getElementById("valorDisplay").innerText =
  "R$ " + total.toFixed(2).replace(".",",");
 
+ document.getElementById("valorDisplay").style.color = cor;
+
  document.getElementById("distancia").innerText =
  km.toFixed(2)+" km";
 
@@ -246,7 +249,6 @@ function atualizarDisplay(){
  String(segundos%60).padStart(2,"0");
 
  document.getElementById("tipoTarifa").innerText = tipo;
- document.getElementById("valorDisplay").style.color = cor;
 }
 
 // SOM
