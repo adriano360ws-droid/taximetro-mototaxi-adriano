@@ -116,26 +116,50 @@ function iniciar(){
   atualizarDisplay();
  },1000);
 
- watchId=navigator.geolocation.watchPosition(pos=>{
-   if(!rodando) return;
+ watchId = navigator.geolocation.watchPosition(pos => {
 
-   let {latitude:lat, longitude:lon, accuracy}=pos.coords;
-   if(accuracy>20) return;
+  if(!rodando) return;
 
-   if(!ultimaPosicao){
-     ultimaPosicao={lat,lon};
-     return;
-   }
+  let { latitude:lat, longitude:lon, accuracy } = pos.coords;
 
-   let distancia=calcularDistancia(
-     ultimaPosicao.lat, ultimaPosicao.lon, lat, lon
-   );
+  if(accuracy > 100) return;
 
-   if(distancia>0.02) km+=distancia;
+  if(!ultimaPosicao){
+    ultimaPosicao = { lat, lon };
+    return;
+  }
 
-   ultimaPosicao={lat,lon};
+  let distancia = calcularDistancia(
+    ultimaPosicao.lat,
+    ultimaPosicao.lon,
+    lat,
+    lon
+  );
 
- },{enableHighAccuracy:true});
+  // filtro melhorado (IMPORTANTE)
+  if(distancia > 0.001 && distancia < 1){
+    km += distancia;
+  }
+
+  ultimaPosicao = { lat, lon };
+
+}, {
+  enableHighAccuracy: true,
+  maximumAge: 2000,
+  timeout: 10000
+});
+  // evita erro de GPS (salto falso)
+if(distancia > 0.001 && distancia < 1){
+  km += distancia;
+}
+
+  ultimaPosicao = { lat, lon };
+
+ }, {
+  enableHighAccuracy: true,
+  maximumAge: 0,
+  timeout: 5000
+ });
 }
 
 // PARAR
