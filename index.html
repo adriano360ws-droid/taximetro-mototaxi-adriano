@@ -9,19 +9,19 @@
 <style>
 body { font-family: Arial; background:#1a1a1a; color:#fff; text-align:center; }
 .container { max-width:400px; margin:auto; }
-.box { background:#333; padding:15px; margin:10px; border-radius:10px; }
+.box { background:#333; padding:15px; margin:10px border-radius:10px; }
 
 /* VALOR TOTAL */
 #valorDisplay { font-size: 6em; font-weight: bold; }
 
-/* AUMENTEI MUITO A FONTE AQUI AGORA - GARANTIDO */
+/* FONTE GIGANTE */
 #distancia, #tempo { 
     font-size: 4em !important; 
     font-weight: bold !important;
     color: #00e676 !important;
 }
 
-/* TARIFA COM BOLINHA VERDE */
+/* TARIFA COM BOLINHA */
 #tipoTarifa {
     font-size: 2.5em !important;
     font-weight: bold !important;
@@ -230,7 +230,7 @@ function atualizarDisplay(){
  // =======================
 
  if(tarifaAtual && tarifaAtual !== tipo){
-   tocarSom();
+   tocarSom(); // Toca o som alto aqui
  }
  tarifaAtual = tipo;
 
@@ -251,12 +251,15 @@ function atualizarDisplay(){
  document.getElementById("tipoTarifa").innerText = tipo;
 }
 
-// SOM
+// 🔊 SOM BEM ALTO E FORTE
 function tocarSom(){
- try {
-    let audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
-    audio.play();
- } catch(e){}
+  try {
+     let audio = new Audio("https://www.soundjay.com/button/sounds/beep-07.mp3");
+     audio.volume = 1.0; // Volume no MÁXIMO
+     audio.play();
+  } catch(e){
+     console.log("Erro ao tocar som");
+  }
 }
 
 // GERAR COMPROVANTE
@@ -350,13 +353,13 @@ function gerarPixTela(){
 function copiarPix(){
  let c=document.getElementById("pixCode");
  c.select();
- document.execCommand("copy");
+ document.execCommand("Copy");
  alert("Pix copiado!");
 }
 
 function compartilhar(){
  let texto = window.textoCorrida || "Corrida não disponível";
- window.location.href = "whatsapp://send?text=" + encodeURIComponent(texto);
+ window.location.href = "whatsapp://send?text="+encodeURIComponent(texto);
 }
 
 // SERVICE WORKER
