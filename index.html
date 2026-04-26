@@ -13,15 +13,31 @@
 body { font-family: Arial; background:#1a1a1a; color:#fff; text-align:center; }
 .container { max-width:400px; margin:auto; }
 .box { background:#333; padding:15px; margin:10px; border-radius:10px; }
-#valorDisplay { color:#0f0; font-size:3em; }
+#valorDisplay { font-size:3em; }
 button { padding:15px; margin:5px; border:none; border-radius:5px; }
 .btn-start { background:green; color:#fff; width:45%; }
 .btn-stop { background:red; color:#fff; width:45%; }
 .btn-maps { background:#4285F4; color:#fff; width:95%; }
 .btn-pix { background:#00c853; color:#fff; width:95%; }
-input { width:95%; padding:10px; margin:10px 0; border-radius:5px; border:none; }
+
+input {
+  width:95%;
+  padding:10px;
+  margin:10px 0;
+  border-radius:5px;
+  border:none;
+  background:#fff;
+  color:#000;
+}
+
 #comprovante { display:none; background:#222; padding:15px; margin-top:10px; border-radius:10px; }
-textarea { width:95%; height:80px; border-radius:5px; margin-top:10px; }
+
+textarea {
+  width:95%;
+  height:80px;
+  border-radius:5px;
+  margin-top:10px;
+}
 </style>
 </head>
 
@@ -142,17 +158,16 @@ function calcularDistancia(lat1, lon1, lat2, lon2){
  return R*(2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
 }
 
-// 🔥 VALOR + TARIFA INTELIGENTE
+// VALOR + TARIFA
 function atualizarDisplay(){
 
  let hora = new Date().getHours();
-
  let minimo, tipo;
 
  if(hora < 7){
-  minimo = 7;
-  tipo = "Madrugada";
-}
+   minimo = 7;
+   tipo = "Madrugada";
+ }
  else if(hora < 19){
    minimo = 8;
    tipo = "Dia";
@@ -162,7 +177,6 @@ function atualizarDisplay(){
    tipo = "Noturna";
  }
 
- // som ao mudar
  if(tarifaAtual && tarifaAtual !== tipo){
    tocarSom();
  }
@@ -182,7 +196,6 @@ function atualizarDisplay(){
 
  document.getElementById("tipoTarifa").innerText = tipo;
 
- // cores
  let cor = "#00e676";
  if(tipo==="Madrugada") cor="#ff3b3b";
  if(tipo==="Noturna") cor="#ffc107";
@@ -190,7 +203,7 @@ function atualizarDisplay(){
  document.getElementById("valorDisplay").style.color = cor;
 }
 
-// 🔊 SOM
+// SOM
 function tocarSom(){
  let audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
  audio.play();
