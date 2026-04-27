@@ -5,6 +5,8 @@
   "display": "standalone",
   "background_color": "#0e0e0e",
   "theme_color": "#00c853",
+  // 🔴 LINHA QUE ESTAVA FALTANDO
+  "permissions": ["geolocation"],
   "icons": [
     {
       "src": "./icone-192.png",
