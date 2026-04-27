@@ -61,7 +61,7 @@ textarea {
 }
 </style>
 </head>
-<body>
+<body onload="pedirPermissaoGPS()"> <!-- 🔴 LINHA ADICIONADA PARA PEDIR PERMISSÃO LOGO QUE ABRE -->
 
 <div class="container">
 
@@ -121,6 +121,18 @@ const PLACA = "QRP-5G89";
 const PIX_KEY="+5586981291332";
 const NOME="ADRIANO";
 const CIDADE="TERESINA";
+
+// 🔴 FUNÇÃO NOVA PARA PEDIR PERMISSÃO AO ABRIR
+function pedirPermissaoGPS(){
+  if ('geolocation' in navigator) {
+    navigator.geolocation.getCurrentPosition(function(){
+      console.log("GPS Permitido!");
+    }, function(erro){
+      console.log("GPS Negado! Código: " + erro.code);
+      alert("⚠️ ATENÇÃO: Você precisa permitir o acesso à localização nas configurações do Android para o app funcionar!");
+    });
+  }
+}
 
 // INICIAR
 function iniciar(){
@@ -256,10 +268,10 @@ function atualizarDisplay(){
  document.getElementById("tipoTarifa").innerText = tipo;
 }
 
-// 🔊 SOM
+// 🔊 SOM (TROQUEI O LINK QUE ESTAVA DANDO ERRO)
 function tocarSom(){
   try {
-     let audio = new Audio("https://upload.wikimedia.org/wikipedia/commons/8/8e/Beep-02.ogg");
+     let audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
      audio.volume = 1.0;
      audio.play();
   } catch(e){
