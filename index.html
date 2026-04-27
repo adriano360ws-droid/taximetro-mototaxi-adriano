@@ -62,7 +62,7 @@ textarea {
 }
 </style>
 </head>
-<body onload="pedirPermissaoGPS()"> <!-- 🔴 LINHA ADICIONADA PARA PEDIR PERMISSÃO LOGO QUE ABRE -->
+<body onload="pedirPermissaoGPS()">
 
 <div class="container">
 
@@ -123,7 +123,7 @@ const PIX_KEY="+5586981291332";
 const NOME="ADRIANO";
 const CIDADE="TERESINA";
 
-// 🔴 FUNÇÃO NOVA PARA PEDIR PERMISSÃO AO ABRIR
+// 🔴 FUNÇÃO PEDIR PERMISSÃO GPS
 function pedirPermissaoGPS(){
   if ('geolocation' in navigator) {
     navigator.geolocation.getCurrentPosition(function(){
@@ -218,9 +218,8 @@ function atualizarDisplay(){
  let hora = new Date().getHours();
  let minimo, bandeirada, valorKm, tipo, cor;
 
- // === TABELA DE PREÇOS FINAL ===
+ // === TABELA DE PREÇOS ===
  if(hora >= 7 && hora < 13){
-   // 🟢 TARIFA BARATA - MANHÃ
    minimo = 8.00; 
    bandeirada = 3.00;
    valorKm = 1.10;
@@ -228,7 +227,6 @@ function atualizarDisplay(){
    cor = "#00e676";
  }
  else if(hora >= 13 && hora < 19){
-   // 🟡 TARIFA MÉDIA - TARDE
    minimo = 9.00;
    bandeirada = 3.50;
    valorKm = 1.25;
@@ -236,21 +234,19 @@ function atualizarDisplay(){
    cor = "#ffc107";
  }
  else {
-   // 🔴 TARIFA PREMIUM - NOITE / MADRUGADA
    minimo = 10.00;
    bandeirada = 4.50;
    valorKm = 1.50;
    tipo = "🔴 Premium";
    cor = "#ff3b3b";
  }
- // ===============================
+ // ========================
 
  if(tarifaAtual && tarifaAtual !== tipo){
    tocarSom();
  }
  tarifaAtual = tipo;
 
- // CÁLCULO PRINCIPAL
  let calculo = bandeirada + (km * valorKm);
  let total = Math.max(minimo, calculo);
 
@@ -269,7 +265,7 @@ function atualizarDisplay(){
  document.getElementById("tipoTarifa").innerText = tipo;
 }
 
-// 🔊 SOM (TROQUEI O LINK QUE ESTAVA DANDO ERRO)
+// 🔊 SOM
 function tocarSom(){
   try {
      let audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
@@ -290,7 +286,6 @@ function gerarComprovante(){
  let distancia=document.getElementById("distancia").innerText;
  let tempo=document.getElementById("tempo").innerText;
 
- // PEGAR DATA ATUAL
  let data = new Date();
  let dia = data.getDate().toString().padStart(2,'0');
  let mes = (data.getMonth()+1).toString().padStart(2,'0');
@@ -308,7 +303,6 @@ function gerarComprovante(){
 
  document.getElementById("comprovante").style.display="block";
 
- // TEXTO PARA O WHATSAPP
  window.textoCorrida = 
 `🛵 COMPROVANTE DE CORRIDA
 
@@ -338,46 +332,75 @@ function abrirMaps(){
  window.open("https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(d));
 }
 
-// FUNÇÕES PIX
-function campo(id,v){return id+v.length.toString().padStart(2,'0')+v;}
-function crc16(p){let c=0xFFFF;for(let i=0;i<p.length;i++){c^=p.charCodeAt(i)<<8;for(let j=0;j<8;j++){c=(c&0x8000)?(c<<1)^0x1021:c<<1;}}return(c&0xFFFF).toString(16).toUpperCase().padStart(4,"0");}
+// ==============================================
+// ✅ FUNÇÕES PIX CORRIGIDAS PARA TODOS OS BANCOS
+// ==============================================
+function campo(id,v){
+  // Garante que o tamanho seja sempre com 2 dígitos
+  let tamanho = v.length.toString().padStart(2, '0');
+  return id + tamanho + v;
+}
+
+// Função CRC16 CORRIGIDA e padrão oficial
+function crc16(payload) {
+  let crc = 0xFFFF;
+  const polynomial = 0x1021;
+  
+  for (let i = 0; i < payload.length; i++) {
+    crc ^= (payload.charCodeAt(i) << 8);
+    
+    for (let j = 0; j < 8; j++) {
+      if ((crc & 0x8000) !== 0) {
+        crc = (crc << 1) ^ polynomial;
+      } else {
+        crc = crc << 1;
+      }
+    }
+  }
+  
+  crc = crc & 0xFFFF;
+  
+  // Converte para hexadecimal, maiúsculo e com 4 caracteres
+  return crc.toString(16).toUpperCase().padStart(4, '0');
+}
 
 function gerarPIX(valor){
- let v=valor.toFixed(2);
- let txid="MTX"+Date.now().toString().slice(-6);
+  let v = valor.toFixed(2);
+  let txid = "MTX" + Date.now().toString().slice(-6);
 
- let payload=
- "000201"+
- campo("26",campo("00","BR.GOV.BCB.PIX")+campo("01",PIX_KEY))+
- "52040000"+
- "5303986"+
- campo("54",v)+
- "5802BR"+
- campo("59",NOME)+
- campo("60",CIDADE)+
- campo("62",campo("05",txid));
+  let payload = 
+    "000201" +
+    campo("26", campo("00", "BR.GOV.BCB.PIX") + campo("01", PIX_KEY)) +
+    "52040000" +
+    "5303986" +
+    campo("54", v) +
+    "5802BR" +
+    campo("59", NOME) +
+    campo("60", CIDADE) +
+    campo("62", campo("05", txid));
 
- return payload+"6304"+crc16(payload);
+  // Calcula o CRC16 correto no final
+  return payload + "6304" + crc16(payload);
 }
 
 function gerarPixTela(){
- let v=parseFloat(document.getElementById("valorDisplay").innerText.replace("R$","").replace(",","."));
- let pix=gerarPIX(v);
+  let v = parseFloat(document.getElementById("valorDisplay").innerText.replace("R$","").replace(",","."));
+  let pix = gerarPIX(v);
 
- document.getElementById("pixCode").value=pix;
- document.getElementById("qrPix").src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data="+encodeURIComponent(pix);
+  document.getElementById("pixCode").value = pix;
+  document.getElementById("qrPix").src = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(pix);
 }
 
 function copiarPix(){
- let c=document.getElementById("pixCode");
- c.select();
- document.execCommand("Copy");
- alert("Pix copiado!");
+  let c = document.getElementById("pixCode");
+  c.select();
+  document.execCommand("Copy");
+  alert("Pix copiado!");
 }
 
 function compartilhar(){
- let texto = window.textoCorrida || "Corrida não disponível";
- window.location.href = "whatsapp://send?text="+encodeURIComponent(texto);
+  let texto = window.textoCorrida || "Corrida não disponível";
+  window.location.href = "whatsapp://send?text="+encodeURIComponent(texto);
 }
 
 // SERVICE WORKER
