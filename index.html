@@ -9,7 +9,7 @@
 <style>
 body { font-family: Arial; background:#1a1a1a; color:#fff; text-align:center; }
 .container { max-width:400px; margin:auto; }
-.box { background:#333; padding:15px; margin:10px border-radius:10px; }
+.box { background:#333; padding:15px; margin:10px; border-radius:10px; }
 
 /* VALOR TOTAL */
 #valorDisplay { font-size: 6em; font-weight: bold; }
@@ -205,36 +205,41 @@ function atualizarDisplay(){
  let hora = new Date().getHours();
  let minimo, bandeirada, valorKm, tipo, cor;
 
- // === TABELA DE PREÇOS ===
- if(hora < 7){
-   minimo = 10.00; 
-   bandeirada = 4.00;
-   valorKm = 1.15;
-   tipo = "🔴 Madrugada";
-   cor = "#ff3b3b";
- }
- else if(hora < 19){
-   minimo = 8.00;
+ // === TABELA DE PREÇOS FINAL ===
+ if(hora >= 7 && hora < 13){
+   // 🟢 TARIFA BARATA - MANHÃ
+   minimo = 8.00; 
    bandeirada = 3.00;
-   valorKm = 1.20;
-   tipo = "🟢 Dia";
+   valorKm = 1.10;
+   tipo = "🟢 Barata";
    cor = "#00e676";
  }
- else {
+ else if(hora >= 13 && hora < 19){
+   // 🟡 TARIFA MÉDIA - TARDE
    minimo = 9.00;
-   bandeirada = 4.00;
-   valorKm = 1.30;
-   tipo = "🟡 Noturna";
+   bandeirada = 3.50;
+   valorKm = 1.25;
+   tipo = "🟡 Média";
    cor = "#ffc107";
  }
- // =======================
+ else {
+   // 🔴 TARIFA PREMIUM - NOITE / MADRUGADA
+   minimo = 10.00;
+   bandeirada = 4.50;
+   valorKm = 1.50;
+   tipo = "🔴 Premium";
+   cor = "#ff3b3b";
+ }
+ // ===============================
 
  if(tarifaAtual && tarifaAtual !== tipo){
-   tocarSom(); // Toca o som alto aqui
+   tocarSom();
  }
  tarifaAtual = tipo;
 
- let total = Math.max(minimo, bandeirada + (km * valorKm));
+ // CÁLCULO PRINCIPAL
+ let calculo = bandeirada + (km * valorKm);
+ let total = Math.max(minimo, calculo);
 
  document.getElementById("valorDisplay").innerText =
  "R$ " + total.toFixed(2).replace(".",",");
@@ -251,11 +256,11 @@ function atualizarDisplay(){
  document.getElementById("tipoTarifa").innerText = tipo;
 }
 
-// 🔊 SOM BEM ALTO E FORTE
+// 🔊 SOM
 function tocarSom(){
   try {
-     let audio = new Audio("https://www.soundjay.com/button/sounds/beep-07.mp3");
-     audio.volume = 1.0; // Volume no MÁXIMO
+     let audio = new Audio("https://upload.wikimedia.org/wikipedia/commons/8/8e/Beep-02.ogg");
+     audio.volume = 1.0;
      audio.play();
   } catch(e){
      console.log("Erro ao tocar som");
@@ -290,7 +295,7 @@ function gerarComprovante(){
 
  document.getElementById("comprovante").style.display="block";
 
- // TEXTO PARA O WHATSAPP COMPLETO E BONITO
+ // TEXTO PARA O WHATSAPP
  window.textoCorrida = 
 `🛵 COMPROVANTE DE CORRIDA
 
