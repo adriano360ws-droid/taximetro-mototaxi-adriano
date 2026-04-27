@@ -8,406 +8,277 @@
 <meta name="theme-color" content="#00c853">
 <title>Taxímetro Pro</title>
 <style>
-body { font-family: Arial; background:#1a1a1a; color:#fff; text-align:center; }
-.container { max-width:400px; margin:auto; }
-.box { background:#333; padding:15px; margin:10px; border-radius:10px; }
+body { 
+    font-family: Arial, sans-serif; 
+    background: #1a1a1a; 
+    color: #fff; 
+    text-align: center; 
+    margin: 0; 
+    padding: 10px; 
+}
+.container { max-width: 400px; margin: auto; }
+.box { 
+    background: #333; 
+    padding: 15px; 
+    margin: 10px 0; 
+    border-radius: 10px; 
+}
 
-/* VALOR TOTAL */
-#valorDisplay { font-size: 6em; font-weight: bold; }
-
-/* FONTE GIGANTE */
+#valorDisplay { font-size: 4em; font-weight: bold; }
 #distancia, #tempo { 
-    font-size: 4em !important; 
+    font-size: 3em !important; 
     font-weight: bold !important;
     color: #00e676 !important;
 }
+#tipoTarifa { font-size: 2em !important; font-weight: bold; }
 
-/* TARIFA COM BOLINHA */
-#tipoTarifa {
-    font-size: 2.5em !important;
-    font-weight: bold !important;
+button { 
+    padding: 15px; 
+    margin: 5px; 
+    border: none; 
+    border-radius: 5px; 
+    font-size: 1.1em; 
+    font-weight: bold; 
+    cursor: pointer;
 }
-
-button { padding:15px; margin:5px; border:none; border-radius:5px; font-size: 1.2em; font-weight: bold;}
-.btn-start { background:green; color:#fff; width:45%; }
-.btn-stop { background:red; color:#fff; width:45%; }
-.btn-maps { background:#4285F4; color:#fff; width:95%; }
-.btn-pix { background:#00c853; color:#fff; width:95%; }
+.btn-start { background: green; color: #fff; width: 45%; }
+.btn-stop { background: red; color: #fff; width: 45%; }
+.btn-maps { background: #4285F4; color: #fff; width: 95%; }
+.btn-pix { background: #00c853; color: #fff; width: 95%; }
+.btn-history { background: #673AB7; color: #fff; width: 95%; margin-top: 10px; }
+.btn-clear { background: #FF5722; color: #fff; width: 100%; }
 
 input {
-  width:95%;
-  padding:15px;
-  margin:10px 0;
-  border-radius:5px;
-  border:none;
-  background:#fff;
-  color:#000;
-  font-size: 1.2em;
+    width: 95%;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: none;
+    background: #fff;
+    color: #000;
+    font-size: 1.1em;
 }
 
-#comprovante {
-  display:none;
-  background:#222;
-  padding:15px;
-  margin-top:10px;
-  border-radius:10px;
-  font-size: 1.2em;
+#comprovante, #historico {
+    display: none;
+    background: #222;
+    padding: 15px;
+    margin-top: 10px;
+    border-radius: 10px;
+    font-size: 1.1em;
 }
 
 textarea {
-  width:95%;
-  height:80px;
-  border-radius:5px;
-  margin-top:10px;
+    width: 95%;
+    height: 80px;
+    border-radius: 5px;
+    margin-top: 10px;
+    font-size: 1em;
+}
+
+.item-historico {
+    background: #333;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 8px;
+    text-align: left;
+    border-left: 5px solid #00c853;
 }
 </style>
 </head>
-<body onload="pedirPermissaoGPS()">
+<body>
 
 <div class="container">
 
-<h2 style="font-size: 2em;">🚖 Taxímetro Pro</h2>
+    <h2>🚖 Taxímetro Pro</h2>
 
-<div class="box">
-<div id="valorDisplay">R$ 0,00</div>
+    <div class="box">
+        <div id="valorDisplay">R$ 0,00</div>
+        <p>Distância: <span id="distancia">0.00 km</span></p>
+        <p>Tempo: <span id="tempo">00:00</span></p>
+        <p>Tarifa: <span id="tipoTarifa">-</span></p>
+    </div>
 
-<p style="font-size: 1.2em; margin: 15px 0 0 0;">Distância: <span id="distancia">0.00 km</span></p>
-<p style="font-size: 1.2em; margin: 15px 0 0 0;">Tempo: <span id="tempo">00:00</span></p>
+    <button class="btn-start" onclick="iniciar()">INICIAR</button>
+    <button class="btn-stop" onclick="parar()">PARAR</button>
 
-<p style="font-size: 1.5em; margin-top:20px;">Tarifa: <span id="tipoTarifa">-</span></p>
-</div>
+    <div class="box">
+        <input type="text" id="origem" placeholder="Local de saída">
+        <input type="text" id="destino" placeholder="Digite o destino">
+        <button class="btn-maps" onclick="abrirMaps()">Abrir no Google Maps</button>
+    </div>
 
-<button class="btn-start" onclick="iniciar()">INICIAR</button>
-<button class="btn-stop" onclick="parar()">PARAR</button>
+    <button class="btn-history" onclick="abrirHistorico()">📜 VER HISTÓRICO</button>
 
-<div class="box">
-<input type="text" id="origem" placeholder="Local de saída">
-<input type="text" id="destino" placeholder="Digite o destino">
-<button class="btn-maps" onclick="abrirMaps()">Abrir no Google Maps</button>
-</div>
+    <div id="comprovante">
+        <h3>📝 Comprovante</h3>
+        <p id="compOrigem"></p>
+        <p id="compDestino"></p>
+        <p id="compValor"></p>
+        <p id="compKm"></p>
+        <p id="compTempo"></p>
 
-<div id="comprovante">
-<h3>Comprovante</h3>
-<p id="compOrigem"></p>
-<p id="compDestino"></p>
-<p id="compValor"></p>
-<p id="compKm"></p>
-<p id="compTempo"></p>
+        <button onclick="compartilhar()" style="width:100%;background:#00c853;color:white;">📲 Compartilhar</button>
+        <button class="btn-pix" onclick="gerarPixTela()">💰 Gerar Pix</button>
+        <textarea id="pixCode" readonly></textarea>
+        <button class="btn-pix" onclick="copiarPix()">📋 Copiar Pix</button>
+        <img id="qrPix" style="width:200px;margin:10px auto;display:block;border-radius:10px;" />
+    </div>
 
-<button onclick="compartilhar()" style="width:100%;background:#00c853;color:white;">
-📲 Compartilhar
-</button>
-
-<button class="btn-pix" onclick="gerarPixTela()">💰 Gerar Pix</button>
-<textarea id="pixCode" readonly></textarea>
-<button class="btn-pix" onclick="copiarPix()">📋 Copiar Pix</button>
-<img id="qrPix" style="width:200px;margin:10px auto;display:block;border-radius:10px;" />
-</div>
+    <div id="historico">
+        <h3>📜 Histórico de Corridas</h3>
+        <div id="listaHistorico"></div>
+        <button class="btn-clear" onclick="limparHistorico()">🗑️ Limpar Todo o Histórico</button>
+        <button onclick="fecharHistorico()" style="width:100%;background:#555;color:white;margin-top:10px;">✖️ Fechar</button>
+    </div>
 
 </div>
 
 <script>
 
-let timer, segundos=0, km=0, rodando=false;
-let ultimaPosicao=null, watchId=null;
-let tarifaAtual="";
+let timer, segundos = 0, km = 0, rodando = false;
+let ultimaPosicao = null, watchId = null;
+let tarifaAtual = "";
 
-// DADOS DO MOTOTAXISTA
+// DADOS
 const NOME_MOTO = "Adriano Souza";
 const TELEFONE = "(86) 98129-1332";
 const VEICULO = "Fan CG 125 Preta";
 const PLACA = "QRP-5G89";
-
-// PIX
-const PIX_KEY="+5586981291332";
-const NOME="ADRIANO";
-const CIDADE="TERESINA";
-
-// 🔴 FUNÇÃO PEDIR PERMISSÃO GPS
-function pedirPermissaoGPS(){
-  if ('geolocation' in navigator) {
-    navigator.geolocation.getCurrentPosition(function(){
-      console.log("GPS Permitido!");
-    }, function(erro){
-      console.log("GPS Negado! Código: " + erro.code);
-      alert("⚠️ ATENÇÃO: Você precisa permitir o acesso à localização nas configurações do Android para o app funcionar!");
-    });
-  }
-}
+const PIX_KEY = "+5586981291332";
+const NOME = "ADRIANO ALVES DE OLIVEIRA";
+const CIDADE = "TERESINA";
 
 // INICIAR
-function iniciar(){
- if(rodando) return;
+function iniciar() {
+    if (rodando) return;
+    rodando = true;
+    segundos = 0; km = 0; ultimaPosicao = null;
+    document.getElementById("comprovante").style.display = "none";
 
- rodando=true;
- segundos=0; 
- km=0; 
- ultimaPosicao=null;
+    timer = setInterval(() => { segundos++; atualizarDisplay(); }, 1000);
 
- document.getElementById("comprovante").style.display="none";
+    watchId = navigator.geolocation.watchPosition(pos => {
+        if (!rodando) return;
+        let { latitude: lat, longitude: lon, accuracy } = pos.coords;
+        if (accuracy > 100) return;
 
- timer=setInterval(()=>{
-  segundos++;
-  atualizarDisplay();
- },1000);
+        if (!ultimaPosicao) { ultimaPosicao = { lat, lon }; return; }
 
- watchId = navigator.geolocation.watchPosition(pos => {
-
-  if(!rodando) return;
-
-  let { latitude:lat, longitude:lon, accuracy } = pos.coords;
-
-  if(accuracy > 100) return;
-
-  if(!ultimaPosicao){
-    ultimaPosicao = { lat, lon };
-    return;
-  }
-
-  let distancia = calcularDistancia(
-    ultimaPosicao.lat,
-    ultimaPosicao.lon,
-    lat,
-    lon
-  );
-
-  if(distancia > 0.001 && distancia < 2){
-    km += distancia;
-  }
-
-  ultimaPosicao = { lat, lon };
-
- }, {
-  enableHighAccuracy: true,
-  maximumAge: 1000,
-  timeout: 10000
- });
+        let distancia = calcularDistancia(ultimaPosicao.lat, ultimaPosicao.lon, lat, lon);
+        if (distancia > 0.001 && distancia < 2) km += distancia;
+        ultimaPosicao = { lat, lon };
+    }, { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 });
 }
 
 // PARAR
-function parar(){
- if(!rodando) return;
-
- rodando=false;
- clearInterval(timer);
-
- if(watchId){
-   navigator.geolocation.clearWatch(watchId);
-   watchId=null;
- }
-
- gerarComprovante();
+function parar() {
+    if (!rodando) return;
+    rodando = false;
+    clearInterval(timer);
+    if (watchId) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+    gerarComprovante();
 }
 
-// CÁLCULO DE DISTÂNCIA
-function calcularDistancia(lat1, lon1, lat2, lon2){
- const R=6371;
- let dLat=(lat2-lat1)*Math.PI/180;
- let dLon=(lon2-lon1)*Math.PI/180;
-
- let a=Math.sin(dLat/2)**2 +
- Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*
- Math.sin(dLon/2)**2;
-
- return R*(2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
+// CALCULO
+function calcularDistancia(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    let dLat = (lat2 - lat1) * Math.PI / 180;
+    let dLon = (lon2 - lon1) * Math.PI / 180;
+    let a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+    return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
 }
 
-// ATUALIZAR VALORES NA TELA
-function atualizarDisplay(){
+// ATUALIZAR TELA
+function atualizarDisplay() {
+    let hora = new Date().getHours();
+    let minimo, bandeirada, valorKm, tipo, cor;
 
- let hora = new Date().getHours();
- let minimo, bandeirada, valorKm, tipo, cor;
+    if (hora >= 7 && hora < 13) { minimo = 8.00; bandeirada = 3.00; valorKm = 1.10; tipo = "🟢 Barata"; cor = "#00e676"; }
+    else if (hora >= 13 && hora < 19) { minimo = 9.00; bandeirada = 3.50; valorKm = 1.25; tipo = "🟡 Média"; cor = "#ffc107"; }
+    else { minimo = 10.00; bandeirada = 4.50; valorKm = 1.50; tipo = "🔴 Premium"; cor = "#ff3b3b"; }
 
- // === TABELA DE PREÇOS ===
- if(hora >= 7 && hora < 13){
-   minimo = 8.00; 
-   bandeirada = 3.00;
-   valorKm = 1.10;
-   tipo = "🟢 Barata";
-   cor = "#00e676";
- }
- else if(hora >= 13 && hora < 19){
-   minimo = 9.00;
-   bandeirada = 3.50;
-   valorKm = 1.25;
-   tipo = "🟡 Média";
-   cor = "#ffc107";
- }
- else {
-   minimo = 10.00;
-   bandeirada = 4.50;
-   valorKm = 1.50;
-   tipo = "🔴 Premium";
-   cor = "#ff3b3b";
- }
- // ========================
+    tarifaAtual = tipo;
+    let total = Math.max(minimo, bandeirada + (km * valorKm));
 
- if(tarifaAtual && tarifaAtual !== tipo){
-   tocarSom();
- }
- tarifaAtual = tipo;
-
- let calculo = bandeirada + (km * valorKm);
- let total = Math.max(minimo, calculo);
-
- document.getElementById("valorDisplay").innerText =
- "R$ " + total.toFixed(2).replace(".",",");
-
- document.getElementById("valorDisplay").style.color = cor;
-
- document.getElementById("distancia").innerText =
- km.toFixed(2)+" km";
-
- document.getElementById("tempo").innerText =
- Math.floor(segundos/60)+":"+
- String(segundos%60).padStart(2,"0");
-
- document.getElementById("tipoTarifa").innerText = tipo;
+    document.getElementById("valorDisplay").innerText = "R$ " + total.toFixed(2).replace(".", ",");
+    document.getElementById("valorDisplay").style.color = cor;
+    document.getElementById("distancia").innerText = km.toFixed(2) + " km";
+    document.getElementById("tempo").innerText = Math.floor(segundos / 60) + ":" + String(segundos % 60).padStart(2, "0");
+    document.getElementById("tipoTarifa").innerText = tipo;
 }
 
-// 🔊 SOM
-function tocarSom(){
-  try {
-     let audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
-     audio.volume = 1.0;
-     audio.play();
-  } catch(e){
-     console.log("Erro ao tocar som");
-  }
+// COMPROVANTE
+function gerarComprovante() {
+    let origem = document.getElementById("origem").value || "Não informado";
+    let destino = document.getElementById("destino").value || "Não informado";
+    let valor = document.getElementById("valorDisplay").innerText;
+    let distancia = document.getElementById("distancia").innerText;
+    let tempo = document.getElementById("tempo").innerText;
+
+    let data = new Date();
+    let dataFormatada = `${data.getDate().toString().padStart(2,'0')}/${(data.getMonth()+1).toString().padStart(2,'0')}/${data.getFullYear()}`;
+    let hora = data.toLocaleTimeString('pt-BR');
+
+    document.getElementById("compOrigem").innerText = "Saída: " + origem;
+    document.getElementById("compDestino").innerText = "Destino: " + destino;
+    document.getElementById("compValor").innerText = "Valor: " + valor;
+    document.getElementById("compKm").innerText = "Distância: " + distancia;
+    document.getElementById("compTempo").innerText = "Tempo: " + tempo;
+    document.getElementById("comprovante").style.display = "block";
+
+    salvarNoHistorico(origem, destino, valor, distancia, tempo, dataFormatada, hora);
+
+    window.textoCorrida = `🛵 COMPROVANTE\n📅 ${dataFormatada} ⏰ ${hora}\n🚏 ${origem} → ${destino}\n💰 ${valor}\n📏 ${distancia}\n⏱ ${tempo}\n👤 ${NOME_MOTO}\n✅ Obrigado!`;
 }
 
-// GERAR COMPROVANTE
-function gerarComprovante(){
-
- let origem = document.getElementById("origem").value || "Não informado";
- let destino = document.getElementById("destino").value || "Não informado";
-
- let valor=document.getElementById("valorDisplay").innerText;
- let distancia=document.getElementById("distancia").innerText;
- let tempo=document.getElementById("tempo").innerText;
-
- let data = new Date();
- let dia = data.getDate().toString().padStart(2,'0');
- let mes = (data.getMonth()+1).toString().padStart(2,'0');
- let ano = data.getFullYear();
- 
- let diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
- let diaSemana = diasSemana[data.getDay()];
- let dataFormatada = `${dia} de ${mes}/${ano} - ${diaSemana}`;
-
- document.getElementById("compOrigem").innerText="Saída: "+origem;
- document.getElementById("compDestino").innerText="Destino: "+destino;
- document.getElementById("compValor").innerText="Valor: "+valor;
- document.getElementById("compKm").innerText="Distância: "+distancia;
- document.getElementById("compTempo").innerText="Tempo: "+tempo;
-
- document.getElementById("comprovante").style.display="block";
-
- window.textoCorrida = 
-`🛵 COMPROVANTE DE CORRIDA
-
-📅 ${dataFormatada}
-⏰ Horário: ${data.toLocaleTimeString('pt-BR')}
-
-🚏 Saída: ${origem}
-📍 Destino: ${destino}
-
-💰 Valor: ${valor}
-📏 Distância: ${distancia}
-⏱ Tempo: ${tempo}
-
-👤 Mototaxista: ${NOME_MOTO}
-📞 Contato: ${TELEFONE}
-🏍 Veículo: ${VEICULO}
-🔤 Placa: ${PLACA}
-
-✅ Obrigado pela preferência!
-Volte sempre que precisar, foi um prazer te levar com segurança e agilidade.
-Deus abençoe seu passeio! 🙏🚀`;
+// MAPS
+function abrirMaps() {
+    let d = document.getElementById("destino").value;
+    window.open("https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(d));
 }
 
-// MAPAS
-function abrirMaps(){
- let d=document.getElementById("destino").value;
- window.open("https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(d));
+// PIX
+function campo(id, v) { const t = String(v.length).padStart(2,'0'); return id + t + v; }
+function crc16(s) { let c = 0xFFFF, p = 0x1021; for(let i=0;i<s.length;i++){ c ^= s.charCodeAt(i) << 8; for(let j=0;j<8;j++) c = (c&0x8000)?(c<<1)^p:(c<<1); } return (c&0xFFFF).toString(16).toUpperCase().padStart(4,'0'); }
+function gerarPIX(valor) {
+    const v = Number(valor).toFixed(2);
+    const payload = "000201"+campo("26", campo("00", "br.gov.bcb.pix") + campo("01", PIX_KEY))+"520400005303986"+campo("54", v)+"5802BR"+campo("59", NOME)+campo("60", CIDADE)+"62070503***6304";
+    return payload + crc16(payload);
 }
-
-// ==============================================
-// ✅ FUNÇÕES PIX CORRIGIDAS PARA TODOS OS BANCOS
-// ==============================================
-function campo(id,v){
-  // Garante que o tamanho seja sempre com 2 dígitos
-  let tamanho = v.length.toString().padStart(2, '0');
-  return id + tamanho + v;
+function gerarPixTela() {
+    let v = parseFloat(document.getElementById("valorDisplay").innerText.replace("R$","").replace(",","."));
+    document.getElementById("pixCode").value = gerarPIX(v);
+    document.getElementById("qrPix").src = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(document.getElementById("pixCode").value);
 }
+function copiarPix() { let e = document.getElementById("pixCode"); e.select(); document.execCommand("Copy"); alert("Pix copiado!"); }
+function compartilhar() { if(navigator.share) navigator.share({text: window.textoCorrida}); else window.open("whatsapp://send?text="+encodeURIComponent(window.textoCorrida)); }
 
-// Função CRC16 CORRIGIDA e padrão oficial
-function crc16(payload) {
-  let crc = 0xFFFF;
-  const polynomial = 0x1021;
-  
-  for (let i = 0; i < payload.length; i++) {
-    crc ^= (payload.charCodeAt(i) << 8);
-    
-    for (let j = 0; j < 8; j++) {
-      if ((crc & 0x8000) !== 0) {
-        crc = (crc << 1) ^ polynomial;
-      } else {
-        crc = crc << 1;
-      }
-    }
-  }
-  
-  crc = crc & 0xFFFF;
-  
-  // Converte para hexadecimal, maiúsculo e com 4 caracteres
-  return crc.toString(16).toUpperCase().padStart(4, '0');
+// HISTORICO
+function salvarNoHistorico(o, d, v, dis, t, da, h) {
+    let hist = JSON.parse(localStorage.getItem('hist') || '[]');
+    hist.push({o, d, v, dis, t, da, h});
+    localStorage.setItem('hist', JSON.stringify(hist));
 }
-
-function gerarPIX(valor){
-  let v = valor.toFixed(2);
-  let txid = "MTX" + Date.now().toString().slice(-6);
-
-  let payload = 
-    "000201" +
-    campo("26", campo("00", "BR.GOV.BCB.PIX") + campo("01", PIX_KEY)) +
-    "52040000" +
-    "5303986" +
-    campo("54", v) +
-    "5802BR" +
-    campo("59", NOME) +
-    campo("60", CIDADE) +
-    campo("62", campo("05", txid));
-
-  // Calcula o CRC16 correto no final
-  return payload + "6304" + crc16(payload);
+function carregarHistorico() {
+    let hist = JSON.parse(localStorage.getItem('hist') || '[]');
+    let div = document.getElementById("listaHistorico");
+    div.innerHTML = "";
+    if(hist.length == 0) { div.innerHTML = "<p style='color:#aaa'>Nenhuma corrida salva.</p>"; return; }
+    hist.forEach((c, i) => {
+        let item = document.createElement("div");
+        item.className = "item-historico";
+        item.innerHTML = `<strong>Corrida ${i+1}</strong><br>📅 ${c.da} ⏰ ${c.h}<br>🚏 ${c.o} → ${c.d}<br>💰 ${c.v} | 📏 ${c.dis} | ⏱ ${c.t}`;
+        div.appendChild(item);
+    });
 }
+function abrirHistorico() { carregarHistorico(); document.getElementById("historico").style.display = "block"; }
+function fecharHistorico() { document.getElementById("historico").style.display = "none"; }
+function limparHistorico() { if(confirm("Tem certeza?")) { localStorage.removeItem('hist'); carregarHistorico(); } }
 
-function gerarPixTela(){
-  let v = parseFloat(document.getElementById("valorDisplay").innerText.replace("R$","").replace(",","."));
-  let pix = gerarPIX(v);
-
-  document.getElementById("pixCode").value = pix;
-  document.getElementById("qrPix").src = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(pix);
-}
-
-function copiarPix(){
-  let c = document.getElementById("pixCode");
-  c.select();
-  document.execCommand("Copy");
-  alert("Pix copiado!");
-}
-
-function compartilhar(){
-  let texto = window.textoCorrida || "Corrida não disponível";
-  window.location.href = "whatsapp://send?text="+encodeURIComponent(texto);
-}
-
-// SERVICE WORKER
 if ('serviceWorker' in navigator) {
  navigator.serviceWorker.register('service-worker.js');
 }
-
 </script>
 
 </body>
