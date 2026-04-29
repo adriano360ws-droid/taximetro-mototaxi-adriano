@@ -24,7 +24,7 @@ body {
     border-radius: 10px; 
 }
 
-#valorDisplay { font-size: 4em; font-weight: bold; }
+#valorDisplay { font-size: 3em; font-weight: bold; }
 #distancia, #tempo { 
     font-size: 3em !important; 
     font-weight: bold !important;
@@ -46,6 +46,7 @@ button {
 .btn-maps { background: #4285F4; color: #fff; width: 95%; }
 .btn-pix { background: #00c853; color: #fff; width: 95%; }
 .btn-history { background: #673AB7; color: #fff; width: 95%; margin-top: 10px; }
+.btn-table { background: #FF9800; color: #fff; width: 95%; margin-top: 10px; }
 .btn-clear { background: #FF5722; color: #fff; width: 100%; }
 
 input {
@@ -59,7 +60,7 @@ input {
     font-size: 1.1em;
 }
 
-#comprovante, #historico {
+#comprovante, #historico, #tabelaTarifas {
     display: none;
     background: #222;
     padding: 15px;
@@ -84,6 +85,26 @@ textarea {
     text-align: left;
     border-left: 5px solid #00c853;
 }
+
+/* ESTILO DA TABELA */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 0.9em;
+}
+th, td {
+    border: 1px solid #555;
+    padding: 10px;
+    text-align: center;
+}
+th {
+    background: #444;
+    color: #fff;
+}
+.tarifa-verde { background: #00e676; color: #000; font-weight: bold; }
+.tarifa-amarela { background: #ffc107; color: #000; font-weight: bold; }
+.tarifa-vermelha { background: #ff3b3b; color: #fff; font-weight: bold; }
 </style>
 </head>
 <body>
@@ -109,6 +130,7 @@ textarea {
     </div>
 
     <button class="btn-history" onclick="abrirHistorico()">📜 VER HISTÓRICO</button>
+    <button class="btn-table" onclick="abrirTabela()">📋 VER TABELA DE PREÇOS</button>
 
     <div id="comprovante">
         <h3>📝 Comprovante</h3>
@@ -132,6 +154,43 @@ textarea {
         <button onclick="fecharHistorico()" style="width:100%;background:#555;color:white;margin-top:10px;">✖️ Fechar</button>
     </div>
 
+    <div id="tabelaTarifas">
+        <h3>📋 Tabela de Preços</h3>
+        
+        <table>
+            <tr>
+                <th>Tarifa</th>
+                <th>Horário</th>
+                <th>Bandeirada</th>
+                <th>Valor KM</th>
+                <th>Mínimo</th>
+            </tr>
+            <tr>
+                <td class="tarifa-verde">🟢 Barata</td>
+                <td>07h às 13h</td>
+                <td>R$ 3,00</td>
+                <td>R$ 1,10</td>
+                <td>R$ 8,00</td>
+            </tr>
+            <tr>
+                <td class="tarifa-amarela">🟡 Média</td>
+                <td>13h às 19h</td>
+                <td>R$ 3,50</td>
+                <td>R$ 1,25</td>
+                <td>R$ 9,00</td>
+            </tr>
+            <tr>
+                <td class="tarifa-vermelha">🔴 Premium</td>
+                <td>19h às 07h</td>
+                <td>R$ 4,00</td>
+                <td>R$ 1,30</td>
+                <td>R$ 10,00</td>
+            </tr>
+        </table>
+
+        <button onclick="fecharTabela()" style="width:100%;background:#555;color:white;margin-top:15px;">✖️ Fechar Tabela</button>
+    </div>
+
 </div>
 
 <script>
@@ -139,6 +198,7 @@ textarea {
 let timer, segundos = 0, km = 0, rodando = false;
 let ultimaPosicao = null, watchId = null;
 let tarifaAtual = "";
+let ultimoTipoTarifa = "";
 
 // DADOS
 const NOME_MOTO = "Adriano Souza";
@@ -149,12 +209,37 @@ const PIX_KEY = "+5586981291332";
 const NOME = "ADRIANO ALVES DE OLIVEIRA";
 const CIDADE = "TERESINA";
 
+// 🔊 SOM
+function tocarSom(frequencia = 800, duracao = 200) {
+    try {
+        let audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let osc = audioContext.createOscillator();
+        let ganho = audioContext.createGain();
+        
+        osc.connect(ganho);
+        ganho.connect(audioContext.destination);
+        
+        osc.frequency.value = frequencia;
+        osc.type = "sine";
+        
+        ganho.gain.setValueAtTime(0.1, audioContext.currentTime);
+        ganho.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duracao/1000);
+        
+        osc.start(audioContext.currentTime);
+        osc.stop(audioContext.currentTime + duracao/1000);
+    } catch(e) {
+        console.log("Som não suportado");
+    }
+}
+
 // INICIAR
 function iniciar() {
     if (rodando) return;
     rodando = true;
     segundos = 0; km = 0; ultimaPosicao = null;
     document.getElementById("comprovante").style.display = "none";
+
+    tocarSom(900, 150);
 
     timer = setInterval(() => { segundos++; atualizarDisplay(); }, 1000);
 
@@ -177,6 +262,8 @@ function parar() {
     rodando = false;
     clearInterval(timer);
     if (watchId) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+    
+    tocarSom(600, 300);
     gerarComprovante();
 }
 
@@ -196,7 +283,12 @@ function atualizarDisplay() {
 
     if (hora >= 7 && hora < 13) { minimo = 8.00; bandeirada = 3.00; valorKm = 1.10; tipo = "🟢 Barata"; cor = "#00e676"; }
     else if (hora >= 13 && hora < 19) { minimo = 9.00; bandeirada = 3.50; valorKm = 1.25; tipo = "🟡 Média"; cor = "#ffc107"; }
-    else { minimo = 10.00; bandeirada = 4.50; valorKm = 1.50; tipo = "🔴 Premium"; cor = "#ff3b3b"; }
+    else { minimo = 10.00; bandeirada = 4.00; valorKm = 1.30; tipo = "🔴 Premium"; cor = "#ff3b3b"; }
+
+    if (ultimoTipoTarifa !== "" && ultimoTipoTarifa !== tipo) {
+        tocarSom(1000, 250);
+    }
+    ultimoTipoTarifa = tipo;
 
     tarifaAtual = tipo;
     let total = Math.max(minimo, bandeirada + (km * valorKm));
@@ -229,7 +321,16 @@ function gerarComprovante() {
 
     salvarNoHistorico(origem, destino, valor, distancia, tempo, dataFormatada, hora);
 
-    window.textoCorrida = `🛵 COMPROVANTE\n📅 ${dataFormatada} ⏰ ${hora}\n🚏 ${origem} → ${destino}\n💰 ${valor}\n📏 ${distancia}\n⏱ ${tempo}\n👤 ${NOME_MOTO}\n✅ Obrigado!`;
+    window.textoCorrida = `🛵 COMPROVANTE\n`+
+    `📅 ${dataFormatada} ⏰ ${hora}\n`+
+    `🚏 ${origem} → ${destino}\n`+
+    `💰 Valor: ${valor}\n`+
+    `📏 ${distancia} | ⏱ ${tempo}\n`+
+    `👤 ${NOME_MOTO}\n`+
+    `🏍️ ${VEICULO}\n`+
+    `🔤 PLACA: ${PLACA}\n`+
+    `📞 ${TELEFONE}\n`+
+    `✅ Obrigado pela preferência!`;
 }
 
 // MAPS
@@ -240,46 +341,101 @@ function abrirMaps() {
 
 // PIX
 function campo(id, v) { const t = String(v.length).padStart(2,'0'); return id + t + v; }
-function crc16(s) { let c = 0xFFFF, p = 0x1021; for(let i=0;i<s.length;i++){ c ^= s.charCodeAt(i) << 8; for(let j=0;j<8;j++) c = (c&0x8000)?(c<<1)^p:(c<<1); } return (c&0xFFFF).toString(16).toUpperCase().padStart(4,'0'); }
+function crc16(s) { 
+    let c = 0xFFFF, p = 0x1021; 
+    for(let i=0;i<s.length;i++){ 
+        c ^= s.charCodeAt(i) << 8; 
+        for(let j=0;j<8;j++) 
+            c = (c&0x8000)?(c<<1)^p:(c<<1); 
+    } 
+    return (c&0xFFFF).toString(16).toUpperCase().padStart(4,'0'); 
+}
+
 function gerarPIX(valor) {
     const v = Number(valor).toFixed(2);
     const payload = "000201"+campo("26", campo("00", "br.gov.bcb.pix") + campo("01", PIX_KEY))+"520400005303986"+campo("54", v)+"5802BR"+campo("59", NOME)+campo("60", CIDADE)+"62070503***6304";
     return payload + crc16(payload);
 }
+
 function gerarPixTela() {
     let v = parseFloat(document.getElementById("valorDisplay").innerText.replace("R$","").replace(",","."));
     document.getElementById("pixCode").value = gerarPIX(v);
     document.getElementById("qrPix").src = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(document.getElementById("pixCode").value);
 }
-function copiarPix() { let e = document.getElementById("pixCode"); e.select(); document.execCommand("Copy"); alert("Pix copiado!"); }
-function compartilhar() { if(navigator.share) navigator.share({text: window.textoCorrida}); else window.open("whatsapp://send?text="+encodeURIComponent(window.textoCorrida)); }
 
-// HISTORICO
-function salvarNoHistorico(o, d, v, dis, t, da, h) {
-    let hist = JSON.parse(localStorage.getItem('hist') || '[]');
-    hist.push({o, d, v, dis, t, da, h});
-    localStorage.setItem('hist', JSON.stringify(hist));
+function copiarPix() { 
+    let e = document.getElementById("pixCode"); 
+    e.select(); 
+    document.execCommand("Copy"); 
+    alert("Pix copiado!"); 
 }
-function carregarHistorico() {
-    let hist = JSON.parse(localStorage.getItem('hist') || '[]');
-    let div = document.getElementById("listaHistorico");
-    div.innerHTML = "";
-    if(hist.length == 0) { div.innerHTML = "<p style='color:#aaa'>Nenhuma corrida salva.</p>"; return; }
-    hist.forEach((c, i) => {
-        let item = document.createElement("div");
-        item.className = "item-historico";
-        item.innerHTML = `<strong>Corrida ${i+1}</strong><br>📅 ${c.da} ⏰ ${c.h}<br>🚏 ${c.o} → ${c.d}<br>💰 ${c.v} | 📏 ${c.dis} | ⏱ ${c.t}`;
-        div.appendChild(item);
+
+// COMPARTILHAR
+function compartilhar() { 
+    if(navigator.share) {
+        navigator.share({text: window.textoCorrida});
+    } else {
+        window.open("https://wa.me/?text=" + encodeURIComponent(window.textoCorrida));
+    }
+}
+
+// HISTÓRICO
+function salvarNoHistorico(origem, destino, valor, km, tempo, data, hora) {
+    let historico = JSON.parse(localStorage.getItem("historicoCorridas") || "[]");
+    let corrida = { origem, destino, valor, km, tempo, data, hora };
+    historico.unshift(corrida);
+    localStorage.setItem("historicoCorridas", JSON.stringify(historico));
+}
+
+function abrirHistorico() {
+    let historico = JSON.parse(localStorage.getItem("historicoCorridas") || "[]");
+    let lista = document.getElementById("listaHistorico");
+    lista.innerHTML = "";
+    if(historico.length === 0) {
+        lista.innerHTML = "<p>Nenhuma corrida registrada ainda.</p>";
+    } else {
+        historico.forEach((corrida, index) => {
+            let div = document.createElement("div");
+            div.className = "item-historico";
+            div.innerHTML = `
+                <strong>Corrida ${index + 1}</strong><br>
+                📅 ${corrida.data} ⏰ ${corrida.hora}<br>
+                🚏 ${corrida.origem} → ${corrida.destino}<br>
+                💰 Valor: ${corrida.valor} | 📏 ${corrida.km} | ⏱️ ${corrida.tempo}
+            `;
+            lista.appendChild(div);
+        });
+    }
+    document.getElementById("historico").style.display = "block";
+}
+
+function fecharHistorico() {
+    document.getElementById("historico").style.display = "none";
+}
+
+function limparHistorico() {
+    if(confirm("Tem certeza que deseja limpar todo o histórico?")) {
+        localStorage.removeItem("historicoCorridas");
+        abrirHistorico();
+    }
+}
+
+// TABELA
+function abrirTabela() {
+    document.getElementById("tabelaTarifas").style.display = "block";
+}
+
+function fecharTabela() {
+    document.getElementById("tabelaTarifas").style.display = "none";
+}
+
+// SERVICE WORKER
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js');
     });
 }
-function abrirHistorico() { carregarHistorico(); document.getElementById("historico").style.display = "block"; }
-function fecharHistorico() { document.getElementById("historico").style.display = "none"; }
-function limparHistorico() { if(confirm("Tem certeza?")) { localStorage.removeItem('hist'); carregarHistorico(); } }
 
-if ('serviceWorker' in navigator) {
- navigator.serviceWorker.register('service-worker.js');
-}
 </script>
-
 </body>
 </html>
