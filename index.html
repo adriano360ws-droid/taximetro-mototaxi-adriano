@@ -28,7 +28,7 @@ body {
 #distancia, #tempo { 
     font-size: 3em !important; 
     font-weight: bold !important;
-    color: #FFEB3B !important; /* AMARELO VIVO */
+    color: #FFEB3B !important;
 }
 
 #tipoTarifa { font-size: 2em !important; font-weight: bold; }
@@ -87,7 +87,6 @@ textarea {
     border-left: 5px solid #00c853;
 }
 
-/* ESTILO DA TABELA */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -244,12 +243,10 @@ function iniciar() {
 
     timer = setInterval(() => { segundos++; atualizarDisplay(); }, 1000);
 
-    // CONFIGURAÇÃO MELHORADA DO GPS
     watchId = navigator.geolocation.watchPosition(pos => {
         if (!rodando) return;
         let { latitude: lat, longitude: lon, accuracy } = pos.coords;
         
-        // Aumentei a tolerância da precisão para aceitar até 200 metros
         if (accuracy > 200) return;
 
         if (!ultimaPosicao) { 
@@ -259,10 +256,8 @@ function iniciar() {
 
         let distancia = calcularDistancia(ultimaPosicao.lat, ultimaPosicao.lon, lat, lon);
         
-        // Mudei para aceitar qualquer distância maior que 1 metro
         if (distancia > 0.001) { 
             km += distancia; 
-            console.log("KM contado: " + distancia); // Log para debug
         }
         
         ultimaPosicao = { lat, lon };
@@ -273,8 +268,8 @@ function iniciar() {
     },
     { 
         enableHighAccuracy: true, 
-        maximumAge: 0,       // Não usa posição antiga
-        timeout: 10000      // Tempo máximo de espera
+        maximumAge: 0, 
+        timeout: 10000 
     });
 }
 
@@ -318,7 +313,7 @@ function atualizarDisplay() {
     document.getElementById("valorDisplay").innerText = "R$ " + total.toFixed(2).replace(".", ",");
     document.getElementById("valorDisplay").style.color = cor;
     document.getElementById("distancia").innerText = km.toFixed(2) + " km";
-    document.getElementById("tempo").innerText = Math.floor(segundos / 60) + ":" + String(segundos % 60).padStart(2, "0");
+    document.getElementById("tempo").innerText = Math.floor(segundos / 60) + ":" + String(segundos % 60).padStart(2, '0');
     document.getElementById("tipoTarifa").innerText = tipo;
 }
 
@@ -361,7 +356,7 @@ function abrirMaps() {
     window.open("https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(d));
 }
 
-// PIX
+// FUNÇÕES DO PIX
 function campo(id, v) { const t = String(v.length).padStart(2,'0'); return id + t + v; }
 function crc16(s) { 
     let c = 0xFFFF, p = 0x1021; 
@@ -402,9 +397,9 @@ function compartilhar() {
 }
 
 // HISTÓRICO
-function salvarNoHistorico(origem, destino, valor, km, tempo, data, hora) {
+function salvarNoHistorico(origem, destino, valor, distancia, tempo, dataFormatada, hora) {
     let historico = JSON.parse(localStorage.getItem("historicoCorridas") || "[]");
-    let corrida = { origem, destino, valor, km, tempo, data, hora };
+    let corrida = { origem, destino, valor, distancia, tempo, dataFormatada, hora };
     historico.unshift(corrida);
     localStorage.setItem("historicoCorridas", JSON.stringify(historico));
 }
@@ -421,9 +416,9 @@ function abrirHistorico() {
             div.className = "item-historico";
             div.innerHTML = `
                 <strong>Corrida ${index + 1}</strong><br>
-                📅 ${corrida.data} ⏰ ${corrida.hora}<br>
+                📅 ${corrida.dataFormatada} ⏰ ${corrida.hora}<br>
                 🚏 ${corrida.origem} → ${corrida.destino}<br>
-                💰 Valor: ${corrida.valor} | 📏 ${corrida.km} | ⏱️ ${corrida.tempo}
+                💰 Valor: ${corrida.valor} | 📏 ${corrida.distancia} | ⏱️ ${corrida.tempo}
             `;
             lista.appendChild(div);
         });
