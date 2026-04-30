@@ -30,6 +30,7 @@ body {
     font-weight: bold !important;
     color: #FFEB3B !important; /* AMARELO VIVO */
 }
+
 #tipoTarifa { font-size: 2em !important; font-weight: bold; }
 
 button { 
@@ -243,21 +244,37 @@ function iniciar() {
 
     timer = setInterval(() => { segundos++; atualizarDisplay(); }, 1000);
 
+    // CONFIGURAÇÃO MELHORADA DO GPS
     watchId = navigator.geolocation.watchPosition(pos => {
         if (!rodando) return;
         let { latitude: lat, longitude: lon, accuracy } = pos.coords;
-        if (accuracy > 100) return;
+        
+        // Aumentei a tolerância da precisão para aceitar até 200 metros
+        if (accuracy > 200) return;
 
-        if (!ultimaPosicao) { ultimaPosicao = { lat, lon }; return; }
+        if (!ultimaPosicao) { 
+            ultimaPosicao = { lat, lon }; 
+            return; 
+        }
 
         let distancia = calcularDistancia(ultimaPosicao.lat, ultimaPosicao.lon, lat, lon);
-        // REMOVIDO O LIMITE MÁXIMO PARA CONTAR QUALQUER DISTÂNCIA
-        if (distancia > 0.001 && distancia < 5) km += distancia;
+        
+        // Mudei para aceitar qualquer distância maior que 1 metro
+        if (distancia > 0.001) { 
+            km += distancia; 
+            console.log("KM contado: " + distancia); // Log para debug
+        }
+        
         ultimaPosicao = { lat, lon };
-    }, { 
+    }, 
+    (error) => {
+        console.log("Erro GPS: " + error.code);
+        alert("Erro no GPS! Verifique se está ativado.");
+    },
+    { 
         enableHighAccuracy: true, 
-        maximumAge: 100, 
-        timeout: 5000 
+        maximumAge: 0,       // Não usa posição antiga
+        timeout: 10000      // Tempo máximo de espera
     });
 }
 
@@ -326,6 +343,11 @@ function gerarComprovante() {
 
     salvarNoHistorico(origem, destino, valor, distancia, tempo, dataFormatada, hora);
 
+    window.textoCorrida = `🛵 COMPROVANTE\n`+
+    `📅 ${dataFormatada} ⏰ ${hora}\n`+
+    `🚏 ${origem} → ${destino}\n`+
+    `💰 Valor: ${valor}\n`+
+    `📏
     window.textoCorrida = `🛵 COMPROVANTE\n`+
     `📅 ${dataFormatada} ⏰ ${hora}\n`+
     `🚏 ${origem} → ${destino}\n`+
