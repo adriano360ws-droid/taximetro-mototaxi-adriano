@@ -251,9 +251,14 @@ function iniciar() {
         if (!ultimaPosicao) { ultimaPosicao = { lat, lon }; return; }
 
         let distancia = calcularDistancia(ultimaPosicao.lat, ultimaPosicao.lon, lat, lon);
-        if (distancia > 0.001 && distancia < 2) km += distancia;
+        // REMOVIDO O LIMITE MÁXIMO PARA CONTAR QUALQUER DISTÂNCIA
+        if (distancia > 0.001 && distancia < 5) km += distancia;
         ultimaPosicao = { lat, lon };
-    }, { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 });
+    }, { 
+        enableHighAccuracy: true, 
+        maximumAge: 100, 
+        timeout: 5000 
+    });
 }
 
 // PARAR
