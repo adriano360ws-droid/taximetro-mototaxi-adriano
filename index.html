@@ -171,6 +171,7 @@ th {
                 <td>R$ 3,00</td>
                 <td>R$ 1,10</td>
                 <td>R$ 8,00</td>
+                <td>A partir de 4,55 KM</td>
             </tr>
             <tr>
                 <td class="tarifa-amarela">🟡 Média</td>
@@ -178,6 +179,7 @@ th {
                 <td>R$ 3,50</td>
                 <td>R$ 1,25</td>
                 <td>R$ 9,00</td>
+                <td>A partir de 4,40 KM</td>
             </tr>
             <tr>
                 <td class="tarifa-vermelha">🔴 Premium</td>
@@ -185,13 +187,12 @@ th {
                 <td>R$ 4,00</td>
                 <td>R$ 1,30</td>
                 <td>R$ 10,00</td>
+                <td>A partir de 4,62 KM</td>
             </tr>
         </table>
 
         <button onclick="fecharTabela()" style="width:100%;background:#555;color:white;margin-top:15px;">✖️ Fechar Tabela</button>
     </div>
-
-</div>
 
 <script>
 
@@ -338,19 +339,34 @@ function gerarComprovante() {
 
     salvarNoHistorico(origem, destino, valor, distancia, tempo, dataFormatada, hora);
 
-    window.textoCorrida = `🛵 COMPROVANTE\n`+
-    `📅 ${dataFormatada} ⏰ ${hora}\n`+
-    `🚏 ${origem} → ${destino}\n`+
-    `💰 Valor: ${valor}\n`+
-    `📏 ${distancia} | ⏱ ${tempo}\n`+
-    `👤 ${NOME_MOTO}\n`+
-    `🏍️ ${VEICULO}\n`+
-    `🔤 PLACA: ${PLACA}\n`+
-    `📞 ${TELEFONE}\n`+
-    `✅ Obrigado pela preferência!`;
-}
+    window.textoCorrida = `🛵 COMPROVANTE
+📅 ${dataFormatada} ⏰ ${hora}
+🚏 ${origem}
+➡️ ${destino}
+
+📊 DETALHES DO CÁLCULO:
+💲 Tarifa: ${tarifaAtual}
+▫️ Bandeirada: R$ ${bandeirada.toFixed(2).replace('.', ',')}
+▫️ KM Rodados: ${km.toFixed(2).replace('.', ',')} km
+▫️ Valor KM: R$ ${valorKm.toFixed(2).replace('.', ',')}
+➕-----------------------------------
+🧮 Cálculo: ${bandeirada.toFixed(2).replace('.', ',')} + (${km.toFixed(2).replace('.', ',')} × ${valorKm.toFixed(2).replace('.', ',')})
+💵 Valor Final: ${valor}
+
+📏 Distância: ${distancia}
+⏱ Tempo: ${tempo}
+
+👤 ${NOME_MOTO}
+🏍️ ${VEICULO}
+🔤 PLACA: ${PLACA}
+📞 ${TELEFONE}
+
+✅ Obrigado pela preferência!`;
+} // <-- ADICIONE ESSA LINHA AQUI
 
 // MAPS
+
+
 function abrirMaps() {
     let d = document.getElementById("destino").value;
     window.open("https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(d));
