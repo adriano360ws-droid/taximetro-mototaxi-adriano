@@ -154,45 +154,46 @@ th {
         <button onclick="fecharHistorico()" style="width:100%;background:#555;color:white;margin-top:10px;">✖️ Fechar</button>
     </div>
 
-    <div id="tabelaTarifas">
-        <h3>📋 Tabela de Preços</h3>
-        
-        <table>
-            <tr>
-                <th>Tarifa</th>
-                <th>Horário</th>
-                <th>Bandeirada</th>
-                <th>Valor KM</th>
-                <th>Mínimo</th>
-            </tr>
-            <tr>
-                <td class="tarifa-verde">🟢 Barata</td>
-                <td>07h às 13h</td>
-                <td>R$ 3,00</td>
-                <td>R$ 1,10</td>
-                <td>R$ 8,00</td>
-                <td>A partir de 4,55 KM</td>
-            </tr>
-            <tr>
-                <td class="tarifa-amarela">🟡 Média</td>
-                <td>13h às 19h</td>
-                <td>R$ 3,50</td>
-                <td>R$ 1,25</td>
-                <td>R$ 9,00</td>
-                <td>A partir de 4,40 KM</td>
-            </tr>
-            <tr>
-                <td class="tarifa-vermelha">🔴 Premium</td>
-                <td>19h às 07h</td>
-                <td>R$ 4,00</td>
-                <td>R$ 1,30</td>
-                <td>R$ 10,00</td>
-                <td>A partir de 4,62 KM</td>
-            </tr>
-        </table>
+<div id="tabelaTarifas">
+    <h3>📋 Tabela de Preços</h3>
+    
+    <table style="font-size: 0.78em;">
+        <tr>
+            <th>TARIFA</th>
+            <th>HORÁRIO</th>
+            <th>BANDEIRADA</th>
+            <th>VALOR KM</th>
+            <th>MÍNIMO</th>
+            <th>COMEÇA A SUBIR ALÉM DO MÍNIMO</th>
+        </tr>
+        <tr>
+            <td class="tarifa-verde" style="color: #000000; font-weight: bold;">🟢 Barata</td>
+            <td style="color: #00e676;">06h às 13h</td>
+            <td style="color: #00e676;">R$ 3,00</td>
+            <td style="color: #00e676;">R$ 1,10</td>
+            <td style="color: #00e676;">R$ 8,00</td>
+            <td style="color: #00e676;">A partir de 4,55 KM</td>
+        </tr>
+        <tr>
+            <td class="tarifa-amarela" style="color: #000000; font-weight: bold;">🟡 Média</td>
+            <td style="color: #ffc107;">14h às 19h</td>
+            <td style="color: #ffc107;">R$ 3,50</td>
+            <td style="color: #ffc107;">R$ 1,25</td>
+            <td style="color: #ffc107;">R$ 9,00</td>
+            <td style="color: #ffc107;">A partir de 4,40 KM</td>
+        </tr>
+        <tr>
+            <td class="tarifa-vermelha" style="color: #ffffff; font-weight: bold;">🔴 Premium</td>
+            <td style="color: #ff3b3b;">20h às 05h</td>
+            <td style="color: #ff3b3b;">R$ 4,00</td>
+            <td style="color: #ff3b3b;">R$ 1,30</td>
+            <td style="color: #ff3b3b;">R$ 10,00</td>
+            <td style="color: #ff3b3b;">A partir de 4,62 KM</td>
+        </tr>
+    </table>
 
-        <button onclick="fecharTabela()" style="width:100%;background:#555;color:white;margin-top:15px;">✖️ Fechar Tabela</button>
-    </div>
+    <button onclick="fecharTabela()" style="width:100%;background:#555;color:white;margin-top:15px;">✖️ Fechar Tabela</button>
+</div>
 
 <script>
 
@@ -299,9 +300,18 @@ function atualizarDisplay() {
     let hora = new Date().getHours();
     let minimo, bandeirada, valorKm, tipo, cor;
 
-    if (hora >= 7 && hora < 13) { minimo = 8.00; bandeirada = 3.00; valorKm = 1.10; tipo = "🟢 Barata"; cor = "#00e676"; }
-    else if (hora >= 13 && hora < 19) { minimo = 9.00; bandeirada = 3.50; valorKm = 1.25; tipo = "🟡 Média"; cor = "#ffc107"; }
-    else { minimo = 10.00; bandeirada = 4.00; valorKm = 1.30; tipo = "🔴 Premium"; cor = "#ff3b3b"; }
+    // 🟢 BARATA: 06h às 13h
+    if (hora >= 6 && hora < 13) { 
+        minimo = 8.00; bandeirada = 3.00; valorKm = 1.10; tipo = "🟢 Barata"; cor = "#00e676"; 
+    }
+    // 🟡 MÉDIA: 14h às 19h
+    else if (hora >= 14 && hora < 19) { 
+        minimo = 9.00; bandeirada = 3.50; valorKm = 1.25; tipo = "🟡 Média"; cor = "#ffc107"; 
+    }
+    // 🔴 PREMIUM: 20h às 05h
+    else { 
+        minimo = 10.00; bandeirada = 4.00; valorKm = 1.30; tipo = "🔴 Premium"; cor = "#ff3b3b"; 
+    }
 
     if (ultimoTipoTarifa !== "" && ultimoTipoTarifa !== tipo) {
         tocarSom(1000, 250);
@@ -317,6 +327,7 @@ function atualizarDisplay() {
     document.getElementById("tempo").innerText = Math.floor(segundos / 60) + ":" + String(segundos % 60).padStart(2, '0');
     document.getElementById("tipoTarifa").innerText = tipo;
 }
+
 
 // COMPROVANTE
 function gerarComprovante() {
