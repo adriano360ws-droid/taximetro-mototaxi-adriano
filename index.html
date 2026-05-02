@@ -61,13 +61,36 @@ input {
     font-size: 1.1em;
 }
 
-#comprovante, #historico, #tabelaTarifas {
+#comprovante {
     display: none;
-    background: #222;
-    padding: 15px;
-    margin-top: 10px;
-    border-radius: 10px;
+    background: #1a1a1a;
+    padding: 20px;
+    margin-top: 15px;
+    border-radius: 15px;
+    font-size: 1.25em;
+    color: #ffffff;
+    border: 1px solid #333;
+}
+
+#historico {
+    display: none;
+    background: #1a1a1a;
+    padding: 20px;
+    margin-top: 15px;
+    border-radius: 15px;
+    font-size: 1.15em;
+    color: #ffffff;
+    border: 1px solid #333;
+}
+
+#tabelaTarifas {
+    display: none;
+    background: #1a1a1a;
+    padding: 20px;
+    margin-top: 15px;
+    border-radius: 15px;
     font-size: 1.1em;
+    border: 1px solid #333;
 }
 
 textarea {
@@ -79,12 +102,14 @@ textarea {
 }
 
 .item-historico {
-    background: #333;
-    padding: 10px;
+    background: #2a2a2a;
+    padding: 15px;
     margin: 8px 0;
-    border-radius: 8px;
+    border-radius: 10px;
     text-align: left;
     border-left: 5px solid #00c853;
+    color: #ffffff;
+    font-size: 1.05em;
 }
 
 table {
@@ -201,6 +226,9 @@ let timer, segundos = 0, km = 0, rodando = false;
 let ultimaPosicao = null, watchId = null;
 let tarifaAtual = "";
 let ultimoTipoTarifa = "";
+let bandeirada = 0;
+let valorKm = 0;
+let valorTotal = 0;
 
 // DADOS
 const NOME_MOTO = "Adriano Souza";
@@ -298,7 +326,7 @@ function calcularDistancia(lat1, lon1, lat2, lon2) {
 // ATUALIZAR TELA
 function atualizarDisplay() {
     let hora = new Date().getHours();
-    let minimo, bandeirada, valorKm, tipo, cor;
+    let minimo, tipo, cor;
 
     // 🟢 BARATA: 06h às 13h
     if (hora >= 6 && hora < 13) { 
@@ -319,15 +347,15 @@ function atualizarDisplay() {
     ultimoTipoTarifa = tipo;
 
     tarifaAtual = tipo;
-    let total = Math.max(minimo, bandeirada + (km * valorKm));
+    valorTotal = Math.max(minimo, bandeirada + (km * valorKm));
 
-    document.getElementById("valorDisplay").innerText = "R$ " + total.toFixed(2).replace(".", ",");
+    document.getElementById("valorDisplay").innerText = "R$ " + valorTotal.toFixed(2).replace(".", ",");
     document.getElementById("valorDisplay").style.color = cor;
     document.getElementById("distancia").innerText = km.toFixed(2) + " km";
-    document.getElementById("tempo").innerText = Math.floor(segundos / 60) + ":" + String(segundos % 60).padStart(2, '0');
+    document.getElementById("tempo").innerText = Math.floor(segundos / 60) + ":" + String(segundos % 60).padStart
+(2,'0');
     document.getElementById("tipoTarifa").innerText = tipo;
 }
-
 
 // COMPROVANTE
 function gerarComprovante() {
@@ -338,7 +366,9 @@ function gerarComprovante() {
     let tempo = document.getElementById("tempo").innerText;
 
     let data = new Date();
-    let dataFormatada = `${data.getDate().toString().padStart(2,'0')}/${(data.getMonth()+1).toString().padStart(2,'0')}/${data.getFullYear()}`;
+    let diasSemana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+    let diaSemana = diasSemana[data.getDay()];
+    let dataFormatada = `${data.getDate().toString().padStart(2,'0')}/${(data.getMonth()+1).toString().padStart(2,'0')}/${data.getFullYear()} - ${diaSemana}`;
     let hora = data.toLocaleTimeString('pt-BR');
 
     document.getElementById("compOrigem").innerText = "Saída: " + origem;
@@ -350,40 +380,50 @@ function gerarComprovante() {
 
     salvarNoHistorico(origem, destino, valor, distancia, tempo, dataFormatada, hora);
 
-    window.textoCorrida = `🛵 COMPROVANTE
-📅 ${dataFormatada} ⏰ ${hora}
-🚏 ${origem}
-➡️ ${destino}
+    window.textoCorrida = `🛵 *COMPROVANTE DE CORRIDA* 🛵
 
-📊 DETALHES DO CÁLCULO:
-💲 Tarifa: ${tarifaAtual}
+📅 ${dataFormatada} ⏰ ${hora}
+
+🚏 *SAÍDA:*
+${origem}
+
+➡️ *DESTINO:*
+${destino}
+
+💲 *TARIFA APLICADA:* ${tarifaAtual}
+
+📊 *DETALHES DO CÁLCULO:*
 ▫️ Bandeirada: R$ ${bandeirada.toFixed(2).replace('.', ',')}
 ▫️ KM Rodados: ${km.toFixed(2).replace('.', ',')} km
-▫️ Valor KM: R$ ${valorKm.toFixed(2).replace('.', ',')}
-➕-----------------------------------
+▫️ Valor por KM: R$ ${valorKm.toFixed(2).replace('.', ',')}
+➕───────────────────────────
 🧮 Cálculo: ${bandeirada.toFixed(2).replace('.', ',')} + (${km.toFixed(2).replace('.', ',')} × ${valorKm.toFixed(2).replace('.', ',')})
-💵 Valor Final: ${valor}
+💵 *VALOR TOTAL:* ${valor}
 
 📏 Distância: ${distancia}
-⏱ Tempo: ${tempo}
+⏱ Tempo total: ${tempo}
 
-👤 ${NOME_MOTO}
-🏍️ ${VEICULO}
-🔤 PLACA: ${PLACA}
+👤 *MOTOTAXISTA:*
+${NOME_MOTO}
 📞 ${TELEFONE}
 
-✅ Obrigado pela preferência!`;
-} // <-- ADICIONE ESSA LINHA AQUI
+🏍️ *VEÍCULO:*
+${VEICULO}
+🔤 PLACA: ${PLACA}
+
+✍️ *Obrigado pela preferência!*
+Foi um prazer poder ajudar no seu transporte hoje.
+Segurança e conforto sempre em primeiro lugar!
+Volte sempre! 🙏😃`;
+}
 
 // MAPS
-
-
 function abrirMaps() {
     let d = document.getElementById("destino").value;
     window.open("https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(d));
 }
 
-// FUNÇÕES DO PIX
+// FUNÇÕES DO PIX COM CRC16
 function campo(id, v) { const t = String(v.length).padStart(2,'0'); return id + t + v; }
 function crc16(s) { 
     let c = 0xFFFF, p = 0x1021; 
@@ -416,11 +456,11 @@ function copiarPix() {
 
 // COMPARTILHAR
 function compartilhar() { 
-    if(navigator.share) {
-        navigator.share({text: window.textoCorrida});
-    } else {
-        window.open("https://wa.me/?text=" + encodeURIComponent(window.textoCorrida));
-    }
+    navigator.clipboard.writeText(window.textoCorrida).then(() => {
+        window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(window.textoCorrida), '_blank');
+    }).catch(() => {
+        window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(window.textoCorrida), '_blank');
+    });
 }
 
 // HISTÓRICO
