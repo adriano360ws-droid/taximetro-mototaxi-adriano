@@ -4,522 +4,233 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
-<meta name="theme-color" content="#00c853">
-<title>Taxímetro Pro</title>
+<meta name="theme-color" content="#000000">
+<title>Painel Moto</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+
 <style>
-body { 
-    font-family: Arial, sans-serif; 
-    background: #1a1a1a; 
-    color: #fff; 
-    text-align: center; 
-    margin: 0; 
-    padding: 10px; 
-}
-.container { max-width: 400px; margin: auto; }
-.box { 
-    background: #333; 
-    padding: 15px; 
-    margin: 10px 0; 
-    border-radius: 10px; 
+body{
+margin:0;
+background:black;
+color:white;
+font-family:Orbitron, monospace; /* Fonte segura */
+text-align:center;
 }
 
-#valorDisplay { font-size: 3em; font-weight: bold; }
-#distancia, #tempo { 
-    font-size: 3em !important; 
-    font-weight: bold !important;
-    color: #FFEB3B !important;
+.top{padding:10px;}
+
+#clock{
+color:#00ff6a;
+font-size:26px;
+margin-bottom:10px;
 }
 
-#tipoTarifa { font-size: 2em !important; font-weight: bold; }
-
-button { 
-    padding: 15px; 
-    margin: 5px; 
-    border: none; 
-    border-radius: 5px; 
-    font-size: 1.1em; 
-    font-weight: bold; 
-    cursor: pointer;
-}
-.btn-start { background: green; color: #fff; width: 45%; }
-.btn-stop { background: red; color: #fff; width: 45%; }
-.btn-maps { background: #4285F4; color: #fff; width: 95%; }
-.btn-pix { background: #00c853; color: #fff; width: 95%; }
-.btn-history { background: #673AB7; color: #fff; width: 95%; margin-top: 10px; }
-.btn-table { background: #FF9800; color: #fff; width: 95%; margin-top: 10px; }
-.btn-clear { background: #FF5722; color: #fff; width: 100%; }
-
-input {
-    width: 95%;
-    padding: 15px; 
-    margin: 10px 0; 
-    border-radius: 5px; 
-    border: none; 
-    background: #fff; 
-    color: #000; 
-    font-size: 1.1em;
+#oilStatus{
+font-size:22px;
+margin-bottom:5px;
 }
 
-#comprovante {
-    display: none;
-    background: #1a1a1a;
-    padding: 20px;
-    margin-top: 15px;
-    border-radius: 15px;
-    font-size: 1.25em;
-    color: #ffffff;
-    border: 1px solid #333;
+#oilInfo{
+font-size:14px;
+color:#aaa;
+margin-bottom:10px;
 }
 
-#historico {
-    display: none;
-    background: #1a1a1a;
-    padding: 20px;
-    margin-top: 15px;
-    border-radius: 15px;
-    font-size: 1.15em;
-    color: #ffffff;
-    border: 1px solid #333;
+#barra{
+width:80%;
+height:12px;
+background:#222;
+margin:10px auto;
+border-radius:5px;
+overflow:hidden;
+border:1px solid #444;
 }
 
-#tabelaTarifas {
-    display: none;
-    background: #1a1a1a;
-    padding: 20px;
-    margin-top: 15px;
-    border-radius: 15px;
-    font-size: 1.1em;
-    border: 1px solid #333;
+#barraInterna{
+height:100%;
+width:100%;
+background:#00ff6a;
+transition:0.3s;
 }
 
-textarea {
-    width: 95%;
-    height: 80px;
-    border-radius: 5px;
-    margin-top: 10px;
-    font-size: 1em;
+.odometro{
+font-size:80px;
+margin-top:10px;
+letter-spacing:2px;
 }
 
-.item-historico {
-    background: #2a2a2a;
-    padding: 15px;
-    margin: 8px 0;
-    border-radius: 10px;
-    text-align: left;
-    border-left: 5px solid #00c853;
-    color: #ffffff;
-    font-size: 1.05em;
+.label{
+margin-top:20px;
+font-size:18px;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-    font-size: 0.9em;
+.controls{
+margin-top:25px;
 }
-th, td {
-    border: 1px solid #555;
-    padding: 10px;
-    text-align: center;
+button{
+background:black;
+color:white;
+border:1px solid white;
+padding:12px 20px;
+margin:5px;
+font-family:Orbitron, monospace;
+font-size:16px;
+border-radius:4px;
 }
-th {
-    background: #444;
-    color: #fff;
+
+input{
+background:black;
+color:white;
+border:1px solid white;
+padding:10px;
+width:120px;
+text-align:center;
+font-size:16px;
+font-family:Orbitron, monospace;
+border-radius:4px;
 }
-.tarifa-verde { background: #00e676; color: #000; font-weight: bold; }
-.tarifa-amarela { background: #ffc107; color: #000; font-weight: bold; }
-.tarifa-vermelha { background: #ff3b3b; color: #fff; font-weight: bold; }
 </style>
 </head>
 <body>
 
-<div class="container">
+<div class="top">
+<div id="clock"></div>
+<div id="oilStatus"></div>
+<div id="oilInfo"></div>
 
-    <h2>🚖 Taxímetro Pro</h2>
+<div id="barra">
+<div id="barraInterna"></div>
+</div>
 
-    <div class="box">
-        <div id="valorDisplay">R$ 0,00</div>
-        <p>Distância: <span id="distancia">0.00 km</span></p>
-        <p>Tempo: <span id="tempo">00:00</span></p>
-        <p>Tarifa: <span id="tipoTarifa">-</span></p>
-    </div>
+<button onclick="resetOil()">✅ TROQUEI O ÓLEO (ZERAR)</button>
+<button onclick="ajustarTroca()">Ajustar Troca</button>
+</div>
 
-    <button class="btn-start" onclick="iniciar()">INICIAR</button>
-    <button class="btn-stop" onclick="parar()">PARAR</button>
+<div class="label"> ODÔMETRO TOTAL</div>
+<div class="odometro" id="totalKm">0</div>
 
-    <div class="box">
-        <input type="text" id="origem" placeholder="Local de saída">
-        <input type="text" id="destino" placeholder="Digite o destino">
-        <button class="btn-maps" onclick="abrirMaps()">Abrir no Google Maps</button>
-    </div>
+<div class="controls">
+<input id="kmInput" type="number" step="0.1" placeholder="Ex: 7.4">
+<br><br>
+<button onclick="addKm()">Adicionar KM RODADO</button>
+</div>
 
-    <button class="btn-history" onclick="abrirHistorico()">📜 VER HISTÓRICO</button>
-    <button class="btn-table" onclick="abrirTabela()">📋 VER TABELA DE PREÇOS</button>
+<div class="controls">
+Tempo
+<div id="time">00:00</div>
+</div>
 
-    <div id="comprovante">
-        <h3>📝 Comprovante</h3>
-        <p id="compOrigem"></p>
-        <p id="compDestino"></p>
-        <p id="compValor"></p>
-        <p id="compKm"></p>
-        <p id="compTempo"></p>
+<div class="controls">
+<button onclick="start()">INICIAR</button>
+<button onclick="stop()">PARAR</button>
+</div>
 
-        <button onclick="compartilhar()" style="width:100%;background:#00c853;color:white;">📲 Compartilhar</button>
-        <button class="btn-pix" onclick="gerarPixTela()">💰 Gerar Pix</button>
-        <textarea id="pixCode" readonly></textarea>
-        <button class="btn-pix" onclick="copiarPix()">📋 Copiar Pix</button>
-        <img id="qrPix" style="width:200px;margin:10px auto;display:block;border-radius:10px;" />
-    </div>
-
-    <div id="historico">
-        <h3>📜 Histórico de Corridas</h3>
-        <div id="listaHistorico"></div>
-        <button class="btn-clear" onclick="limparHistorico()">🗑️ Limpar Todo o Histórico</button>
-        <button onclick="fecharHistorico()" style="width:100%;background:#555;color:white;margin-top:10px;">✖️ Fechar</button>
-    </div>
-
-<div id="tabelaTarifas">
-    <h3>📋 Tabela de Preços</h3>
-    
-    <table style="font-size: 0.78em;">
-        <tr>
-            <th>TARIFA</th>
-            <th>HORÁRIO</th>
-            <th>BANDEIRADA</th>
-            <th>VALOR KM</th>
-            <th>MÍNIMO</th>
-            <th>COMEÇA A SUBIR ALÉM DO MÍNIMO</th>
-        </tr>
-        <tr>
-            <td class="tarifa-verde" style="color: #000000; font-weight: bold;">🟢 Barata</td>
-            <td style="color: #00e676;">06h às 13h</td>
-            <td style="color: #00e676;">R$ 3,00</td>
-            <td style="color: #00e676;">R$ 1,10</td>
-            <td style="color: #00e676;">R$ 8,00</td>
-            <td style="color: #00e676;">A partir de 5,05 KM</td>
-        </tr>
-        <tr>
-            <td class="tarifa-amarela" style="color: #000000; font-weight: bold;">🟡 Média</td>
-            <td style="color: #ffc107;">14h às 19h</td>
-            <td style="color: #ffc107;">R$ 3,50</td>
-            <td style="color: #ffc107;">R$ 1,25</td>
-            <td style="color: #ffc107;">R$ 9,00</td>
-            <td style="color: #ffc107;">A partir de 4,90 KM</td>
-        </tr>
-        <tr>
-            <td class="tarifa-vermelha" style="color: #ffffff; font-weight: bold;">🔴 Premium</td>
-            <td style="color: #ff3b3b;">20h às 05h</td>
-            <td style="color: #ff3b3b;">R$ 4,00</td>
-            <td style="color: #ff3b3b;">R$ 1,30</td>
-            <td style="color: #ff3b3b;">R$ 10,00</td>
-            <td style="color: #ff3b3b;">A partir de 5,12 KM</td>
-        </tr>
-    </table>
-
-    <button onclick="fecharTabela()" style="width:100%;background:#555;color:white;margin-top:15px;">✖️ Fechar Tabela</button>
+<div class="controls">
+<button onclick="ajustarOdometro()">Ajustar Odômetro</button>
 </div>
 
 <script>
+// 🛢️ Configuração
+const OIL_LIMIT = 1300;
 
-let timer, segundos = 0, km = 0, rodando = false;
-let ultimaPosicao = null, watchId = null;
-let tarifaAtual = "";
-let ultimoTipoTarifa = "";
-let bandeirada = 0;
-let valorKm = 0;
-let valorTotal = 0;
+// Valores iniciais
+let totalKm = Number(localStorage.getItem("totalKm")) || 161.9;
+let oilBase = Number(localStorage.getItem("oilBase")) || 161.9;
 
-// DADOS
-const NOME_MOTO = "Adriano Souza";
-const TELEFONE = "(86) 98129-1332";
-const VEICULO = "Fan CG 125 Preta";
-const PLACA = "QRP-5G89";
-const PIX_KEY = "+5586981291332";
-const NOME = "ADRIANO ALVES DE OLIVEIRA";
-const CIDADE = "TERESINA";
-
-// 🔊 SOM
-function tocarSom(frequencia = 800, duracao = 200) {
-    try {
-        let audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        let osc = audioContext.createOscillator();
-        let ganho = audioContext.createGain();
-        
-        osc.connect(ganho);
-        ganho.connect(audioContext.destination);
-        
-        osc.frequency.value = frequencia;
-        osc.type = "sine";
-        
-        ganho.gain.setValueAtTime(0.1, audioContext.currentTime);
-        ganho.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duracao/1000);
-        
-        osc.start(audioContext.currentTime);
-        osc.stop(audioContext.currentTime + duracao/1000);
-    } catch(e) {
-        console.log("Som não suportado");
-    }
+function updateDisplay(){
+  document.getElementById("totalKm").innerText = totalKm.toFixed(1);
+  updateOil();
 }
 
-// INICIAR
-function iniciar() {
-    if (rodando) return;
-    rodando = true;
-    segundos = 0; km = 0; ultimaPosicao = null;
-    document.getElementById("comprovante").style.display = "none";
+function addKm(){
+  let v = parseFloat(document.getElementById("kmInput").value);
+  if(!v || v<=0) return;
 
-    tocarSom(900, 150);
-
-    timer = setInterval(() => { segundos++; atualizarDisplay(); }, 1000);
-
-    watchId = navigator.geolocation.watchPosition(pos => {
-        if (!rodando) return;
-        let { latitude: lat, longitude: lon, accuracy } = pos.coords;
-        
-        if (accuracy > 200) return;
-
-        if (!ultimaPosicao) { 
-            ultimaPosicao = { lat, lon }; 
-            return; 
-        }
-
-        let distancia = calcularDistancia(ultimaPosicao.lat, ultimaPosicao.lon, lat, lon);
-        
-        if (distancia > 0.001) { 
-            km += distancia; 
-        }
-        
-        ultimaPosicao = { lat, lon };
-    }, 
-    (error) => {
-        console.log("Erro GPS: " + error.code);
-        alert("Erro no GPS! Verifique se está ativado.");
-    },
-    { 
-        enableHighAccuracy: true, 
-        maximumAge: 0, 
-        timeout: 10000 
-    });
+  totalKm += v;
+  salvarDados();
+  document.getElementById("kmInput").value="";
+  updateDisplay();
 }
 
-// PARAR
-function parar() {
-    if (!rodando) return;
-    rodando = false;
-    clearInterval(timer);
-    if (watchId) { navigator.geolocation.clearWatch(watchId); watchId = null; }
-    
-    tocarSom(600, 300);
-    gerarComprovante();
+function salvarDados(){
+  localStorage.setItem("totalKm", totalKm);
+  localStorage.setItem("oilBase", oilBase);
 }
 
-// CALCULO
-function calcularDistancia(lat1, lon1, lat2, lon2) {
-    const R = 6371;
-    let dLat = (lat2 - lat1) * Math.PI / 180;
-    let dLon = (lon2 - lon1) * Math.PI / 180;
-    let a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
-    return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+function updateOil(){
+  let percorrido = Math.max(0, totalKm - oilBase);
+  let restante = OIL_LIMIT - percorrido;
+  let porcentagem = 100 - (percorrido / OIL_LIMIT * 100);
+
+  let txt, cor;
+  if(restante <= 0){
+    txt = "🛑 TROCAR ÓLEO AGORA";
+    cor="#ff0000";
+  }
+  else if(restante <=300){
+    txt = `⚠️ FALTAM ${Math.ceil(restante)} KM PARA TROCAR`;
+    cor="#ffff00";
+  }
+  else{
+    txt = `✅ PODE RODAR TRANQUILO<br>🟢 RODADOS: ${percorrido.toFixed(1)} KM (Desde troca)<br>🔴 FALTAM: ${Math.ceil(restante)} KM para ${OIL_LIMIT}`;
+    cor="#00ff6a";
+  }
+
+  document.getElementById("oilStatus").innerHTML = txt;
+  document.getElementById("oilStatus").style.color = cor;
+  document.getElementById("oilInfo").innerHTML = `Troca feita em: ${oilBase.toFixed(1)} km<br>Próxima em: ${(oilBase + OIL_LIMIT).toFixed(1)} km`;
+  document.getElementById("barraInterna").style.width = `${Math.max(0, porcentagem)}%`;
+  document.getElementById("barraInterna").style.background = cor;
 }
 
-// ATUALIZAR TELA
-function atualizarDisplay() {
-    let hora = new Date().getHours();
-    let minimo, tipo, cor;
-
-    // 🟢 BARATA: 06h às 13h
-    if (hora >= 6 && hora < 13) { 
-        minimo = 8.00; bandeirada = 3.00; valorKm = 1.10; tipo = "🟢 Barata"; cor = "#00e676"; 
-    }
-    // 🟡 MÉDIA: 14h às 19h
-    else if (hora >= 14 && hora < 19) { 
-        minimo = 9.00; bandeirada = 3.50; valorKm = 1.25; tipo = "🟡 Média"; cor = "#ffc107"; 
-    }
-    // 🔴 PREMIUM: 20h às 05h
-    else { 
-        minimo = 10.00; bandeirada = 4.00; valorKm = 1.30; tipo = "🔴 Premium"; cor = "#ff3b3b"; 
-    }
-
-    if (ultimoTipoTarifa !== "" && ultimoTipoTarifa !== tipo) {
-        tocarSom(1000, 250);
-    }
-    ultimoTipoTarifa = tipo;
-
-    tarifaAtual = tipo;
-    valorTotal = Math.max(minimo, bandeirada + (km * valorKm));
-
-    document.getElementById("valorDisplay").innerText = "R$ " + valorTotal.toFixed(2).replace(".", ",");
-    document.getElementById("valorDisplay").style.color = cor;
-    document.getElementById("distancia").innerText = km.toFixed(2) + " km";
-    document.getElementById("tempo").innerText = Math.floor(segundos / 60) + ":" + String(segundos % 60).padStart
-(2,'0');
-    document.getElementById("tipoTarifa").innerText = tipo;
+function resetOil(){
+  oilBase = totalKm;
+  salvarDados();
+  alert("Troca de óleo registrada!");
+  updateDisplay();
 }
 
-// COMPROVANTE
-function gerarComprovante() {
-    let origem = document.getElementById("origem").value || "Não informado";
-    let destino = document.getElementById("destino").value || "Não informado";
-    let valor = document.getElementById("valorDisplay").innerText;
-    let distancia = document.getElementById("distancia").innerText;
-    let tempo = document.getElementById("tempo").innerText;
-
-    let data = new Date();
-    let diasSemana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
-    let diaSemana = diasSemana[data.getDay()];
-    let dataFormatada = `${data.getDate().toString().padStart(2,'0')}/${(data.getMonth()+1).toString().padStart(2,'0')}/${data.getFullYear()} - ${diaSemana}`;
-    let hora = data.toLocaleTimeString('pt-BR');
-
-    document.getElementById("compOrigem").innerText = "Saída: " + origem;
-    document.getElementById("compDestino").innerText = "Destino: " + destino;
-    document.getElementById("compValor").innerText = "Valor: " + valor;
-    document.getElementById("compKm").innerText = "Distância: " + distancia;
-    document.getElementById("compTempo").innerText = "Tempo: " + tempo;
-    document.getElementById("comprovante").style.display = "block";
-
-    salvarNoHistorico(origem, destino, valor, distancia, tempo, dataFormatada, hora);
-
-    window.textoCorrida = `🛵 *COMPROVANTE DE CORRIDA* 🛵
-
-📅 ${dataFormatada} ⏰ ${hora}
-
-🚏 *SAÍDA:*
-${origem}
-
-➡️ *DESTINO:*
-${destino}
-
-💲 *TARIFA APLICADA:* ${tarifaAtual}
-
-📊 *DETALHES DO CÁLCULO:*
-▫️ Bandeirada: R$ ${bandeirada.toFixed(2).replace('.', ',')}
-▫️ KM Rodados: ${km.toFixed(2).replace('.', ',')} km
-▫️ Valor por KM: R$ ${valorKm.toFixed(2).replace('.', ',')}
-➕───────────────────────────
-🧮 Cálculo: ${bandeirada.toFixed(2).replace('.', ',')} + (${km.toFixed(2).replace('.', ',')} × ${valorKm.toFixed(2).replace('.', ',')})
-💵 *VALOR TOTAL:* ${valor}
-
-📏 Distância: ${distancia}
-⏱ Tempo total: ${tempo}
-
-👤 *MOTOTAXISTA:*
-${NOME_MOTO}
-📞 ${TELEFONE}
-
-🏍️ *VEÍCULO:*
-${VEICULO}
-🔤 PLACA: ${PLACA}
-
-✍️ *Obrigado pela preferência!*
-Foi um prazer poder ajudar no seu transporte hoje.
-Segurança e conforto sempre em primeiro lugar!
-Volte sempre! 🙏😃`;
+function ajustarTroca(){
+  let novo = prompt("Digite o KM da última troca de óleo", oilBase);
+  if(novo && !isNaN(novo)){
+    oilBase = Number(novo);
+    salvarDados();
+    updateDisplay();
+  }
 }
 
-// MAPS
-function abrirMaps() {
-    let d = document.getElementById("destino").value;
-    window.open("https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(d));
+// Cronômetro
+let sec=0, timer=null;
+function start(){ if(!timer) timer=setInterval(atualizarTempo,1000); }
+function stop(){ clearInterval(timer); timer=null; }
+function atualizarTempo(){
+  let m=Math.floor(sec/60), s=sec%60;
+  document.getElementById("time").innerText = String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+  sec++;
 }
 
-// FUNÇÕES DO PIX COM CRC16
-function campo(id, v) { const t = String(v.length).padStart(2,'0'); return id + t + v; }
-function crc16(s) { 
-    let c = 0xFFFF, p = 0x1021; 
-    for(let i=0;i<s.length;i++){ 
-        c ^= s.charCodeAt(i) << 8; 
-        for(let j=0;j<8;j++) 
-            c = (c&0x8000)?(c<<1)^p:(c<<1); 
-    } 
-    return (c&0xFFFF).toString(16).toUpperCase().padStart(4,'0'); 
+function ajustarOdometro(){
+  let novo = prompt("Digite o novo valor do odômetro", totalKm);
+  if(novo && !isNaN(novo)){
+    totalKm = Number(novo);
+    salvarDados();
+    updateDisplay();
+  }
 }
 
-function gerarPIX(valor) {
-    const v = Number(valor).toFixed(2);
-    const payload = "000201"+campo("26", campo("00", "br.gov.bcb.pix") + campo("01", PIX_KEY))+"520400005303986"+campo("54", v)+"5802BR"+campo("59", NOME)+campo("60", CIDADE)+"62070503***6304";
-    return payload + crc16(payload);
-}
+// Relógio
+setInterval(()=>{
+  document.getElementById("clock").innerText = new Date().toLocaleTimeString("pt-BR");
+},1000);
 
-function gerarPixTela() {
-    let v = parseFloat(document.getElementById("valorDisplay").innerText.replace("R$","").replace(",","."));
-    document.getElementById("pixCode").value = gerarPIX(v);
-    document.getElementById("qrPix").src = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(document.getElementById("pixCode").value);
-}
+updateDisplay();
 
-function copiarPix() { 
-    let e = document.getElementById("pixCode"); 
-    e.select(); 
-    document.execCommand("Copy"); 
-    alert("Pix copiado!"); 
-}
-
-// COMPARTILHAR
-function compartilhar() { 
-    navigator.clipboard.writeText(window.textoCorrida).then(() => {
-        window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(window.textoCorrida), '_blank');
-    }).catch(() => {
-        window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(window.textoCorrida), '_blank');
-    });
-}
-
-// HISTÓRICO
-function salvarNoHistorico(origem, destino, valor, distancia, tempo, dataFormatada, hora) {
-    let historico = JSON.parse(localStorage.getItem("historicoCorridas") || "[]");
-    let corrida = { origem, destino, valor, distancia, tempo, dataFormatada, hora };
-    historico.unshift(corrida);
-    localStorage.setItem("historicoCorridas", JSON.stringify(historico));
-}
-
-function abrirHistorico() {
-    let historico = JSON.parse(localStorage.getItem("historicoCorridas") || "[]");
-    let lista = document.getElementById("listaHistorico");
-    lista.innerHTML = "";
-    if(historico.length === 0) {
-        lista.innerHTML = "<p>Nenhuma corrida registrada ainda.</p>";
-    } else {
-        historico.forEach((corrida, index) => {
-            let div = document.createElement("div");
-            div.className = "item-historico";
-            div.innerHTML = `
-                <strong>Corrida ${index + 1}</strong><br>
-                📅 ${corrida.dataFormatada} ⏰ ${corrida.hora}<br>
-                🚏 ${corrida.origem} → ${corrida.destino}<br>
-                💰 Valor: ${corrida.valor} | 📏 ${corrida.distancia} | ⏱️ ${corrida.tempo}
-            `;
-            lista.appendChild(div);
-        });
-    }
-    document.getElementById("historico").style.display = "block";
-}
-
-function fecharHistorico() {
-    document.getElementById("historico").style.display = "none";
-}
-
-function limparHistorico() {
-    if(confirm("Tem certeza que deseja limpar todo o histórico?")) {
-        localStorage.removeItem("historicoCorridas");
-        abrirHistorico();
-    }
-}
-
-// TABELA
-function abrirTabela() {
-    document.getElementById("tabelaTarifas").style.display = "block";
-}
-
-function fecharTabela() {
-    document.getElementById("tabelaTarifas").style.display = "none";
-}
-
-// SERVICE WORKER
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js');
-    });
-}
-
+// Registro do Serviço de Fundo
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("sw.js?v=3");
+} 
 </script>
+
 </body>
 </html>
