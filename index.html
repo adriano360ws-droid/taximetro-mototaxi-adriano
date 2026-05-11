@@ -14,7 +14,7 @@ body{
 margin:0;
 background:black;
 color:white;
-font-family:Orbitron, monospace; /* Fonte segura */
+font-family:Orbitron, monospace;
 text-align:center;
 }
 
@@ -134,9 +134,24 @@ Tempo
 // 🛢️ Configuração
 const OIL_LIMIT = 1300;
 
-// Valores iniciais
-let totalKm = Number(localStorage.getItem("totalKm")) || 161.9;
-let oilBase = Number(localStorage.getItem("oilBase")) || 161.9;
+// ✅ SISTEMA DE SALVAMENTO À PROVA DE FALHAS
+function carregarDados(){
+  try{
+    let dadosSalvos = localStorage.getItem("kmMoto2026");
+    if(dadosSalvos) return JSON.parse(dadosSalvos);
+    return {total: 161.9, base: 161.9};
+  } catch{
+    return {total: 161.9, base: 161.9};
+  }
+}
+
+let DADOS = carregarDados();
+let totalKm = DADOS.total;
+let oilBase = DADOS.base;
+
+function salvarDados(){
+  localStorage.setItem("kmMoto2026", JSON.stringify({total: totalKm, base: oilBase}));
+}
 
 function updateDisplay(){
   document.getElementById("totalKm").innerText = totalKm.toFixed(1);
@@ -151,11 +166,6 @@ function addKm(){
   salvarDados();
   document.getElementById("kmInput").value="";
   updateDisplay();
-}
-
-function salvarDados(){
-  localStorage.setItem("totalKm", totalKm);
-  localStorage.setItem("oilBase", oilBase);
 }
 
 function updateOil(){
@@ -225,6 +235,11 @@ setInterval(()=>{
 },1000);
 
 updateDisplay();
+
+// 🧩 ✅ CÓDIGO RESTAURADO (INSTALAÇÃO NA TELA INICIAL)
+if("serviceWorker" in navigator){
+   navigator.serviceWorker.register("sw.js?v=3");
+}
 </script>
 
 </body>
