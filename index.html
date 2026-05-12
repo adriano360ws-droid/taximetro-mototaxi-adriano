@@ -176,7 +176,7 @@ th {
         <h3>📜 Histórico de Corridas</h3>
         <div id="listaHistorico"></div>
         <button class="btn-clear" onclick="limparHistorico()">🗑️ Limpar Todo o Histórico</button>
-        <button onclick="fecharHistorico()" style="width:100%;background:#555;color:white;margin-top:10px;">✖️ Fechar</button>
+        <button onclick="fecharHistorico()" style="width:100%;background:#555;color:white;margin-top:15px;">✖️ Fechar</button>
     </div>
 
 <div id="tabelaTarifas">
@@ -202,7 +202,7 @@ th {
         <tr>
             <td class="tarifa-amarela" style="color: #000000; font-weight: bold;">🟡 Média</td>
             <td style="color: #ffc107;">14h às 19h</td>
-            <td style="color: #ffc107;">R$ 3,50</td>
+            <td style="color: #ffc107;">R$ 3,00</td>
             <td style="color: #ffc107;">R$ 1,25</td>
             <td style="color: #ffc107;">R$ 9,00</td>
             <td style="color: #ffc107;">A partir de 4,40 KM</td>
@@ -314,7 +314,7 @@ function parar() {
     gerarComprovante();
 }
 
-// CALCULO
+// CALCULO DE DISTÂNCIA
 function calcularDistancia(lat1, lon1, lat2, lon2) {
     const R = 6371;
     let dLat = (lat2 - lat1) * Math.PI / 180;
@@ -323,20 +323,20 @@ function calcularDistancia(lat1, lon1, lat2, lon2) {
     return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
 }
 
-// ATUALIZAR TELA
+// ✅ TARIFAS ALTERADAS CONFORME VOCÊ PEDIU
 function atualizarDisplay() {
     let hora = new Date().getHours();
     let minimo, tipo, cor;
 
-    // 🟢 BARATA: 06h às 13h
+    // 🟢 BARATA: 06h às 13h | R$ 3,00
     if (hora >= 6 && hora < 13) { 
         minimo = 8.00; bandeirada = 3.00; valorKm = 1.10; tipo = "🟢 Barata"; cor = "#00e676"; 
     }
-    // 🟡 MÉDIA: 14h às 19h
+    // 🟡 MÉDIA: 14h às 19h | R$ 3,00
     else if (hora >= 14 && hora < 19) { 
-        minimo = 9.00; bandeirada = 3.50; valorKm = 1.25; tipo = "🟡 Média"; cor = "#ffc107"; 
+        minimo = 9.00; bandeirada = 3.00; valorKm = 1.25; tipo = "🟡 Média"; cor = "#ffc107"; 
     }
-    // 🔴 PREMIUM: 20h às 05h
+    // 🔴 PREMIUM: 20h às 05h | R$ 4,00
     else { 
         minimo = 10.00; bandeirada = 4.00; valorKm = 1.30; tipo = "🔴 Premium"; cor = "#ff3b3b"; 
     }
@@ -349,11 +349,11 @@ function atualizarDisplay() {
     tarifaAtual = tipo;
     valorTotal = Math.max(minimo, bandeirada + (km * valorKm));
 
-    document.getElementById("valorDisplay").innerText = "R$ " + valorTotal.toFixed(2).replace(".", ",");
+    document.getElementById("valorDisplay").innerText =
+document.getElementById("valorDisplay").innerText = "R$ " + valorTotal.toFixed(2).replace(".", ",");
     document.getElementById("valorDisplay").style.color = cor;
     document.getElementById("distancia").innerText = km.toFixed(2) + " km";
-    document.getElementById("tempo").innerText = Math.floor(segundos / 60) + ":" + String(segundos % 60).padStart
-(2,'0');
+    document.getElementById("tempo").innerText = Math.floor(segundos / 60) + ":" + String(segundos % 60).padStart(2,'0');
     document.getElementById("tipoTarifa").innerText = tipo;
 }
 
