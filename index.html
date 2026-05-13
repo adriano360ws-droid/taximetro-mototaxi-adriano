@@ -238,6 +238,24 @@ const PLACA = "QRP-5G89";
 const PIX_KEY = "+5586981291332";
 const NOME = "ADRIANO ALVES DE OLIVEIRA";
 const CIDADE = "TERESINA";
+// MANTER TELA ACESA
+let wakeLock = null;
+async function manterTelaAcesa() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => {
+        console.log('Tela apagada');
+      });
+    }
+  } catch (err) {
+    console.log('Erro Wake Lock:', err.name, err.message);
+  }
+}
+function liberarTela() {
+  if (wakeLock !== null) wakeLock.release();
+}
+
 
 // 🔊 SOM
 function tocarSom(frequencia = 800, duracao = 200) {
