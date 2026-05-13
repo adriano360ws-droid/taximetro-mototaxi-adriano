@@ -195,25 +195,25 @@ th {
             <td class="tarifa-verde" style="color: #000000; font-weight: bold;">🟢 Barata</td>
             <td style="color: #00e676;">06h às 13h</td>
             <td style="color: #00e676;">R$ 3,00</td>
-            <td style="color: #00e676;">R$ 1,10</td>
-            <td style="color: #00e676;">R$ 8,00</td>
-            <td style="color: #00e676;">A partir de 4,55 KM</td>
+            <td style="color: #00e676;">R$ 1,50</td>
+            <td style="color: #00e676;">R$ 9,00</td>
+            <td style="color: #00e676;">A partir de 4,00 KM</td>
         </tr>
         <tr>
             <td class="tarifa-amarela" style="color: #000000; font-weight: bold;">🟡 Média</td>
             <td style="color: #ffc107;">14h às 19h</td>
             <td style="color: #ffc107;">R$ 3,00</td>
-            <td style="color: #ffc107;">R$ 1,25</td>
-            <td style="color: #ffc107;">R$ 9,00</td>
-            <td style="color: #ffc107;">A partir de 4,40 KM</td>
+            <td style="color: #ffc107;">R$ 1,70</td>
+            <td style="color: #ffc107;">R$ 10,00</td>
+            <td style="color: #ffc107;">A partir de 4,12 KM</td>
         </tr>
         <tr>
             <td class="tarifa-vermelha" style="color: #ffffff; font-weight: bold;">🔴 Premium</td>
             <td style="color: #ff3b3b;">20h às 05h</td>
-            <td style="color: #ff3b3b;">R$ 4,00</td>
-            <td style="color: #ff3b3b;">R$ 1,30</td>
-            <td style="color: #ff3b3b;">R$ 10,00</td>
-            <td style="color: #ff3b3b;">A partir de 4,62 KM</td>
+            <td style="color: #ff3b3b;">R$ 3,50</td>
+            <td style="color: #ff3b3b;">R$ 1,90</td>
+            <td style="color: #ff3b3b;">R$ 12,00</td>
+            <td style="color: #ff3b3b;">A partir de 4,47 KM</td>
         </tr>
     </table>
 
@@ -238,7 +238,8 @@ const PLACA = "QRP-5G89";
 const PIX_KEY = "+5586981291332";
 const NOME = "ADRIANO ALVES DE OLIVEIRA";
 const CIDADE = "TERESINA";
-// MANTER TELA ACESA
+
+// ✅ MANTER TELA ACESA
 let wakeLock = null;
 async function manterTelaAcesa() {
   try {
@@ -255,7 +256,6 @@ async function manterTelaAcesa() {
 function liberarTela() {
   if (wakeLock !== null) wakeLock.release();
 }
-
 
 // 🔊 SOM
 function tocarSom(frequencia = 800, duracao = 200) {
@@ -288,6 +288,7 @@ function iniciar() {
     document.getElementById("comprovante").style.display = "none";
 
     tocarSom(900, 150);
+    manterTelaAcesa(); // ✅ Liga tela acesa
 
     timer = setInterval(() => { segundos++; atualizarDisplay(); }, 1000);
 
@@ -329,6 +330,7 @@ function parar() {
     if (watchId) { navigator.geolocation.clearWatch(watchId); watchId = null; }
     
     tocarSom(600, 300);
+    liberarTela(); // ✅ Libera tela
     gerarComprovante();
 }
 
@@ -341,22 +343,22 @@ function calcularDistancia(lat1, lon1, lat2, lon2) {
     return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
 }
 
-// ✅ TARIFAS ALTERADAS CONFORME VOCÊ PEDIU
+// ✅ TARIFAS ATUALIZADAS CONFORME VOCÊ PEDIU
 function atualizarDisplay() {
     let hora = new Date().getHours();
     let minimo, tipo, cor;
 
     // 🟢 BARATA: 06h às 13h | R$ 3,00
     if (hora >= 6 && hora < 13) { 
-        minimo = 8.00; bandeirada = 3.00; valorKm = 1.10; tipo = "🟢 Barata"; cor = "#00e676"; 
+        minimo = 9.00; bandeirada = 3.00; valorKm = 1.50; tipo = "🟢 Barata"; cor = "#00e676"; 
     }
     // 🟡 MÉDIA: 14h às 19h | R$ 3,00
     else if (hora >= 14 && hora < 19) { 
-        minimo = 9.00; bandeirada = 3.00; valorKm = 1.25; tipo = "🟡 Média"; cor = "#ffc107"; 
+        minimo = 10.00; bandeirada = 3.00; valorKm = 1.70; tipo = "🟡 Média"; cor = "#ffc107";
     }
-    // 🔴 PREMIUM: 20h às 05h | R$ 4,00
+    // 🔴 PREMIUM: 20h às 05h | R$ 3,50
     else { 
-        minimo = 10.00; bandeirada = 4.00; valorKm = 1.30; tipo = "🔴 Premium"; cor = "#ff3b3b"; 
+        minimo = 12.00; bandeirada = 3.50; valorKm = 1.90; tipo = "🔴 Premium"; cor = "#ff3b3b"; 
     }
 
     if (ultimoTipoTarifa !== "" && ultimoTipoTarifa !== tipo) {
@@ -367,8 +369,7 @@ function atualizarDisplay() {
     tarifaAtual = tipo;
     valorTotal = Math.max(minimo, bandeirada + (km * valorKm));
 
-    document.getElementById("valorDisplay").innerText =
-document.getElementById("valorDisplay").innerText = "R$ " + valorTotal.toFixed(2).replace(".", ",");
+    document.getElementById("valorDisplay").innerText = "R$ " + valorTotal.toFixed(2).replace(".", ",");
     document.getElementById("valorDisplay").style.color = cor;
     document.getElementById("distancia").innerText = km.toFixed(2) + " km";
     document.getElementById("tempo").innerText = Math.floor(segundos / 60) + ":" + String(segundos % 60).padStart(2,'0');
@@ -522,8 +523,46 @@ function limparHistorico() {
     }
 }
 
-// TABELA
+// TABELA DE PREÇOS ATUALIZADA
 function abrirTabela() {
+    document.getElementById("tabelaTarifas").innerHTML = `
+    <h3>📋 Tabela de Preços</h3>
+    <table style="font-size: 0.78em;">
+        <tr>
+            <th>TARIFA</th>
+            <th>HORÁRIO</th>
+            <th>BANDEIRADA</th>
+            <th>VALOR KM</th>
+            <th>MÍNIMO</th>
+            <th>COMEÇA A SUBIR ALÉM DO MÍNIMO</th>
+        </tr>
+        <tr>
+            <td class="tarifa-verde">🟢 Barata</td>
+            <td>06h às 13h</td>
+            <td>R$ 3,00</td>
+            <td>R$ 1,50</td>
+            <td>R$ 9,00</td>
+            <td>A partir de 4,00 KM</td>
+        </tr>
+        <tr>
+            <td class="tarifa-amarela">🟡 Média</td>
+            <td>14h às 19h</td>
+            <td>R$ 3,00</td>
+            <td>R$ 1,70</td>
+            <td>R$ 10,00</td>
+            <td>A partir de 4,12 KM</td>
+        </tr>
+        <tr>
+            <td class="tarifa-vermelha">🔴 Premium</td>
+            <td>20h às 05h</td>
+            <td>R$ 3,50</td>
+            <td>R$ 1,90</td>
+            <td>R$ 12,00</td>
+            <td>A partir de 4,47 KM</td>
+        </tr>
+    </table>
+    <button onclick="fecharTabela()" style="width:100%;background:#555;color:white;margin-top:15px;">✖️ Fechar Tabela</button>
+    `;
     document.getElementById("tabelaTarifas").style.display = "block";
 }
 
