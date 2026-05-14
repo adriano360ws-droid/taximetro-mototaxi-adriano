@@ -3,234 +3,373 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
-<meta name="theme-color" content="#00c853">
-<title>Taxímetro Pro</title>
+
+<meta name="theme-color" content="#00B050">
+
+<title>Taxímetro Pro | Uber Moto</title>
+
 <style>
-body { 
-    font-family: Arial, sans-serif; 
-    background: #1a1a1a; 
-    color: #fff; 
-    text-align: center; 
-    margin: 0; 
-    padding: 10px; 
-}
-.container { max-width: 400px; margin: auto; }
-.box { 
-    background: #333; 
-    padding: 15px; 
-    margin: 10px 0; 
-    border-radius: 10px; 
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:'Roboto',Arial,sans-serif;
 }
 
-#valorDisplay { font-size: 3em; font-weight: bold; }
-#distancia, #tempo { 
-    font-size: 3em !important; 
-    font-weight: bold !important;
-    color: #FFEB3B !important;
+body{
+    background:#F7F8FA;
+    color:#1C1C1C;
+    text-align:center;
+    padding:15px;
+    font-size:1.08em;
 }
 
-#tipoTarifa { font-size: 2em !important; font-weight: bold; }
-
-button { 
-    padding: 15px; 
-    margin: 5px; 
-    border: none; 
-    border-radius: 5px; 
-    font-size: 1.1em; 
-    font-weight: bold; 
-    cursor: pointer;
-}
-.btn-start { background: green; color: #fff; width: 45%; }
-.btn-stop { background: red; color: #fff; width: 45%; }
-.btn-maps { background: #4285F4; color: #fff; width: 95%; }
-.btn-pix { background: #00c853; color: #fff; width: 95%; }
-.btn-history { background: #673AB7; color: #fff; width: 95%; margin-top: 10px; }
-.btn-table { background: #FF9800; color: #fff; width: 95%; margin-top: 10px; }
-.btn-clear { background: #FF5722; color: #fff; width: 100%; }
-
-input {
-    width: 95%;
-    padding: 15px; 
-    margin: 10px 0; 
-    border-radius: 5px; 
-    border: none; 
-    background: #fff; 
-    color: #000; 
-    font-size: 1.1em;
+.container{
+    max-width:420px;
+    margin:auto;
 }
 
-#comprovante {
-    display: none;
-    background: #1a1a1a;
-    padding: 20px;
-    margin-top: 15px;
-    border-radius: 15px;
-    font-size: 1.25em;
-    color: #ffffff;
-    border: 1px solid #333;
+h2{
+    color:#00B050;
+    margin-bottom:20px;
+}
+.box p{
+    font-size:1.2em;
+    margin:4px 0;
+    line-height:1.1;
 }
 
-#historico {
-    display: none;
-    background: #1a1a1a;
-    padding: 20px;
-    margin-top: 15px;
-    border-radius: 15px;
-    font-size: 1.15em;
-    color: #ffffff;
-    border: 1px solid #333;
+#valorDisplay{
+    font-size:4.5em;
+    font-weight:700;
+    color:#00B050;
+    margin:5px 0 10px 0;
+    line-height:1;
 }
 
-#tabelaTarifas {
-    display: none;
-    background: #1a1a1a;
-    padding: 20px;
-    margin-top: 15px;
-    border-radius: 15px;
-    font-size: 1.1em;
-    border: 1px solid #333;
+
+#distancia,
+#tempo{
+    font-size:3.3em;
+    font-weight:bold;
+    color:#FFA800;
+    line-height:1;
 }
 
-textarea {
-    width: 95%;
-    height: 80px;
-    border-radius: 5px;
-    margin-top: 10px;
-    font-size: 1em;
+#tipoTarifa{
+    font-size:1.3em;
+    font-weight:bold;
+    display:inline-block;
+    margin-top:10px;
+    background:#F1F1F1;
+    padding:8px 14px;
+    border-radius:20px;
 }
 
-.item-historico {
-    background: #2a2a2a;
-    padding: 15px;
-    margin: 8px 0;
-    border-radius: 10px;
-    text-align: left;
-    border-left: 5px solid #00c853;
-    color: #ffffff;
-    font-size: 1.05em;
+button{
+    padding:16px;
+    margin:6px 4px;
+    border:none;
+    border-radius:12px;
+    font-size:1em;
+    font-weight:bold;
+    cursor:pointer;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-    font-size: 0.9em;
+button:disabled{
+    opacity:.5;
+    cursor:not-allowed;
 }
-th, td {
-    border: 1px solid #555;
-    padding: 10px;
-    text-align: center;
+
+.btn-start{
+    background:#00B050;
+    color:#FFF;
+    width:46%;
 }
-th {
-    background: #444;
-    color: #fff;
+
+.btn-stop{
+    background:#EB3B3B;
+    color:#FFF;
+    width:46%;
 }
-.tarifa-verde { background: #00e676; color: #000; font-weight: bold; }
-.tarifa-amarela { background: #ffc107; color: #000; font-weight: bold; }
-.tarifa-vermelha { background: #ff3b3b; color: #fff; font-weight: bold; }
+
+.btn-maps{
+    background:#4285F4;
+    color:#FFF;
+    width:100%;
+}
+
+.btn-history{
+    background:#6C47C8;
+    color:#FFF;
+    width:100%;
+}
+
+.btn-table{
+    background:#FFA800;
+    color:#FFF;
+    width:100%;
+}
+
+.btn-pix{
+    background:#00B050;
+    color:#FFF;
+    width:100%;
+}
+
+.btn-clear{
+    background:#EB3B3B;
+    color:#FFF;
+    width:100%;
+}
+
+.fechar-btn{
+    background:#EEE;
+    width:100%;
+}
+
+input,
+textarea{
+    width:100%;
+    padding:16px;
+    margin:10px 0;
+    border-radius:12px;
+    border:1px solid #DDD;
+    font-size:1em;
+}
+
+#comprovante,
+#historico,
+#tabelaTarifas{
+    display:none;
+    background:#FFF;
+    padding:20px;
+    margin-top:20px;
+    border-radius:16px;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+
+#comprovante p{
+    font-size:1.2em;
+    margin:8px 0;
+    font-weight:500;
+}
+
+.item-historico{
+    background:#F7F8FA;
+    padding:15px;
+    border-radius:12px;
+    margin:10px 0;
+    text-align:left;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:15px;
+}
+
+th,td{
+    border:1px solid #DDD;
+    padding:10px;
+    font-size:.9em;
+}
+
+.tarifa-verde{
+    background:#E8F5E9;
+}
+
+.tarifa-amarela{
+    background:#FFF8E1;
+}
+
+.tarifa-vermelha{
+    background:#FFEBEE;
+}
+
 </style>
 </head>
+
 <body>
 
 <div class="container">
 
-    <h2>🚖 Taxímetro Pro</h2>
+<h2>🛵 Taxímetro Pro | Uber Moto</h2>
 
-    <div class="box">
-        <div id="valorDisplay">R$ 0,00</div>
-        <p>Distância: <span id="distancia">0.00 km</span></p>
-        <p>Tempo: <span id="tempo">00:00</span></p>
-        <p>Tarifa: <span id="tipoTarifa">-</span></p>
-    </div>
+<div class="box">
 
-    <button class="btn-start" onclick="iniciar()">INICIAR</button>
-    <button class="btn-stop" onclick="parar()">PARAR</button>
+    <div id="valorDisplay">R$ 0,00</div>
 
-    <div class="box">
-        <input type="text" id="origem" placeholder="Local de saída">
-        <input type="text" id="destino" placeholder="Digite o destino">
-        <button class="btn-maps" onclick="abrirMaps()">Abrir no Google Maps</button>
-    </div>
+    <p>
+        Distância:
+        <span id="distancia">0.00 km</span>
+    </p>
 
-    <button class="btn-history" onclick="abrirHistorico()">📜 VER HISTÓRICO</button>
-    <button class="btn-table" onclick="abrirTabela()">📋 VER TABELA DE PREÇOS</button>
+    <p>
+        Tempo:
+        <span id="tempo">00:00:00</span>
+    </p>
 
-    <div id="comprovante">
-        <h3>📝 Comprovante</h3>
-        <p id="compOrigem"></p>
-        <p id="compDestino"></p>
-        <p id="compValor"></p>
-        <p id="compKm"></p>
-        <p id="compTempo"></p>
+    <p>
+        Tarifa:
+        <span id="tipoTarifa">-</span>
+    </p>
 
-        <button onclick="compartilhar()" style="width:100%;background:#00c853;color:white;">📲 Compartilhar</button>
-        <button class="btn-pix" onclick="gerarPixTela()">💰 Gerar Pix</button>
-        <textarea id="pixCode" readonly></textarea>
-        <button class="btn-pix" onclick="copiarPix()">📋 Copiar Pix</button>
-        <img id="qrPix" style="width:200px;margin:10px auto;display:block;border-radius:10px;" />
-    </div>
+</div>
 
-    <div id="historico">
-        <h3>📜 Histórico de Corridas</h3>
-        <div id="listaHistorico"></div>
-        <button class="btn-clear" onclick="limparHistorico()">🗑️ Limpar Todo o Histórico</button>
-        <button onclick="fecharHistorico()" style="width:100%;background:#555;color:white;margin-top:15px;">✖️ Fechar</button>
-    </div>
+<button id="btnIniciar" class="btn-start" onclick="iniciar()">
+    INICIAR CORRIDA
+</button>
+
+<button id="btnParar" class="btn-stop" onclick="parar()" disabled>
+    PARAR CORRIDA
+</button>
+
+<div class="box">
+
+    <input type="text" id="origem" placeholder="Local de saída">
+
+    <input type="text" id="destino" placeholder="Digite o destino">
+
+    <button class="btn-maps" onclick="abrirMaps()">
+        Ver Rota no Mapa
+    </button>
+
+</div>
+
+<button class="btn-history" onclick="abrirHistorico()">
+📜 HISTÓRICO DE CORRIDAS
+</button>
+
+<button class="btn-table" onclick="abrirTabela()">
+📋 TABELA DE TARIFAS
+</button>
+
+<div id="comprovante">
+
+<h3>📝 COMPROVANTE DE CORRIDA</h3>
+
+<p id="compOrigem"></p>
+<p id="compDestino"></p>
+<p id="compValor"></p>
+<p id="compKm"></p>
+<p id="compTempo"></p>
+
+<button class="btn-pix" onclick="compartilhar()">
+📲 Compartilhar
+</button>
+
+<button class="btn-pix" onclick="gerarPixTela()">
+💰 Gerar Código Pix
+</button>
+
+<textarea id="pixCode" readonly></textarea>
+
+<button class="btn-pix" onclick="copiarPix()">
+📋 Copiar Código Pix
+</button>
+
+<img id="qrPix"
+style="
+width:200px;
+margin:15px auto;
+display:block;
+border-radius:12px;
+">
+
+</div>
+
+<div id="historico">
+
+<h3>📜 HISTÓRICO DE CORRIDAS</h3>
+
+<div id="listaHistorico"></div>
+
+<button class="btn-clear" onclick="limparHistorico()">
+🗑️ Limpar Histórico
+</button>
+
+<button class="fechar-btn" onclick="fecharHistorico()">
+✖️ Fechar
+</button>
+
+</div>
 
 <div id="tabelaTarifas">
-    <h3>📋 Tabela de Preços</h3>
-    
-    <table style="font-size: 0.78em;">
-        <tr>
-            <th>TARIFA</th>
-            <th>HORÁRIO</th>
-            <th>BANDEIRADA</th>
-            <th>VALOR KM</th>
-            <th>MÍNIMO</th>
-            <th>COMEÇA A SUBIR ALÉM DO MÍNIMO</th>
-        </tr>
-        <tr>
-            <td class="tarifa-verde" style="color: #000000; font-weight: bold;">🟢 Barata</td>
-            <td style="color: #00e676;">06h às 13h</td>
-            <td style="color: #00e676;">R$ 3,00</td>
-            <td style="color: #00e676;">R$ 1,50</td>
-            <td style="color: #00e676;">R$ 9,00</td>
-            <td style="color: #00e676;">A partir de 4,00 KM</td>
-        </tr>
-        <tr>
-            <td class="tarifa-amarela" style="color: #000000; font-weight: bold;">🟡 Média</td>
-            <td style="color: #ffc107;">14h às 19h</td>
-            <td style="color: #ffc107;">R$ 3,00</td>
-            <td style="color: #ffc107;">R$ 1,70</td>
-            <td style="color: #ffc107;">R$ 10,00</td>
-            <td style="color: #ffc107;">A partir de 4,12 KM</td>
-        </tr>
-        <tr>
-            <td class="tarifa-vermelha" style="color: #ffffff; font-weight: bold;">🔴 Premium</td>
-            <td style="color: #ff3b3b;">20h às 05h</td>
-            <td style="color: #ff3b3b;">R$ 3,50</td>
-            <td style="color: #ff3b3b;">R$ 1,90</td>
-            <td style="color: #ff3b3b;">R$ 12,00</td>
-            <td style="color: #ff3b3b;">A partir de 4,47 KM</td>
-        </tr>
-    </table>
 
-    <button onclick="fecharTabela()" style="width:100%;background:#555;color:white;margin-top:15px;">✖️ Fechar Tabela</button>
+<h3>📋 TABELA DE TARIFAS</h3>
+
+<table>
+
+<tr>
+<th>TARIFA</th>
+<th>HORÁRIO</th>
+<th>VALOR/KM</th>
+<th>MÍNIMO</th>
+<th>COMEÇA COBRAR KM</th>
+</tr>
+
+<tr>
+<td class="tarifa-verde">🟢 Baixa</td>
+<td>06h às 13h</td>
+<td>R$ 1,50</td>
+<td>R$ 9,00</td>
+<td>Após 4,15 km</td>
+</tr>
+
+<tr>
+<td class="tarifa-amarela">🟡 Média</td>
+<td>14h às 19h</td>
+<td>R$ 1,70</td>
+<td>R$ 10,00</td>
+<td>Após 4,20 km</td>
+</tr>
+
+<tr>
+<td class="tarifa-vermelha">🔴 Alta</td>
+<td>20h às 05h</td>
+<td>R$ 1,90</td>
+<td>R$ 12,00</td>
+<td>Após 4,50 km</td>
+</tr>
+
+</table>
+
+<button class="fechar-btn" onclick="fecharTabela()">
+✖️ Fechar Tabela
+</button>
+
 </div>
+
 
 <script>
 
-let timer, segundos = 0, km = 0, rodando = false;
-let ultimaPosicao = null, watchId = null;
-let tarifaAtual = "";
-let ultimoTipoTarifa = "";
+// ==========================
+// VARIÁVEIS
+// ==========================
+
+let timer;
+let segundos = 0;
+let km = 0;
+let rodando = false;
+
+let ultimaPosicao = null;
+let watchId = null;
+
 let bandeirada = 0;
 let valorKm = 0;
+let valorMinimo = 0;
+let tipoTarifa = "";
 let valorTotal = 0;
 
+// ==========================
 // DADOS
+// ==========================
+
 const NOME_MOTO = "Adriano Souza";
 const TELEFONE = "(86) 98129-1332";
 const VEICULO = "Fan CG 125 Preta";
@@ -239,344 +378,634 @@ const PIX_KEY = "+5586981291332";
 const NOME = "ADRIANO ALVES DE OLIVEIRA";
 const CIDADE = "TERESINA";
 
-// ✅ MANTER TELA ACESA
+// ==========================
+// WAKE LOCK
+// ==========================
+
 let wakeLock = null;
-async function manterTelaAcesa() {
-  try {
-    if ('wakeLock' in navigator) {
-      wakeLock = await navigator.wakeLock.request('screen');
-      wakeLock.addEventListener('release', () => {
-        console.log('Tela apagada');
-      });
+
+async function manterTelaAcesa(){
+
+    try{
+
+        if("wakeLock" in navigator){
+            wakeLock = await navigator.wakeLock.request("screen");
+        }
+
+    }catch(e){
+        console.log(e);
     }
-  } catch (err) {
-    console.log('Erro Wake Lock:', err.name, err.message);
-  }
-}
-function liberarTela() {
-  if (wakeLock !== null) wakeLock.release();
+
 }
 
-// 🔊 SOM
-function tocarSom(frequencia = 800, duracao = 200) {
-    try {
-        let audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        let osc = audioContext.createOscillator();
-        let ganho = audioContext.createGain();
-        
-        osc.connect(ganho);
-        ganho.connect(audioContext.destination);
-        
-        osc.frequency.value = frequencia;
-        osc.type = "sine";
-        
-        ganho.gain.setValueAtTime(0.1, audioContext.currentTime);
-        ganho.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duracao/1000);
-        
-        osc.start(audioContext.currentTime);
-        osc.stop(audioContext.currentTime + duracao/1000);
-    } catch(e) {
-        console.log("Som não suportado");
+function liberarTela(){
+
+    if(wakeLock){
+        wakeLock.release();
     }
+
 }
 
+// ==========================
+// SOM
+// ==========================
+
+function tocarSom(freq = 800, dur = 200){
+
+    try{
+
+        let ctx = new(window.AudioContext || window.webkitAudioContext)();
+
+        let osc = ctx.createOscillator();
+
+        let gain = ctx.createGain();
+
+        osc.connect(gain);
+
+        gain.connect(ctx.destination);
+
+        osc.frequency.value = freq;
+
+        gain.gain.setValueAtTime(0.1, ctx.currentTime);
+
+        gain.gain.exponentialRampToValueAtTime(
+            0.01,
+            ctx.currentTime + dur/1000
+        );
+
+        osc.start();
+
+        osc.stop(ctx.currentTime + dur/1000);
+
+    }catch(e){}
+
+}
+
+// ==========================
 // INICIAR
-function iniciar() {
-    if (rodando) return;
+// ==========================
+
+function iniciar(){
+
+    if(rodando) return;
+
     rodando = true;
-    segundos = 0; km = 0; ultimaPosicao = null;
+
+    segundos = 0;
+    km = 0;
+
+    ultimaPosicao = null;
+
     document.getElementById("comprovante").style.display = "none";
 
-    tocarSom(900, 150);
-    manterTelaAcesa(); // ✅ Liga tela acesa
+    document.getElementById("btnIniciar").disabled = true;
+    document.getElementById("btnParar").disabled = false;
 
-    timer = setInterval(() => { segundos++; atualizarDisplay(); }, 1000);
+    tocarSom(900,150);
 
-    watchId = navigator.geolocation.watchPosition(pos => {
-        if (!rodando) return;
-        let { latitude: lat, longitude: lon, accuracy } = pos.coords;
-        
-        if (accuracy > 200) return;
+    manterTelaAcesa();
 
-        if (!ultimaPosicao) { 
-            ultimaPosicao = { lat, lon }; 
-            return; 
+    atualizarTela();
+
+    timer = setInterval(()=>{
+
+        segundos++;
+
+        atualizarTela();
+
+    },1000);
+
+    if(!navigator.geolocation){
+
+        alert("GPS não suportado.");
+
+        return;
+
+    }
+
+    watchId = navigator.geolocation.watchPosition(
+
+        (pos)=>{
+
+            if(!rodando) return;
+
+            let lat = pos.coords.latitude;
+            let lon = pos.coords.longitude;
+
+            let precisao = pos.coords.accuracy;
+
+            if(precisao > 200) return;
+
+            if(!ultimaPosicao){
+
+                ultimaPosicao = {lat, lon};
+
+                return;
+
+            }
+
+            let dist = calcularDistancia(
+                ultimaPosicao.lat,
+                ultimaPosicao.lon,
+                lat,
+                lon
+            );
+
+            // FILTRO PARA EVITAR KM FALSO
+            if(dist > 0.001 && dist < 1){
+
+                km += dist;
+
+            }
+
+            ultimaPosicao = {lat, lon};
+
+            atualizarTela();
+
+        },
+
+        (erro)=>{
+
+            console.log(erro);
+
+            alert("Erro ao acessar GPS.");
+
+        },
+
+        {
+            enableHighAccuracy:true,
+            maximumAge:0,
+            timeout:10000
         }
 
-        let distancia = calcularDistancia(ultimaPosicao.lat, ultimaPosicao.lon, lat, lon);
-        
-        if (distancia > 0.001) { 
-            km += distancia; 
-        }
-        
-        ultimaPosicao = { lat, lon };
-    }, 
-    (error) => {
-        console.log("Erro GPS: " + error.code);
-        alert("Erro no GPS! Verifique se está ativado.");
-    },
-    { 
-        enableHighAccuracy: true, 
-        maximumAge: 0, 
-        timeout: 10000 
-    });
+    );
+
 }
 
+// ==========================
 // PARAR
-function parar() {
-    if (!rodando) return;
+// ==========================
+
+function parar(){
+
+    if(!rodando) return;
+
     rodando = false;
+
     clearInterval(timer);
-    if (watchId) { navigator.geolocation.clearWatch(watchId); watchId = null; }
-    
-    tocarSom(600, 300);
-    liberarTela(); // ✅ Libera tela
+
+    if(watchId){
+
+        navigator.geolocation.clearWatch(watchId);
+
+        watchId = null;
+
+    }
+
+    liberarTela();
+
+    tocarSom(600,300);
+
+    document.getElementById("btnIniciar").disabled = false;
+
+    document.getElementById("btnParar").disabled = true;
+
     gerarComprovante();
+
+    salvarHistorico();
+
 }
 
-// CALCULO DE DISTÂNCIA
-function calcularDistancia(lat1, lon1, lat2, lon2) {
+// ==========================
+// GPS / DISTÂNCIA REAL
+// ==========================
+
+function calcularDistancia(lat1, lon1, lat2, lon2){
+
     const R = 6371;
-    let dLat = (lat2 - lat1) * Math.PI / 180;
-    let dLon = (lon2 - lon1) * Math.PI / 180;
-    let a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
-    return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+
+    const a =
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI/180) *
+        Math.cos(lat2 * Math.PI/180) *
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+    return R * c;
+
 }
 
-// ✅ TARIFAS ATUALIZADAS CONFORME VOCÊ PEDIU
-function atualizarDisplay() {
-    let hora = new Date().getHours();
-    let minimo, tipo, cor;
+// ==========================
+// ATUALIZAR TELA
+// ==========================
 
-    // 🟢 BARATA: 06h às 13h | R$ 3,00
-    if (hora >= 6 && hora < 13) { 
-        minimo = 9.00; bandeirada = 3.00; valorKm = 1.50; tipo = "🟢 Barata"; cor = "#00e676"; 
-    }
-    // 🟡 MÉDIA: 14h às 19h | R$ 3,00
-    else if (hora >= 14 && hora < 19) { 
-        minimo = 10.00; bandeirada = 3.00; valorKm = 1.70; tipo = "🟡 Média"; cor = "#ffc107";
-    }
-    // 🔴 PREMIUM: 20h às 05h | R$ 3,50
-    else { 
-        minimo = 12.00; bandeirada = 3.50; valorKm = 1.90; tipo = "🔴 Premium"; cor = "#ff3b3b"; 
+function atualizarTela(){
+
+    const hora = new Date().getHours();
+
+    if(hora >= 6 && hora < 13){
+
+        tipoTarifa = "🟢 BAIXA";
+
+        bandeirada = 3;
+
+        valorKm = 1.5;
+
+        valorMinimo = 9;
+
+        document.getElementById("valorDisplay").style.color = "#00B050";
+
     }
 
-    if (ultimoTipoTarifa !== "" && ultimoTipoTarifa !== tipo) {
-        tocarSom(1000, 250);
+    else if(hora >= 14 && hora < 19){
+
+        tipoTarifa = "🟡 MÉDIA";
+
+        bandeirada = 3;
+
+        valorKm = 1.7;
+
+        valorMinimo = 10;
+
+        document.getElementById("valorDisplay").style.color = "#FFB300";
+
     }
-    ultimoTipoTarifa = tipo;
 
-    tarifaAtual = tipo;
-    valorTotal = Math.max(minimo, bandeirada + (km * valorKm));
+    else{
 
-    document.getElementById("valorDisplay").innerText = "R$ " + valorTotal.toFixed(2).replace(".", ",");
-    document.getElementById("valorDisplay").style.color = cor;
-    document.getElementById("distancia").innerText = km.toFixed(2) + " km";
-    document.getElementById("tempo").innerText = Math.floor(segundos / 60) + ":" + String(segundos % 60).padStart(2,'0');
-    document.getElementById("tipoTarifa").innerText = tipo;
+        tipoTarifa = "🔴 ALTA";
+
+        bandeirada = 3.5;
+
+        valorKm = 1.9;
+
+        valorMinimo = 12;
+
+        document.getElementById("valorDisplay").style.color = "#E53935";
+
+    }
+
+    valorTotal = bandeirada + (km * valorKm);
+
+    if(valorTotal < valorMinimo){
+
+        valorTotal = valorMinimo;
+
+    }
+
+    const h = Math.floor(segundos / 3600);
+
+    const m = Math.floor((segundos % 3600) / 60);
+
+    const s = segundos % 60;
+
+    const tempo =
+`${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+
+    document.getElementById("valorDisplay").textContent =
+        `R$ ${valorTotal.toFixed(2).replace(".",",")}`;
+
+    document.getElementById("distancia").textContent =
+        `${km.toFixed(2)} km`;
+
+    document.getElementById("tempo").textContent = tempo;
+
+    document.getElementById("tipoTarifa").textContent = tipoTarifa;
+
 }
 
+// ==========================
+// MAPS
+// ==========================
+
+function abrirMaps(){
+
+    const origem =
+        document.getElementById("origem").value.trim();
+
+    const destino =
+        document.getElementById("destino").value.trim();
+
+    if(!origem || !destino){
+
+        alert("Preencha origem e destino.");
+
+        return;
+
+    }
+
+    const url =
+`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origem)}&destination=${encodeURIComponent(destino)}&travelmode=driving`;
+
+    window.open(url,"_blank");
+
+}
+
+// ==========================
 // COMPROVANTE
-function gerarComprovante() {
-    let origem = document.getElementById("origem").value || "Não informado";
-    let destino = document.getElementById("destino").value || "Não informado";
-    let valor = document.getElementById("valorDisplay").innerText;
-    let distancia = document.getElementById("distancia").innerText;
-    let tempo = document.getElementById("tempo").innerText;
+// ==========================
 
-    let data = new Date();
-    let diasSemana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
-    let diaSemana = diasSemana[data.getDay()];
-    let dataFormatada = `${data.getDate().toString().padStart(2,'0')}/${(data.getMonth()+1).toString().padStart(2,'0')}/${data.getFullYear()} - ${diaSemana}`;
-    let hora = data.toLocaleTimeString('pt-BR');
+function gerarComprovante(){
 
-    document.getElementById("compOrigem").innerText = "Saída: " + origem;
-    document.getElementById("compDestino").innerText = "Destino: " + destino;
-    document.getElementById("compValor").innerText = "Valor: " + valor;
-    document.getElementById("compKm").innerText = "Distância: " + distancia;
-    document.getElementById("compTempo").innerText = "Tempo: " + tempo;
+    document.getElementById("compOrigem").textContent =
+        `📍 Origem: ${document.getElementById("origem").value || "Não informado"}`;
+
+    document.getElementById("compDestino").textContent =
+        `🎯 Destino: ${document.getElementById("destino").value || "Não informado"}`;
+
+    document.getElementById("compValor").textContent =
+        `💰 ${document.getElementById("valorDisplay").textContent}`;
+
+    document.getElementById("compKm").textContent =
+        `📏 ${document.getElementById("distancia").textContent}`;
+
+    document.getElementById("compTempo").textContent =
+        `⏱️ ${document.getElementById("tempo").textContent}`;
+
     document.getElementById("comprovante").style.display = "block";
 
-    salvarNoHistorico(origem, destino, valor, distancia, tempo, dataFormatada, hora);
+}
 
-    window.textoCorrida = `🛵 *COMPROVANTE DE CORRIDA* 🛵
+// ==========================
+// COMPARTILHAR
+// ==========================
 
-📅 ${dataFormatada} ⏰ ${hora}
+function compartilhar(){
 
-🚏 *SAÍDA:*
+    const origem =
+        document.getElementById("origem").value || "Não informado";
+
+    const destino =
+        document.getElementById("destino").value || "Não informado";
+
+    const valor =
+        document.getElementById("valorDisplay").textContent;
+
+    const distancia =
+        document.getElementById("distancia").textContent;
+
+    const tempo =
+        document.getElementById("tempo").textContent;
+
+    const data =
+        new Date().toLocaleString("pt-BR");
+
+    const mensagem = `🛵 *COMPROVANTE DE CORRIDA*
+
+📅 ${data}
+
+📍 Origem:
 ${origem}
 
-➡️ *DESTINO:*
+🎯 Destino:
 ${destino}
 
-💲 *TARIFA APLICADA:* ${tarifaAtual}
-
-📊 *DETALHES DO CÁLCULO:*
-▫️ Bandeirada: R$ ${bandeirada.toFixed(2).replace('.', ',')}
-▫️ KM Rodados: ${km.toFixed(2).replace('.', ',')} km
-▫️ Valor por KM: R$ ${valorKm.toFixed(2).replace('.', ',')}
-➕───────────────────────────
-🧮 Cálculo: ${bandeirada.toFixed(2).replace('.', ',')} + (${km.toFixed(2).replace('.', ',')} × ${valorKm.toFixed(2).replace('.', ',')})
-💵 *VALOR TOTAL:* ${valor}
+💰 Valor: ${valor}
 
 📏 Distância: ${distancia}
-⏱ Tempo total: ${tempo}
 
-👤 *MOTOTAXISTA:*
+⏱️ Tempo: ${tempo}
+
+📊 Tarifa: ${tipoTarifa}
+
+👤 Mototaxista:
 ${NOME_MOTO}
+
 📞 ${TELEFONE}
 
-🏍️ *VEÍCULO:*
-${VEICULO}
-🔤 PLACA: ${PLACA}
+🏍️ ${VEICULO}
+🔤 Placa: ${PLACA}
 
-✍️ *Obrigado pela preferência!*
-Foi um prazer poder ajudar no seu transporte hoje.
+🙏 Obrigado pela preferência!
+
+Foi um prazer ajudar no seu transporte hoje.
 Segurança e conforto sempre em primeiro lugar!
-Volte sempre! 🙏😃`;
+Volte sempre! 😃`;
+
+    window.open(
+        `https://wa.me/?text=${encodeURIComponent(mensagem)}`,
+        "_blank"
+    );
+
 }
 
-// MAPS
-function abrirMaps() {
-    let d = document.getElementById("destino").value;
-    window.open("https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(d));
+// ==========================
+// PIX
+// ==========================
+
+function campo(id, v) {
+    const t = String(v.length).padStart(2,'0');
+    return id + t + v;
 }
 
-// FUNÇÕES DO PIX COM CRC16
-function campo(id, v) { const t = String(v.length).padStart(2,'0'); return id + t + v; }
 function crc16(s) { 
     let c = 0xFFFF, p = 0x1021; 
+
     for(let i=0;i<s.length;i++){ 
+
         c ^= s.charCodeAt(i) << 8; 
+
         for(let j=0;j<8;j++) 
             c = (c&0x8000)?(c<<1)^p:(c<<1); 
+
     } 
-    return (c&0xFFFF).toString(16).toUpperCase().padStart(4,'0'); 
+
+    return (c&0xFFFF)
+    .toString(16)
+    .toUpperCase()
+    .padStart(4,'0'); 
 }
 
 function gerarPIX(valor) {
+
     const v = Number(valor).toFixed(2);
-    const payload = "000201"+campo("26", campo("00", "br.gov.bcb.pix") + campo("01", PIX_KEY))+"520400005303986"+campo("54", v)+"5802BR"+campo("59", NOME)+campo("60", CIDADE)+"62070503***6304";
+
+    const payload =
+"000201"+
+campo("26",
+campo("00","br.gov.bcb.pix") +
+campo("01",PIX_KEY)
+)+
+"520400005303986"+
+campo("54",v)+
+"5802BR"+
+campo("59",NOME)+
+campo("60",CIDADE)+
+"62070503***6304";
+
     return payload + crc16(payload);
+
 }
 
 function gerarPixTela() {
-    let v = parseFloat(document.getElementById("valorDisplay").innerText.replace("R$","").replace(",","."));
+
+    let v = valorTotal;
+
     document.getElementById("pixCode").value = gerarPIX(v);
-    document.getElementById("qrPix").src = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(document.getElementById("pixCode").value);
+
+    document.getElementById("qrPix").src =
+"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" +
+encodeURIComponent(document.getElementById("pixCode").value);
+
 }
 
 function copiarPix() { 
+
     let e = document.getElementById("pixCode"); 
+
     e.select(); 
-    document.execCommand("Copy"); 
+
+    document.execCommand("copy"); 
+
     alert("Pix copiado!"); 
+
 }
 
-// COMPARTILHAR
-function compartilhar() { 
-    navigator.clipboard.writeText(window.textoCorrida).then(() => {
-        window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(window.textoCorrida), '_blank');
-    }).catch(() => {
-        window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(window.textoCorrida), '_blank');
-    });
-}
-
+// ==========================
 // HISTÓRICO
-function salvarNoHistorico(origem, destino, valor, distancia, tempo, dataFormatada, hora) {
-    let historico = JSON.parse(localStorage.getItem("historicoCorridas") || "[]");
-    let corrida = { origem, destino, valor, distancia, tempo, dataFormatada, hora };
-    historico.unshift(corrida);
-    localStorage.setItem("historicoCorridas", JSON.stringify(historico));
+// ==========================
+
+let historico =
+JSON.parse(localStorage.getItem("historicoCorridas")) || [];
+
+function salvarHistorico(){
+
+    const corrida = {
+
+        data:new Date().toLocaleString("pt-BR"),
+
+        origem:document.getElementById("origem").value || "Não informado",
+
+        destino:document.getElementById("destino").value || "Não informado",
+
+        valor:document.getElementById("valorDisplay").textContent,
+
+        distancia:document.getElementById("distancia").textContent,
+
+        tempo:document.getElementById("tempo").textContent,
+
+        tarifa:document.getElementById("tipoTarifa").textContent
+
+    };
+
+    historico.push(corrida);
+
+    localStorage.setItem(
+        "historicoCorridas",
+        JSON.stringify(historico)
+    );
+
 }
 
-function abrirHistorico() {
-    let historico = JSON.parse(localStorage.getItem("historicoCorridas") || "[]");
-    let lista = document.getElementById("listaHistorico");
+function atualizarListaHistorico(){
+
+    const lista =
+        document.getElementById("listaHistorico");
+
     lista.innerHTML = "";
-    if(historico.length === 0) {
-        lista.innerHTML = "<p>Nenhuma corrida registrada ainda.</p>";
-    } else {
-        historico.forEach((corrida, index) => {
-            let div = document.createElement("div");
-            div.className = "item-historico";
-            div.innerHTML = `
-                <strong>Corrida ${index + 1}</strong><br>
-                📅 ${corrida.dataFormatada} ⏰ ${corrida.hora}<br>
-                🚏 ${corrida.origem} → ${corrida.destino}<br>
-                💰 Valor: ${corrida.valor} | 📏 ${corrida.distancia} | ⏱️ ${corrida.tempo}
-            `;
-            lista.appendChild(div);
-        });
+
+    if(historico.length === 0){
+
+        lista.innerHTML =
+        "<p>Nenhuma corrida registrada.</p>";
+
+        return;
+
     }
-    document.getElementById("historico").style.display = "block";
-}
 
-function fecharHistorico() {
-    document.getElementById("historico").style.display = "none";
-}
+    historico.forEach((item,index)=>{
 
-function limparHistorico() {
-    if(confirm("Tem certeza que deseja limpar todo o histórico?")) {
-        localStorage.removeItem("historicoCorridas");
-        abrirHistorico();
-    }
-}
+        const div = document.createElement("div");
 
-// TABELA DE PREÇOS ATUALIZADA
-function abrirTabela() {
-    document.getElementById("tabelaTarifas").innerHTML = `
-    <h3>📋 Tabela de Preços</h3>
-    <table style="font-size: 0.78em;">
-        <tr>
-            <th>TARIFA</th>
-            <th>HORÁRIO</th>
-            <th>BANDEIRADA</th>
-            <th>VALOR KM</th>
-            <th>MÍNIMO</th>
-            <th>COMEÇA A SUBIR ALÉM DO MÍNIMO</th>
-        </tr>
-        <tr>
-            <td class="tarifa-verde">🟢 Barata</td>
-            <td>06h às 13h</td>
-            <td>R$ 3,00</td>
-            <td>R$ 1,50</td>
-            <td>R$ 9,00</td>
-            <td>A partir de 4,00 KM</td>
-        </tr>
-        <tr>
-            <td class="tarifa-amarela">🟡 Média</td>
-            <td>14h às 19h</td>
-            <td>R$ 3,00</td>
-            <td>R$ 1,70</td>
-            <td>R$ 10,00</td>
-            <td>A partir de 4,12 KM</td>
-        </tr>
-        <tr>
-            <td class="tarifa-vermelha">🔴 Premium</td>
-            <td>20h às 05h</td>
-            <td>R$ 3,50</td>
-            <td>R$ 1,90</td>
-            <td>R$ 12,00</td>
-            <td>A partir de 4,47 KM</td>
-        </tr>
-    </table>
-    <button onclick="fecharTabela()" style="width:100%;background:#555;color:white;margin-top:15px;">✖️ Fechar Tabela</button>
-    `;
-    document.getElementById("tabelaTarifas").style.display = "block";
-}
+        div.className = "item-historico";
 
-function fecharTabela() {
-    document.getElementById("tabelaTarifas").style.display = "none";
-}
+        div.innerHTML = `
+            <p><strong>Corrida #${index+1}</strong></p>
+            <p>📅 ${item.data}</p>
+            <p>📍 ${item.origem}</p>
+            <p>🎯 ${item.destino}</p>
+            <p>💰 ${item.valor}</p>
+            <p>📏 ${item.distancia}</p>
+            <p>⏱️ ${item.tempo}</p>
+            <p>📊 ${item.tarifa}</p>
+        `;
 
-// SERVICE WORKER
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js');
+        lista.appendChild(div);
+
     });
+
+}
+
+function abrirHistorico(){
+
+    atualizarListaHistorico();
+
+    document.getElementById("historico").style.display =
+        "block";
+
+}
+
+function fecharHistorico(){
+
+    document.getElementById("historico").style.display =
+        "none";
+
+}
+
+function limparHistorico(){
+
+    if(confirm("Apagar histórico?")){
+
+        historico = [];
+
+        localStorage.removeItem("historicoCorridas");
+
+        atualizarListaHistorico();
+
+    }
+
+}
+
+// ==========================
+// TABELA
+// ==========================
+
+function abrirTabela(){
+
+    document.getElementById("tabelaTarifas").style.display =
+        "block";
+
+}
+
+function fecharTabela(){
+
+    document.getElementById("tabelaTarifas").style.display =
+        "none";
+
+}
+
+// ==========================
+// INICIAR PÁGINA
+// ==========================
+
+window.onload = ()=>{
+
+    atualizarTela();
+
+};
+
+if ('serviceWorker' in navigator) {
+
+ navigator.serviceWorker.register('service-worker.js');
+
 }
 
 </script>
+
 </body>
 </html>
