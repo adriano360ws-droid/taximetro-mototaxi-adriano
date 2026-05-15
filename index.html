@@ -218,6 +218,12 @@ th,td{
         Tarifa:
         <span id="tipoTarifa">-</span>
     </p>
+    <p>
+    Espera:
+    <span id="valorEspera">
+        R$ 0,00
+    </span>
+</p>
 
 </div>
 
@@ -228,7 +234,18 @@ th,td{
 <button id="btnParar" class="btn-stop" onclick="parar()" disabled>
     PARAR CORRIDA
 </button>
+<button id="btnEspera" class="btn-table" onclick="ativarEspera()">
+⏱️ ATIVAR ESPERA
+</button>
 
+<button id="btnPararEspera"
+class="btn-stop"
+onclick="desativarEspera()"
+style="display:none;width:100%;margin-top:8px;">
+
+🛑 PARAR ESPERA
+
+</button>
 <div class="box">
 
     <input type="text" id="origem" placeholder="Local de saída">
@@ -249,6 +266,7 @@ th,td{
 📋 TABELA DE TARIFAS
 </button>
 
+
 <div id="comprovante">
 
 <h3>📝 COMPROVANTE DE CORRIDA</h3>
@@ -258,6 +276,7 @@ th,td{
 <p id="compValor"></p>
 <p id="compKm"></p>
 <p id="compTempo"></p>
+<p id="compEspera"></p>
 
 <button class="btn-pix" onclick="compartilhar()">
 📲 Compartilhar
@@ -299,6 +318,9 @@ border-radius:12px;
 
 </div>
 
+
+</div>
+
 <div id="tabelaTarifas">
 
 <h3>📋 TABELA DE TARIFAS</h3>
@@ -320,16 +342,16 @@ border-radius:12px;
 <td>R$ 3,00</td>
 <td>R$ 1,30</td>
 <td>GPS em tempo real</td>
-<td>R$ 7,00</td>
+<td>R$ 8,00</td>
 </tr>
 
 <tr>
 <td class="tarifa-amarela">🟡 Tarde</td>
-<td>14h às 17h</td>
+<td>14h às 18h</td>
 <td>R$ 3,00</td>
 <td>R$ 1,50</td>
 <td>GPS em tempo real</td>
-<td>R$ 7,00</td>
+<td>R$ 8,00</td>
 </tr>
 
 <tr>
@@ -338,14 +360,10 @@ border-radius:12px;
 <td>R$ 3,50</td>
 <td>R$ 1,70</td>
 <td>GPS em tempo real</td>
-<td>R$ 7,00</td>
+<td>R$ 9,00</td>
 </tr>
 
 </table>
-
-<button class="fechar-btn" onclick="fecharTabela()">
-✖️ Fechar Tabela
-</button>
 
 </div>
 </table>
@@ -376,11 +394,20 @@ let valorKm = 0;
 let tipoTarifa = "";
 let valorTotal = 0;
 
+// ⏱️ TEMPO PARADO
+let tempoParadoAtivo = false;
+
+let minutosParados = 0;
+
+let valorMinutoParado = 0.25;
+
+
+
 // ==========================
 // DADOS
-// ==========================
+// =========================
 const SITE_OFICIAL =
-"https://adriano360ws-droid.github.io/taximetro-mototaxi-adriano/";
+"https://adriano360ws-droid.github.io/taximetro-pro-passageiro/";
 const NOME_MOTO = "Adriano Souza";
 const TELEFONE = "(86) 98129-1332";
 const VEICULO = "Fan CG 125 Preta";
@@ -464,6 +491,8 @@ function iniciar(){
 
     segundos = 0;
     km = 0;
+    minutosParados = 0;
+    tempoParadoAtivo = false;
 
     ultimaPosicao = null;
 
@@ -482,7 +511,18 @@ function iniciar(){
 
         segundos++;
 
-        atualizarTela();
+        // ⏱️ COBRANÇA PARADO
+        if(tempoParadoAtivo){
+
+            minutosParados += 1/60;
+
+        }
+
+        if(rodando){
+
+            atualizarTela();
+
+        }
 
     },1000);
 
@@ -522,15 +562,13 @@ function iniciar(){
                 lon
             );
 
-            if(dist > 0.001 && dist < 1){
+            if(dist > 0.01 && dist < 1){
 
-                km += dist;
+    km += dist;
 
-            }
+}
 
             ultimaPosicao = {lat, lon};
-
-            atualizarTela();
 
         },
 
@@ -543,9 +581,9 @@ function iniciar(){
         },
 
         {
-            enableHighAccuracy:true,
-            maximumAge:0,
-            timeout:10000
+            enableHighAccuracy:false,
+            maximumAge:10000,
+            timeout:20000
         }
 
     );
@@ -674,15 +712,30 @@ function atualizarTela(){
     // ==========================
 
     valorTotal =
-    bandeirada + (km * valorKm);
+bandeirada +
+(km * valorKm) +
+(minutosParados * valorMinutoParado);
 
     // ==========================
     // MÍNIMO
     // ==========================
+if(hora >= 18 || hora < 6){
 
-    if(valorTotal < 7){
+    if(valorTotal < 9){
 
-        valorTotal = 7;
+        valorTotal = 9;
+
+    }
+
+}else{
+
+    if(valorTotal < 8){
+
+        valorTotal = 8;
+
+    }
+
+    
 
     }
 
@@ -722,8 +775,13 @@ function atualizarTela(){
 
     document.getElementById("tipoTarifa").textContent =
     tipoTarifa;
-
+    
+    document.getElementById("valorEspera").textContent =
+`R$ ${(minutosParados * valorMinutoParado)
+.toFixed(2)
+.replace(".",",")}`;
 }
+
 
 // ==========================
 // MAPS
@@ -772,6 +830,10 @@ function gerarComprovante(){
 
     document.getElementById("compTempo").textContent =
         `⏱️ ${document.getElementById("tempo").textContent}`;
+        document.getElementById("compEspera").textContent =
+`🚦 Espera: R$ ${(minutosParados * valorMinutoParado)
+.toFixed(2)
+.replace(".",",")}`;
 
     document.getElementById("comprovante").style.display = "block";
 
@@ -809,6 +871,10 @@ function compartilhar(){
 
     const valorKmTexto =
     valorKm.toFixed(2).replace(".",",");
+    const valorEspera =
+(minutosParados * valorMinutoParado)
+.toFixed(2)
+.replace(".",",");
 
     const mensagem =
 `🛵 *COMPROVANTE OFICIAL DE CORRIDA*
@@ -853,9 +919,12 @@ R$ ${bandeiradaTexto} +
 
 🧾 Total KM:
 R$ ${calculoKm}
+🚦 Espera:
+R$ ${valorEspera}
 
 💰 Valor Final:
 ${valor}
+
 
 ━━━━━━━━━━━━━━━
 🧍 MOTOTAXISTA
@@ -987,16 +1056,22 @@ document.getElementById("pixCode").value
 
 }
 
-function copiarPix(){
+async function copiarPix(){
 
     const campoPix =
-    document.getElementById("pixCode");
+    document.getElementById("pixCode").value;
 
-    campoPix.select();
+    try{
 
-    document.execCommand("copy");
+        await navigator.clipboard.writeText(campoPix);
 
-    alert("Pix copiado!");
+        alert("Pix copiado!");
+
+    }catch(e){
+
+        alert("Erro ao copiar Pix.");
+
+    }
 
 }
 
@@ -1019,7 +1094,12 @@ function salvarHistorico(){
 
         tempo:document.getElementById("tempo").textContent,
 
-        tarifa:tipoTarifa
+        tarifa:tipoTarifa,
+
+espera:
+`R$ ${(minutosParados * valorMinutoParado)
+.toFixed(2)
+.replace(".",",")}`
 
     };
 
@@ -1063,6 +1143,7 @@ function atualizarListaHistorico(){
         <p>📏 ${item.distancia}</p>
         <p>⏱️ ${item.tempo}</p>
         <p>📊 ${item.tarifa}</p>
+        <p>🚦 ${item.espera}</p>
         `;
 
         lista.appendChild(div);
@@ -1112,10 +1193,45 @@ function abrirTabela(){
 
 }
 
+
+
 function fecharTabela(){
 
     document.getElementById("tabelaTarifas").style.display =
     "none";
+
+}
+
+
+// ==========================
+// TEMPO PARADO / ESPERA
+// ==========================
+
+function ativarEspera(){
+
+    tempoParadoAtivo = true;
+
+    document.getElementById("btnEspera").style.display =
+    "none";
+
+    document.getElementById("btnPararEspera").style.display =
+    "block";
+
+    tocarSom(1000,150);
+
+}
+
+function desativarEspera(){
+
+    tempoParadoAtivo = false;
+
+    document.getElementById("btnEspera").style.display =
+    "block";
+
+    document.getElementById("btnPararEspera").style.display =
+    "none";
+
+    tocarSom(500,150);
 
 }
 
