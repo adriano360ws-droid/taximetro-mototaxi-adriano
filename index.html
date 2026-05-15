@@ -308,35 +308,46 @@ border-radius:12px;
 <tr>
 <th>TARIFA</th>
 <th>HORÁRIO</th>
+<th>BANDEIRADA</th>
 <th>VALOR/KM</th>
+<th>COBRANÇA</th>
 <th>MÍNIMO</th>
-<th>COMEÇA COBRAR KM</th>
 </tr>
 
 <tr>
-<td class="tarifa-verde">🟢 Baixa</td>
+<td class="tarifa-verde">🟢 Manhã</td>
 <td>06h às 13h</td>
+<td>R$ 3,00</td>
 <td>R$ 1,30</td>
-<td>R$ 8,00</td>
-<td>Após 3,85 km</td>
+<td>GPS em tempo real</td>
+<td>R$ 7,00</td>
 </tr>
 
 <tr>
-<td class="tarifa-amarela">🟡 Média</td>
-<td>14h às 19h</td>
+<td class="tarifa-amarela">🟡 Tarde</td>
+<td>14h às 17h</td>
+<td>R$ 3,00</td>
 <td>R$ 1,50</td>
-<td>R$ 10,00</td>
-<td>Após 4,67 km</td>
+<td>GPS em tempo real</td>
+<td>R$ 7,00</td>
 </tr>
 
 <tr>
-<td class="tarifa-vermelha">🔴 Alta</td>
-<td>20h às 05h</td>
+<td class="tarifa-vermelha">🔴 Noite</td>
+<td>18h às 05h</td>
+<td>R$ 3,50</td>
 <td>R$ 1,70</td>
-<td>R$ 11,00</td>
-<td>Após 4,41 km</td>
+<td>GPS em tempo real</td>
+<td>R$ 7,00</td>
 </tr>
 
+</table>
+
+<button class="fechar-btn" onclick="fecharTabela()">
+✖️ Fechar Tabela
+</button>
+
+</div>
 </table>
 
 <button class="fechar-btn" onclick="fecharTabela()">
@@ -362,7 +373,6 @@ let watchId = null;
 
 let bandeirada = 0;
 let valorKm = 0;
-let valorMinimo = 0;
 let tipoTarifa = "";
 let valorTotal = 0;
 
@@ -511,7 +521,6 @@ function iniciar(){
                 lon
             );
 
-            // FILTRO PARA EVITAR KM FALSO
             if(dist > 0.001 && dist < 1){
 
                 km += dist;
@@ -600,27 +609,25 @@ function calcularDistancia(lat1, lon1, lat2, lon2){
 
 }
 
+// ==========================
+// ATUALIZAR TELA
+// ==========================
+
 function atualizarTela(){
 
     const hora = new Date().getHours();
 
-    let kmLiberado = 0;
-
     // ==========================
-    // TARIFA BAIXA
+    // TARIFA MANHÃ
     // ==========================
 
     if(hora >= 6 && hora < 14){
 
-        tipoTarifa = "🟢 BAIXA";
+        tipoTarifa = "🟢 MANHÃ";
 
-        bandeirada = 3.0;
+        bandeirada = 3.00;
 
-        valorKm = 1.3;
-
-        valorMinimo = 8.0;
-
-        kmLiberado = 3.85;
+        valorKm = 1.30;
 
         document.getElementById("valorDisplay").style.color =
         "#00B050";
@@ -628,20 +635,16 @@ function atualizarTela(){
     }
 
     // ==========================
-    // TARIFA MÉDIA
+    // TARIFA TARDE
     // ==========================
 
-    else if(hora >= 14 && hora < 20){
+    else if(hora >= 14 && hora < 18){
 
-        tipoTarifa = "🟡 MÉDIA";
+        tipoTarifa = "🟡 TARDE";
 
-        bandeirada = 3.0;
+        bandeirada = 3.00;
 
-        valorKm = 1.5;
-
-        valorMinimo = 10.0;
-
-        kmLiberado = 4.67;
+        valorKm = 1.50;
 
         document.getElementById("valorDisplay").style.color =
         "#FFB300";
@@ -649,20 +652,16 @@ function atualizarTela(){
     }
 
     // ==========================
-    // TARIFA ALTA
+    // TARIFA NOITE
     // ==========================
 
     else{
 
-        tipoTarifa = "🔴 ALTA";
+        tipoTarifa = "🔴 NOITE";
 
-        bandeirada = 3.5;
+        bandeirada = 3.50;
 
-        valorKm = 1.7;
-
-        valorMinimo = 11.0;
-
-        kmLiberado = 4.41;
+        valorKm = 1.70;
 
         document.getElementById("valorDisplay").style.color =
         "#E53935";
@@ -670,23 +669,26 @@ function atualizarTela(){
     }
 
     // ==========================
-    // COBRANÇA REAL
+    // COBRANÇA GPS REAL
     // ==========================
 
-    let kmCobrados =
-    Math.max(0, km - kmLiberado);
-
     valorTotal =
-    bandeirada + (kmCobrados * valorKm);
+    bandeirada + (km * valorKm);
 
-    // VALOR MÍNIMO
-    if(valorTotal < valorMinimo){
+    // ==========================
+    // MÍNIMO
+    // ==========================
 
-        valorTotal = valorMinimo;
+    if(valorTotal < 7){
+
+        valorTotal = 7;
 
     }
 
-    // ARREDONDAR PARA CIMA EM 10 CENTAVOS
+    // ==========================
+    // ARREDONDAMENTO
+    // ==========================
+
     valorTotal =
     Math.ceil(valorTotal * 10) / 10;
 
@@ -705,7 +707,7 @@ function atualizarTela(){
 `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
 
     // ==========================
-    // EXIBIR NA TELA
+    // EXIBIR
     // ==========================
 
     document.getElementById("valorDisplay").textContent =
@@ -721,7 +723,7 @@ function atualizarTela(){
     tipoTarifa;
 
 }
- 
+
 // ==========================
 // MAPS
 // ==========================
@@ -781,54 +783,134 @@ function gerarComprovante(){
 function compartilhar(){
 
     const origem =
-        document.getElementById("origem").value || "Não informado";
+    document.getElementById("origem").value || "Não informado";
 
     const destino =
-        document.getElementById("destino").value || "Não informado";
+    document.getElementById("destino").value || "Não informado";
 
     const valor =
-        document.getElementById("valorDisplay").textContent;
+    document.getElementById("valorDisplay").textContent;
 
     const distancia =
-        document.getElementById("distancia").textContent;
+    document.getElementById("distancia").textContent;
 
     const tempo =
-        document.getElementById("tempo").textContent;
+    document.getElementById("tempo").textContent;
 
     const data =
-        new Date().toLocaleString("pt-BR");
+    new Date().toLocaleString("pt-BR");
 
-    const mensagem = `🛵 *COMPROVANTE DE CORRIDA*
+    // ==========================
+    // CÁLCULO DETALHADO
+    // ==========================
 
-📅 ${data}
+    const calculoKm =
+    (km * valorKm).toFixed(2).replace(".",",");
 
-📍 Origem:
+    const bandeiradaTexto =
+    bandeirada.toFixed(2).replace(".",",");
+
+    const valorKmTexto =
+    valorKm.toFixed(2).replace(".",",");
+
+    // ==========================
+    // MENSAGEM COMPLETA
+    // ==========================
+
+    const mensagem =
+`🛵 *COMPROVANTE OFICIAL DE CORRIDA*
+
+━━━━━━━━━━━━━━━
+📅 DATA/HORA
+━━━━━━━━━━━━━━━
+${data}
+
+━━━━━━━━━━━━━━━
+📍 TRAJETO
+━━━━━━━━━━━━━━━
+
+🟢 Origem:
 ${origem}
 
-🎯 Destino:
+🔴 Destino:
 ${destino}
 
-💰 Valor: ${valor}
+━━━━━━━━━━━━━━━
+📊 DADOS DA CORRIDA
+━━━━━━━━━━━━━━━
 
-📏 Distância: ${distancia}
+📏 Distância Percorrida:
+${distancia}
 
-⏱️ Tempo: ${tempo}
+⏱️ Tempo Total:
+${tempo}
 
-📊 Tarifa: ${tipoTarifa}
+🚦 Tarifa Aplicada:
+${tipoTarifa}
 
-👤 Mototaxista:
+💵 Bandeirada:
+R$ ${bandeiradaTexto}
+
+🛣️ Valor por KM:
+R$ ${valorKmTexto}
+
+🧮 Cálculo:
+R$ ${bandeiradaTexto} + 
+(${km.toFixed(2)} km × R$ ${valorKmTexto})
+
+🧾 Total KM:
+R$ ${calculoKm}
+
+💰 Valor Final:
+${valor}
+
+━━━━━━━━━━━━━━━
+🧍 MOTOTAXISTA
+━━━━━━━━━━━━━━━
+
+👤 Nome:
 ${NOME_MOTO}
 
-📞 ${TELEFONE}
+📞 Telefone:
+${TELEFONE}
 
-🏍️ ${VEICULO}
-🔤 Placa: ${PLACA}
+🏍️ Veículo:
+${VEICULO}
 
-🙏 Obrigado pela preferência!
+🔤 Placa:
+${PLACA}
 
-Foi um prazer ajudar no seu transporte hoje.
-Segurança e conforto sempre em primeiro lugar!
-Volte sempre! 😃`;
+📌 Cidade:
+${CIDADE}
+
+━━━━━━━━━━━━━━━
+💳 PAGAMENTO PIX
+━━━━━━━━━━━━━━━
+
+🔑 Chave Pix:
+${PIX_KEY}
+
+👤 Favorecido:
+${NOME}
+
+━━━━━━━━━━━━━━━
+🙏 AGRADECIMENTO
+━━━━━━━━━━━━━━━
+
+Obrigado pela preferência! 😊
+
+Foi um prazer realizar seu transporte com segurança, rapidez e responsabilidade.
+
+Tenha um excelente dia e volte sempre! 🛵✨`;
+
+━━━━━━━━━━━━━━━
+🌐 APP OFICIAL
+━━━━━━━━━━━━━━━
+
+https://seudominio.com
+
+Baixe ou acesse o sistema oficial
+Taxímetro Pro Adriano Moto.
 
     window.open(
         `https://wa.me/?text=${encodeURIComponent(mensagem)}`,
@@ -836,37 +918,54 @@ Volte sempre! 😃`;
     );
 
 }
-
 // ==========================
 // PIX
 // ==========================
 
-function campo(id, v) {
-    const t = String(v.length).padStart(2,'0');
-    return id + t + v;
+function campo(id, valor){
+
+    const tamanho =
+    String(valor.length).padStart(2,'0');
+
+    return id + tamanho + valor;
+
 }
 
-function crc16(s) { 
-    let c = 0xFFFF, p = 0x1021; 
+function crc16(str){
 
-    for(let i=0;i<s.length;i++){ 
+    let crc = 0xFFFF;
 
-        c ^= s.charCodeAt(i) << 8; 
+    for(let c = 0; c < str.length; c++){
 
-        for(let j=0;j<8;j++) 
-            c = (c&0x8000)?(c<<1)^p:(c<<1); 
+        crc ^= str.charCodeAt(c) << 8;
 
-    } 
+        for(let i = 0; i < 8; i++){
 
-    return (c&0xFFFF)
+            if(crc & 0x8000){
+
+                crc = (crc << 1) ^ 0x1021;
+
+            }else{
+
+                crc = crc << 1;
+
+            }
+
+        }
+
+    }
+
+    return (crc & 0xFFFF)
     .toString(16)
     .toUpperCase()
-    .padStart(4,'0'); 
+    .padStart(4,'0');
+
 }
 
-function gerarPIX(valor) {
+function gerarPIX(valor){
 
-    const v = Number(valor).toFixed(2);
+    const valorPix =
+    Number(valor).toFixed(2);
 
     const payload =
 "000201"+
@@ -875,7 +974,7 @@ campo("00","br.gov.bcb.pix") +
 campo("01",PIX_KEY)
 )+
 "520400005303986"+
-campo("54",v)+
+campo("54",valorPix)+
 "5802BR"+
 campo("59",NOME)+
 campo("60",CIDADE)+
@@ -885,27 +984,29 @@ campo("60",CIDADE)+
 
 }
 
-function gerarPixTela() {
+function gerarPixTela(){
 
-    let v = valorTotal;
-
-    document.getElementById("pixCode").value = gerarPIX(v);
+    document.getElementById("pixCode").value =
+    gerarPIX(valorTotal);
 
     document.getElementById("qrPix").src =
 "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" +
-encodeURIComponent(document.getElementById("pixCode").value);
+encodeURIComponent(
+document.getElementById("pixCode").value
+);
 
 }
 
-function copiarPix() { 
+function copiarPix(){
 
-    let e = document.getElementById("pixCode"); 
+    const campoPix =
+    document.getElementById("pixCode");
 
-    e.select(); 
+    campoPix.select();
 
-    document.execCommand("copy"); 
+    document.execCommand("copy");
 
-    alert("Pix copiado!"); 
+    alert("Pix copiado!");
 
 }
 
@@ -922,17 +1023,13 @@ function salvarHistorico(){
 
         data:new Date().toLocaleString("pt-BR"),
 
-        origem:document.getElementById("origem").value || "Não informado",
-
-        destino:document.getElementById("destino").value || "Não informado",
-
         valor:document.getElementById("valorDisplay").textContent,
 
         distancia:document.getElementById("distancia").textContent,
 
         tempo:document.getElementById("tempo").textContent,
 
-        tarifa:document.getElementById("tipoTarifa").textContent
+        tarifa:tipoTarifa
 
     };
 
@@ -948,7 +1045,7 @@ function salvarHistorico(){
 function atualizarListaHistorico(){
 
     const lista =
-        document.getElementById("listaHistorico");
+    document.getElementById("listaHistorico");
 
     lista.innerHTML = "";
 
@@ -963,19 +1060,19 @@ function atualizarListaHistorico(){
 
     historico.forEach((item,index)=>{
 
-        const div = document.createElement("div");
+        const div =
+        document.createElement("div");
 
-        div.className = "item-historico";
+        div.className =
+        "item-historico";
 
         div.innerHTML = `
-            <p><strong>Corrida #${index+1}</strong></p>
-            <p>📅 ${item.data}</p>
-            <p>📍 ${item.origem}</p>
-            <p>🎯 ${item.destino}</p>
-            <p>💰 ${item.valor}</p>
-            <p>📏 ${item.distancia}</p>
-            <p>⏱️ ${item.tempo}</p>
-            <p>📊 ${item.tarifa}</p>
+        <p><strong>Corrida #${index+1}</strong></p>
+        <p>📅 ${item.data}</p>
+        <p>💰 ${item.valor}</p>
+        <p>📏 ${item.distancia}</p>
+        <p>⏱️ ${item.tempo}</p>
+        <p>📊 ${item.tarifa}</p>
         `;
 
         lista.appendChild(div);
@@ -989,14 +1086,14 @@ function abrirHistorico(){
     atualizarListaHistorico();
 
     document.getElementById("historico").style.display =
-        "block";
+    "block";
 
 }
 
 function fecharHistorico(){
 
     document.getElementById("historico").style.display =
-        "none";
+    "none";
 
 }
 
@@ -1021,26 +1118,16 @@ function limparHistorico(){
 function abrirTabela(){
 
     document.getElementById("tabelaTarifas").style.display =
-        "block";
+    "block";
 
 }
 
 function fecharTabela(){
 
     document.getElementById("tabelaTarifas").style.display =
-        "none";
+    "none";
 
 }
-
-// ==========================
-// INICIAR PÁGINA
-// ==========================
-
-window.onload = ()=>{
-
-    atualizarTela();
-
-};
 
 if ('serviceWorker' in navigator) {
 
