@@ -535,34 +535,36 @@ function iniciar(){
     }
 
     watchId = navigator.geolocation.watchPosition(
+    (pos)=>{
 
-        (pos)=>{
+        if(!rodando) return;
 
-            if(!rodando) return;
+        let lat = pos.coords.latitude;
+        let lon = pos.coords.longitude;
 
-            let lat = pos.coords.latitude;
-            let lon = pos.coords.longitude;
+        let precisao = pos.coords.accuracy;
 
-            let precisao = pos.coords.accuracy;
+        if(precisao > 50) return;
 
-            if(precisao > 200) return;
+        if(!ultimaPosicao){
+            ultimaPosicao = {lat, lon};
+            return;
+        }
 
-            if(!ultimaPosicao){
+        let dist = calcularDistancia(
+            ultimaPosicao.lat,
+            ultimaPosicao.lon,
+            lat,
+            lon
+        );
 
-                ultimaPosicao = {lat, lon};
+        if(dist > 0.002){
+            km += dist;
+        }
 
-                return;
+        ultimaPosicao = {lat, lon};
 
-            }
-
-            let dist = calcularDistancia(
-                ultimaPosicao.lat,
-                ultimaPosicao.lon,
-                lat,
-                lon
-            );
-
-            if(dist > 0.01 && dist < 1){
+    },
 
     km += dist;
 
@@ -581,7 +583,7 @@ function iniciar(){
         },
 
         {
-            enableHighAccuracy:false,
+            enableHighAccuracy:true
             maximumAge:10000,
             timeout:20000
         }
