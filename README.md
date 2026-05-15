@@ -1,4 +1,4 @@
-# 🛵 Moto Táxi Adriano
+# 🛵 taximetro-pro-passageiro
 
 Aplicativo web (PWA) de taxímetro para uso próprio.
 
@@ -21,3 +21,4 @@ Aplicativo web (PWA) de taxímetro para uso próprio.
 
 ## 👤 Desenvolvido por
 Moto Táxi Adriano
+taximetro-pro-passageiro
