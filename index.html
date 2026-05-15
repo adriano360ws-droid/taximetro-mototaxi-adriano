@@ -379,7 +379,8 @@ let valorTotal = 0;
 // ==========================
 // DADOS
 // ==========================
-
+const SITE_OFICIAL =
+"https://adriano360ws-droid.github.io/taximetro-mototaxi-adriano/";
 const NOME_MOTO = "Adriano Souza";
 const TELEFONE = "(86) 98129-1332";
 const VEICULO = "Fan CG 125 Preta";
@@ -800,10 +801,6 @@ function compartilhar(){
     const data =
     new Date().toLocaleString("pt-BR");
 
-    // ==========================
-    // CÁLCULO DETALHADO
-    // ==========================
-
     const calculoKm =
     (km * valorKm).toFixed(2).replace(".",",");
 
@@ -812,10 +809,6 @@ function compartilhar(){
 
     const valorKmTexto =
     valorKm.toFixed(2).replace(".",",");
-
-    // ==========================
-    // MENSAGEM COMPLETA
-    // ==========================
 
     const mensagem =
 `🛵 *COMPROVANTE OFICIAL DE CORRIDA*
@@ -855,7 +848,7 @@ R$ ${bandeiradaTexto}
 R$ ${valorKmTexto}
 
 🧮 Cálculo:
-R$ ${bandeiradaTexto} + 
+R$ ${bandeiradaTexto} +
 (${km.toFixed(2)} km × R$ ${valorKmTexto})
 
 🧾 Total KM:
@@ -894,6 +887,12 @@ ${PIX_KEY}
 ${NOME}
 
 ━━━━━━━━━━━━━━━
+🌐 APP OFICIAL
+━━━━━━━━━━━━━━━
+
+${SITE_OFICIAL}
+
+━━━━━━━━━━━━━━━
 🙏 AGRADECIMENTO
 ━━━━━━━━━━━━━━━
 
@@ -902,15 +901,6 @@ Obrigado pela preferência! 😊
 Foi um prazer realizar seu transporte com segurança, rapidez e responsabilidade.
 
 Tenha um excelente dia e volte sempre! 🛵✨`;
-
-━━━━━━━━━━━━━━━
-🌐 APP OFICIAL
-━━━━━━━━━━━━━━━
-
-https://seudominio.com
-
-Baixe ou acesse o sistema oficial
-Taxímetro Pro Adriano Moto.
 
     window.open(
         `https://wa.me/?text=${encodeURIComponent(mensagem)}`,
