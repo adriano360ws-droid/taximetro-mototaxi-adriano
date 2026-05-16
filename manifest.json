@@ -1,62 +1,38 @@
-{
-  "name": "Taxímetro Pro",
-  "short_name": "Taxímetro Pro",
-  "description": "Aplicativo de cálculo de corrida para moto, com funções completas e configurações personalizadas",
-  "start_url": "/index.html",
-  "display": "standalone",
-  "background_color": "#00B050",
-  "theme_color": "#00B050",
-  "orientation": "portrait-primary",
-  "icons": [
+"icons": [
     {
-      "src": "icon-48.png",
+      "src": "icone-48.png",
       "sizes": "48x48",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icon-72.png",
+      "src": "icone-72.png",
       "sizes": "72x72",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icon-96.png",
+      "src": "icone-96.png",
       "sizes": "96x96",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icon-144.png",
+      "src": "icone-144.png",
       "sizes": "144x144",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icon-192.png",
+      "src": "icone-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icon-512.png",
+      "src": "icone-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ],
-  "screenshots": [
-    {
-      "src": "tela-principal.png",
-      "sizes": "720x1280",
-      "type": "image/png",
-      "description": "Tela principal do aplicativo com valores e controles"
-    },
-    {
-      "src": "tela-configuracoes.png",
-      "sizes": "720x1280",
-      "type": "image/png",
-      "description": "Tela de configuração de valores e tarifas"
-    }
   ]
-}
