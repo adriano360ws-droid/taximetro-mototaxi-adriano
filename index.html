@@ -5,13 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#00B050">
+<meta name="description" content="Taxímetro Pro - Cálculo de corrida para moto com precisão e praticidade">
+
+<!-- Ícones em diferentes tamanhos (Melhoria 9) -->
+<link rel="icon" type="image/png" sizes="48x48" href="icon-48.png">
+<link rel="icon" type="image/png" sizes="72x72" href="icon-72.png">
+<link rel="icon" type="image/png" sizes="96x96" href="icon-96.png">
+<link rel="icon" type="image/png" sizes="144x144" href="icon-144.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
 
-<meta name="theme-color" content="#00B050">
-
-<title>Taxímetro Pro | Uber Moto</title>
+<title>Taxímetro Pro | Moto</title>
 
 <style>
 *{
@@ -19,6 +27,51 @@
     margin:0;
     padding:0;
     font-family:'Roboto',Arial,sans-serif;
+    transition: background 0.3s ease, color 0.3s ease, font-size 0.3s ease;
+}
+
+/* MODO ESCURO (Melhoria 6) */
+body.dark-mode{
+    background:#121212;
+    color:#E0E0E0;
+}
+
+body.dark-mode .box,
+body.dark-mode #comprovante,
+body.dark-mode #historico,
+body.dark-mode #tabelaTarifas{
+    background:#1E1E1E;
+    color:#E0E0E0;
+}
+
+body.dark-mode .item-historico{
+    background:#2C2C2C;
+}
+
+body.dark-mode .fechar-btn{
+    background:#333;
+    color:#E0E0E0;
+}
+
+body.dark-mode .btn-table{
+    background:#FFB74D;
+    color:#000;
+}
+
+body.dark-mode .btn-history{
+    background:#9C6ADE;
+}
+
+body.dark-mode .tarifa-verde{
+    background:#1B4D3E;
+}
+
+body.dark-mode .tarifa-amarela{
+    background:#5C5016;
+}
+
+body.dark-mode .tarifa-vermelha{
+    background:#5C1B1B;
 }
 
 body{
@@ -27,6 +80,7 @@ body{
     text-align:center;
     padding:15px;
     font-size:1.08em;
+    --tamanho-fonte: 1em;
 }
 
 .container{
@@ -38,31 +92,46 @@ h2{
     color:#00B050;
     margin-bottom:20px;
 }
+
+body.dark-mode h2{
+    color:#66BB6A;
+}
+
 .box p{
-    font-size:1.2em;
+    font-size:var(--tamanho-fonte, 1.2em);
     margin:4px 0;
     line-height:1.1;
 }
 
 #valorDisplay{
-    font-size:4.5em;
+    font-size:calc(var(--tamanho-fonte, 1em) * 3.5);
     font-weight:700;
     color:#00B050;
     margin:5px 0 10px 0;
     line-height:1;
 }
 
+body.dark-mode #valorDisplay{
+    color:#66BB6A;
+}
+
 #distancia,
 #tempo,
 #tempoEspera{
-    font-size:3.3em;
+    font-size:calc(var(--tamanho-fonte, 1em) * 2.5);
     font-weight:bold;
     color:#FFA800;
     line-height:1;
 }
 
+body.dark-mode #distancia,
+body.dark-mode #tempo,
+body.dark-mode #tempoEspera{
+    color:#FFB74D;
+}
+
 #tipoTarifa{
-    font-size:1.3em;
+    font-size:calc(var(--tamanho-fonte, 1em) * 1.1);
     font-weight:bold;
     display:inline-block;
     margin-top:10px;
@@ -71,12 +140,16 @@ h2{
     border-radius:20px;
 }
 
+body.dark-mode #tipoTarifa{
+    background:#333;
+}
+
 button{
     padding:16px;
     margin:6px 4px;
     border:none;
     border-radius:12px;
-    font-size:1em;
+    font-size:var(--tamanho-fonte, 1em);
     font-weight:bold;
     cursor:pointer;
     transition:opacity 0.2s;
@@ -134,6 +207,11 @@ button:disabled{
     width:100%;
 }
 
+body.dark-mode .fechar-btn{
+    background:#333;
+    color:#E0E0E0;
+}
+
 input,
 textarea{
     width:100%;
@@ -141,12 +219,22 @@ textarea{
     margin:10px 0;
     border-radius:12px;
     border:1px solid #DDD;
-    font-size:1em;
+    font-size:var(--tamanho-fonte, 1em);
+    background:#FFF;
+    color:#1C1C1C;
+}
+
+body.dark-mode input,
+body.dark-mode textarea{
+    background:#2C2C2C;
+    color:#E0E0E0;
+    border-color:#444;
 }
 
 #comprovante,
 #historico,
-#tabelaTarifas{
+#tabelaTarifas,
+#telaConfiguracao{
     display:none;
     background:#FFF;
     padding:20px;
@@ -155,8 +243,15 @@ textarea{
     box-shadow:0 2px 8px rgba(0,0,0,.08);
 }
 
+body.dark-mode #comprovante,
+body.dark-mode #historico,
+body.dark-mode #tabelaTarifas,
+body.dark-mode #telaConfiguracao{
+    background:#1E1E1E;
+}
+
 #comprovante p{
-    font-size:1.2em;
+    font-size:var(--tamanho-fonte, 1.2em);
     margin:8px 0;
     font-weight:500;
 }
@@ -178,7 +273,12 @@ table{
 th,td{
     border:1px solid #DDD;
     padding:10px;
-    font-size:.9em;
+    font-size:0.9em;
+}
+
+body.dark-mode th,
+body.dark-mode td{
+    border-color:#444;
 }
 
 .tarifa-verde{
@@ -193,20 +293,103 @@ th,td{
     background:#FFEBEE;
 }
 
-@media(max-width:380px){
-    #valorDisplay{font-size:3.5em;}
-    #distancia, #tempo, #tempoEspera{font-size:2.5em;}
-    button{padding:12px 8px; font-size:0.95em;}
+body.dark-mode .tarifa-verde{
+    background:#1B4D3E;
 }
 
+body.dark-mode .tarifa-amarela{
+    background:#5C5016;
+}
+
+body.dark-mode .tarifa-vermelha{
+    background:#5C1B1B;
+}
+
+/* BOTÕES ADICIONAIS DAS MELHORIAS */
+.botoes-ajustes{
+    display:flex;
+    gap:8px;
+    margin:10px 0;
+    flex-wrap:wrap;
+    justify-content:center;
+}
+
+.btn-ajuste{
+    padding:10px 12px;
+    font-size:0.9em;
+    width:auto;
+    flex:1;
+    min-width:100px;
+}
+
+.btn-config{
+    background:#6C47C8;
+    color:white;
+}
+
+.btn-modo{
+    background:#FFA800;
+    color:white;
+}
+
+.btn-economia{
+    background:#00B050;
+    color:white;
+}
+
+.tela-carregamento{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:#00B050;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    color:white;
+    z-index:9999;
+    transition:opacity 0.5s ease;
+}
+
+.tela-carregamento .logo{
+    font-size:3em;
+    margin-bottom:20px;
+}
+
+.tela-carregamento .carregando{
+    font-size:1.2em;
+}
+
+@media(max-width:380px){
+    #valorDisplay{font-size:calc(var(--tamanho-fonte, 1em) * 2.8);}
+    #distancia, #tempo, #tempoEspera{font-size:calc(var(--tamanho-fonte, 1em) * 1.8);}
+    button{padding:12px 8px; font-size:0.95em;}
+}
 </style>
 </head>
 
-<body>
+<body onload="ocultarTelaCarregamento()">
+
+<!-- TELA DE CARREGAMENTO - MELHORIA 9 -->
+<div class="tela-carregamento" id="telaCarregamento">
+    <div class="logo">🛵</div>
+    <div class="carregando">Taxímetro Pro<br>Carregando...</div>
+</div>
 
 <div class="container">
 
-<h2>🛵 Taxímetro Pro | Uber Moto</h2>
+<h2>🛵 Taxímetro Pro | Moto</h2>
+
+<!-- BOTÕES DE AJUSTES - MELHORIAS 6,7,2 -->
+<div class="botoes-ajustes">
+    <button class="btn-modo btn-ajuste" id="btnModoEscuro">🌓 Modo Escuro</button>
+    <button class="btn-ajuste" id="btnAumentarFonte">A+ Aumentar Fonte</button>
+    <button class="btn-ajuste" id="btnDiminuirFonte">A- Diminuir Fonte</button>
+    <button class="btn-economia btn-ajuste" id="btnModoEconomia">⚡ Modo Economia</button>
+    <button class="btn-config btn-ajuste" id="btnAbrirConfiguracao">⚙️ Configurações</button>
+</div>
 
 <div class="box">
     <div id="valorDisplay">R$ 0,00</div>
@@ -230,6 +413,7 @@ th,td{
 
 <button class="btn-history">📜 HISTÓRICO DE CORRIDAS</button>
 <button id="btnAbrirTarifa" class="btn-table">📋 TABELA DE TARIFAS</button>
+<button id="btn-historico-mapa" class="btn-history">🗺️ VER TRAJETO</button>
 
 <div id="comprovante">
     <h3>📝 COMPROVANTE DE CORRIDA</h3>
@@ -241,7 +425,8 @@ th,td{
     <p id="compTempoEspera"></p>
     <p id="compEspera"></p>
 
-    <button class="btn-pix" id="btnCompartilhar">📲 Compartilhar</button>
+    <button class="btn-pix" id="btnCompartilhar">📲 Compartilhar (Texto)</button>
+    <button class="btn-pix" id="btnCompartilharImagem">🖼️ Compartilhar (Imagem)</button>
     <button class="btn-pix" id="btnGerarPix">💰 Gerar Código Pix</button>
     <textarea id="pixCode" readonly style="height:100px;"></textarea>
     <button class="btn-pix" id="btnCopiarPix">📋 Copiar Código Pix</button>
@@ -269,29 +454,67 @@ th,td{
         <tr>
             <td class="tarifa-verde">🟢 Manhã</td>
             <td>06h às 13h</td>
-            <td>R$ 3,00</td>
-            <td>R$ 1,30</td>
+            <td id="bmanha">R$ 3,00</td>
+            <td id="vkmmanha">R$ 1,30</td>
             <td>GPS em tempo real</td>
-            <td>R$ 8,00</td>
+            <td id="minmanha">R$ 8,00</td>
         </tr>
+        <tr>
         <tr>
             <td class="tarifa-amarela">🟡 Tarde</td>
             <td>14h às 18h</td>
-            <td>R$ 3,00</td>
-            <td>R$ 1,50</td>
+            <td id="btarde">R$ 3,00</td>
+            <td id="vkmtarde">R$ 1,50</td>
             <td>GPS em tempo real</td>
-            <td>R$ 8,00</td>
+            <td id="mintarde">R$ 8,00</td>
         </tr>
         <tr>
             <td class="tarifa-vermelha">🔴 Noite</td>
             <td>18h às 05h</td>
-            <td>R$ 3,50</td>
-            <td>R$ 1,70</td>
+            <td id="bnoite">R$ 3,50</td>
+            <td id="vkmnoite">R$ 1,70</td>
             <td>GPS em tempo real</td>
-            <td>R$ 9,00</td>
+            <td id="minnoite">R$ 9,00</td>
         </tr>
     </table>
     <button class="fechar-btn">✖️ Fechar Tabela</button>
+</div>
+
+<!-- TELA DE CONFIGURAÇÕES - MELHORIA 4 E 5 -->
+<div id="telaConfiguracao">
+    <h3>⚙️ CONFIGURAÇÕES DE VALORES</h3>
+    <p>Ajuste os valores conforme regras da sua região</p>
+    
+    <h4>🟢 TARIFA MANHÃ (06h às 13h)</h4>
+    <label>Bandeirada R$:</label>
+    <input type="number" id="confBManha" step="0.01" min="0" value="3.00">
+    <label>Valor por KM R$:</label>
+    <input type="number" id="confVKMManha" step="0.01" min="0" value="1.30">
+    <label>Valor Mínimo R$:</label>
+    <input type="number" id="confMinManha" step="0.01" min="0" value="8.00">
+
+    <h4>🟡 TARIFA TARDE (14h às 18h)</h4>
+    <label>Bandeirada R$:</label>
+    <input type="number" id="confBTarde" step="0.01" min="0" value="3.00">
+    <label>Valor por KM R$:</label>
+    <input type="number" id="confVKMTarde" step="0.01" min="0" value="1.50">
+    <label>Valor Mínimo R$:</label>
+    <input type="number" id="confMinTarde" step="0.01" min="0" value="8.00">
+
+    <h4>🔴 TARIFA NOITE (18h às 05h)</h4>
+    <label>Bandeirada R$:</label>
+    <input type="number" id="confBNoite" step="0.01" min="0" value="3.50">
+    <label>Valor por KM R$:</label>
+    <input type="number" id="confVKMNoite" step="0.01" min="0" value="1.70">
+    <label>Valor Mínimo R$:</label>
+    <input type="number" id="confMinNoite" step="0.01" min="0" value="9.00">
+
+    <h4>⏱️ VALORES GERAIS</h4>
+    <label>Valor por minuto de espera R$:</label>
+    <input type="number" id="confValorEspera" step="0.01" min="0" value="0.30">
+
+    <button class="btn-pix" id="btnSalvarConfiguracao">💾 Salvar Alterações</button>
+    <button class="fechar-btn">✖️ Fechar</button>
 </div>
 
 </div>
@@ -308,22 +531,39 @@ let watchId = null;
 let ultimaAtualizacao = 0;
 let minutosParados = 0;
 
-let bandeirada = 0;
-let valorKm = 0;
+// VALORES CONFIGURÁVEIS - MELHORIA 4 E 5
+let bandeirada = 3.00;
+let valorKm = 1.30;
 let tipoTarifa = "";
 let valorTotal = 0;
 let tempoParadoAtivo = false;
-const valorMinutoParado = 0.30;
+let valorMinutoParado = 0.30;
 
-const NOME_MOTO = "Adriano Souza";
-const TELEFONE = "(86) 98129-1332";
-const VEICULO = "Fan CG 125 Preta";
-const PLACA = "QRP-5G89";
-const PIX_KEY = "+5586981291332";
-const NOME = "ADRIANO ALVES DE OLIVEIRA";
-const CIDADE = "TERESINA";
+let NOME_MOTO = "Adriano Souza";
+let TELEFONE = "(86) 98129-1332";
+let VEICULO = "Fan CG 125 Preta";
+let PLACA = "QRP-5G89";
+let PIX_KEY = "+5586981291332";
+let NOME = "ADRIANO ALVES DE OLIVEIRA";
+let CIDADE = "TERESINA";
 
 let wakeLock = null;
+
+// VARIÁVEIS DAS MELHORIAS
+let modoEscuro = false;
+let tamanhoFonte = 1;
+let modoEconomiaAtivado = false;
+let historicoTrajeto = [];
+let tempoParadoInicio = 0;
+
+// OCULTAR TELA DE CARREGAMENTO - MELHORIA 9
+function ocultarTelaCarregamento(){
+    const tela = document.getElementById("telaCarregamento");
+    tela.style.opacity = 0;
+    setTimeout(() => {
+        tela.style.display = "none";
+    }, 500);
+}
 
 async function manterTelaAcesa(){
     try{
@@ -355,24 +595,45 @@ function tocarSom(freq = 800, dur = 200){
     }catch(e){}
 }
 
+// ATUALIZAR CÁLCULO COM VALORES CONFIGURÁVEIS
 function atualizarCalculo(){
     const hora = new Date().getHours();
+    
+    // CARREGAR VALORES SALVOS OU USAR PADRÃO
+    let dadosConfiguracao = JSON.parse(localStorage.getItem("dadosConfiguracaoTaximetro")) || {
+        bManha: 3.00,
+        vKMManha: 1.30,
+        minManha: 8.00,
+        bTarde: 3.00,
+        vKMTarde: 1.50,
+        minTarde: 8.00,
+        bNoite: 3.50,
+        vKMNoite: 1.70,
+        minNoite: 9.00,
+        valorEspera: 0.30
+    };
+
+    valorMinutoParado = dadosConfiguracao.valorEspera;
+
     if(hora >= 6 && hora < 14){
         tipoTarifa = "🟢 MANHÃ";
-        bandeirada = 3.00;
-        valorKm = 1.30;
+        bandeirada = dadosConfiguracao.bManha;
+        valorKm = dadosConfiguracao.vKMManha;
+        valorMinimo = dadosConfiguracao.minManha;
     }else if(hora >= 14 && hora < 18){
         tipoTarifa = "🟡 TARDE";
-        bandeirada = 3.00;
-        valorKm = 1.50;
+        bandeirada = dadosConfiguracao.bTarde;
+        valorKm = dadosConfiguracao.vKMTarde;
+        valorMinimo = dadosConfiguracao.minTarde;
     }else{
         tipoTarifa = "🔴 NOITE";
-        bandeirada = 3.50;
-        valorKm = 1.70;
+        bandeirada = dadosConfiguracao.bNoite;
+        valorKm = dadosConfiguracao.vKMNoite;
+        valorMinimo = dadosConfiguracao.minNoite;
     }
 
     valorTotal = bandeirada + (km * valorKm) + (minutosParados * valorMinutoParado);
-    valorTotal = (hora >= 18 || hora < 6) ? Math.max(valorTotal, 9) : Math.max(valorTotal, 8);
+    valorTotal = Math.max(valorTotal, valorMinimo);
     valorTotal = Math.round(valorTotal * 100) / 100;
 }
 
@@ -390,81 +651,92 @@ function calcularDistancia(lat1, lon1, lat2, lon2){
     return distancia;
 }
 
+// FUNÇÃO INICIAR COM AJUSTES DE PRECISÃO - MELHORIA 1
 function iniciar(){
-    // Verifica se já está em execução para evitar duplicações
     if(rodando) return;
     
-    // Reseta todos os valores para começar do zero
     rodando = true;
-    segundos = 0;                // Contador total de corrida
-    segundosEspera = 0;         // Contador de tempo parado/espera
-    km = 0;                      // Zera a distância percorrida
-    minutosParados = 0;          // Zera o valor cobrado por espera
-    tempoParadoAtivo = false;    // Estado: corrida em andamento
-    ultimaPosicao = null;        // Armazena a última localização registrada
-    ultimaAtualizacao = 0;       // Marca o horário da última atualização válida
+    segundos = 0;
+    segundosEspera = 0;
+    km = 0;
+    minutosParados = 0;
+    tempoParadoAtivo = false;
+    ultimaPosicao = null;
+    ultimaAtualizacao = 0;
+    historicoTrajeto = [];
+    tempoParadoInicio = 0;
     
-    // Atualiza a interface: esconde comprovante, desabilita botão de iniciar, habilita parar
     document.getElementById("comprovante").style.display = "none";
     document.getElementById("btnIniciar").disabled = true;
     document.getElementById("btnParar").disabled = false;
 
-    // Toca som de aviso de início
     tocarSom(900, 150);
-    // Mantém a tela acesa durante a corrida
     manterTelaAcesa();
-    // Atualiza os valores na tela imediatamente
     atualizarTela();
 
-    // Contador de tempo: atualiza a cada 1 segundo
     timer = setInterval(() => {
-        segundos++; // Incrementa o tempo total
+        segundos++;
 
-        // Se estiver no modo espera, conta o tempo parado
         if(tempoParadoAtivo) {
             segundosEspera++;
-            minutosParados = segundosEspera / 60; // Converte segundos para minutos para cálculo
+            minutosParados = segundosEspera / 60;
         }
 
-        // Atualiza os valores exibidos na tela
+        // VERIFICAR SE ESTÁ PARADO PARA ATIVAR MODO ECONOMIA
+        if(modoEconomiaAtivado && ultimaPosicao){
+            const agora = Date.now();
+            const tempoDesdeUltima = agora - ultimaAtualizacao;
+            if(tempoDesdeUltima > 60000 && !tempoParadoInicio){
+                tempoParadoInicio = agora;
+            }else if(tempoDesdeUltima > 60000 && (agora - tempoParadoInicio) > 60000){
+                // Diminui frequência de leitura quando parado há mais de 1min
+                if(watchId){
+                    navigator.geolocation.clearWatch(watchId);
+                    watchId = null;
+                    setTimeout(() => {
+                        reiniciarMonitoramentoGPS();
+                    }, 2000);
+                }
+            }
+        }
+
         atualizarTela();
     }, 1000);
 
-    // Verifica se o aparelho suporta acesso ao GPS
     if(!navigator.geolocation){
         alert("Seu celular não suporta acesso ao GPS!");
-        parar(); // Encerra a operação se não tiver suporte
+        parar();
         return;
     }
 
-    // Configura o monitoramento de localização com ajustes precisos
+    // AJUSTES DE PRECISÃO: DISTÂNCIA 1M (0,001KM) E TEMPO 300MS - MELHORIA 1
     watchId = navigator.geolocation.watchPosition(
-    // Função executada quando recebe nova localização
     (posicao) => {
-        // Se a corrida foi parada, não processa mais dados
         if(!rodando) return;
         
-        // Obtém dados da localização atual
-        const agora = Date.now();                // Horário atual em milissegundos
-        const latitude = posicao.coords.latitude; // Latitude atual
-        const longitude = posicao.coords.longitude; // Longitude atual
-        const precisao = posicao.coords.accuracy; // Precisão da leitura em metros
+        const agora = Date.now();
+        const latitude = posicao.coords.latitude;
+        const longitude = posicao.coords.longitude;
+        const precisao = posicao.coords.accuracy;
 
-        // ✅ FILTRO DE PRECISÃO: ignora leituras com precisão pior que 60 metros
-        // Esse valor é ajustável: quanto menor, mais rigoroso, mas pode perder leituras em locais com sinal fraco
         if(precisao > 60) return;
 
-        // Se é a primeira leitura, armazena a posição e sai da função
+        // SALVAR PONTO NO HISTÓRICO DE TRAJETO - MELHORIA 3
+        historicoTrajeto.push({
+            lat: latitude,
+            lon: longitude,
+            tempo: agora
+        });
+
         if(!ultimaPosicao){
             ultimaPosicao = {
                 lat: latitude,
                 lon: longitude,
-                tempo: agora // Marca o horário dessa primeira leitura
+                tempo: agora
             };
             return;
         }
 
-        // Calcula a distância entre a última posição registrada e a atual
         const distanciaPercorrida = calcularDistancia(
             ultimaPosicao.lat, 
             ultimaPosicao.lon, 
@@ -472,29 +744,21 @@ function iniciar(){
             longitude
         );
 
-        // ✅ REGRAS DE CONTAGEM DE DISTÂNCIA:
-        // 1. Distância mínima para contagem: 0,0008 km = 0,8 metros
-        //    Esse valor é ideal para capturar movimentos de caminhada e moto sem contar pequenas oscilações do sinal
-        // 2. Tempo mínimo entre leituras: 200 milissegundos
-        //    Evita sobrecarga e leituras duplicadas ou erradas causadas por mudanças rápidas do sinal
-        if(distanciaPercorrida > 0.0008 && (agora - ultimaAtualizacao) > 200){
-            // Soma a distância, arredondando para 3 casas decimais para precisão
+        // AJUSTE: DISTÂNCIA MÍNIMA 0,001KM (1M) E INTERVALO 300MS - MELHORIA 1
+        if(distanciaPercorrida > 0.001 && (agora - ultimaAtualizacao) > 300){
             km = parseFloat((km + distanciaPercorrida).toFixed(3));
-            // Atualiza o horário da última contagem válida
             ultimaAtualizacao = agora;
+            tempoParadoInicio = 0;
         }
 
-        // Atualiza a posição armazenada com a nova localização
         ultimaPosicao = {
             lat: latitude,
             lon: longitude,
             tempo: agora
         };
 
-        // Atualiza os valores na tela
         atualizarTela();
     },
-    // Função executada quando ocorre erro na obtenção da localização
     (erro) => {
         let msg = "";
         switch(erro.code){
@@ -510,20 +774,67 @@ function iniciar(){
             default: 
                 msg = "❌ Erro desconhecido ao acessar o GPS. Verifique as permissões e conexão.";
         }
-        // Exibe mensagem de erro e para a corrida
         alert(msg);
         parar();
     },
-    // CONFIGURAÇÕES AVANÇADAS DO GPS
     {
-        enableHighAccuracy: true,    // Ativa modo de alta precisão - usa GPS, Wi-Fi e dados móveis
-        maximumAge: 0,               // Não usa dados de localização armazenados em cache - sempre busca dados novos
-        timeout: 15000              // Tempo máximo de espera por uma leitura: 15 segundos, evita travamentos
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 15000
     });
 }
 
+// FUNÇÃO PARA REINICIAR MONITORAMENTO QUANDO SAIR DO MODO ECONOMIA
+function reiniciarMonitoramentoGPS(){
+    if(!rodando || !modoEconomiaAtivado) return;
+    
+    watchId = navigator.geolocation.watchPosition(
+    (posicao) => {
+        if(!rodando) return;
+        
+        const agora = Date.now();
+        const latitude = posicao.coords.latitude;
+        const longitude = posicao.coords.longitude;
+        const precisao = posicao.coords.accuracy;
 
-// FUNÇÃO PARA PARAR A CORRIDA E ENCERRAR OS RECURSOS
+        if(precisao > 60) return;
+
+        historicoTrajeto.push({lat: latitude, lon: longitude, tempo: agora});
+
+        if(!ultimaPosicao){
+            ultimaPosicao = {lat: latitude, lon: longitude, tempo: agora};
+            return;
+        }
+
+        const distanciaPercorrida = calcularDistancia(ultimaPosicao.lat, ultimaPosicao.lon, latitude, longitude);
+
+        if(distanciaPercorrida > 0.001 && (agora - ultimaAtualizacao) > 300){
+            km = parseFloat((km + distanciaPercorrida).toFixed(3));
+            ultimaAtualizacao = agora;
+            tempoParadoInicio = 0;
+        }
+
+        ultimaPosicao = {lat: latitude, lon: longitude, tempo: agora};
+        atualizarTela();
+    },
+    (erro) => {
+        let msg = "";
+        switch(erro.code){
+            case 1: msg = "❌ Permissão negada!"; break;
+            case 2: msg = "❌ Localização não disponível!"; break;
+            case 3: msg = "❌ Tempo esgotado!"; break;
+            default: msg = "❌ Erro desconhecido!";
+        }
+        alert(msg);
+        parar();
+    },
+    {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 15000
+    });
+}
+
 function parar(){
     if(!rodando) return;
     
@@ -538,7 +849,8 @@ function parar(){
     liberarTela();
     tocarSom(600, 300);
 
-    document.getElementById("btnIniciar").disabled = false;
+    document.getElementById("
+"btnIniciar").disabled = false;
     document.getElementById("btnParar").disabled = true;
 
     gerarComprovante();
@@ -563,6 +875,75 @@ function abrirMapa(){
     url += "&travelmode=driving";
 
     window.open(url, '_blank', 'location=yes,width=800,height=600');
+}
+
+// GERAR IMAGEM DO COMPROVANTE - MELHORIA 8
+async function gerarImagemComprovante(){
+    const origem = document.getElementById("origem").value.trim() || "Não informado";
+    const destino = document.getElementById("destino").value.trim() || "Não informado";
+    const data = new Date().toLocaleString("pt-BR");
+
+    const elemento = document.createElement("div");
+    elemento.style.padding = "20px";
+    elemento.style.background = "#fff";
+    elemento.style.borderRadius = "16px";
+    elemento.style.width = "350px";
+    elemento.style.fontFamily = "Roboto, sans-serif";
+    elemento.innerHTML = `
+        <h3 style="color: #00B050; text-align: center; margin-bottom: 20px; margin-top:0;">📝 COMPROVANTE DE CORRIDA</h3>
+        <p style="margin:8px 0; font-size:16px;">📅 Data: ${data}</p>
+        <p style="margin:8px 0; font-size:16px;">📍 Origem: ${origem}</p>
+        <p style="margin:8px 0; font-size:16px;">🎯 Destino: ${destino}</p>
+        <hr style="margin:15px 0; border: 0; border-top:1px solid #ddd;">
+        <p style="margin:8px 0; font-size:16px; font-weight:bold;">💰 Valor Total: R$ ${valorTotal.toFixed(2).replace(".", ",")}</p>
+        <p style="margin:8px 0; font-size:16px;">📏 Distância: ${km.toFixed(2)} km</p>
+        <p style="margin:8px 0; font-size:16px;">⏱️ Tempo: ${document.getElementById("tempo").textContent}</p>
+        <p style="margin:8px 0; font-size:16px;">⏱️ Espera: ${document.getElementById("tempoEspera").textContent}</p>
+        <p style="margin:8px 0; font-size:16px;">🚦 Tarifa: ${tipoTarifa}</p>
+        <p style="margin:8px 0; font-size:16px;">🚦 Valor Espera: R$ ${(minutosParados * valorMinutoParado).toFixed(2).replace(".", ",")}</p>
+        <hr style="margin:15px 0; border: 0; border-top:1px solid #ddd;">
+        <p style="margin:8px 0; font-size:14px;"><strong>MOTORISTA:</strong> ${NOME_MOTO}</p>
+        <p style="margin:8px 0; font-size:14px;"><strong>CONTATO:</strong> ${TELEFONE}</p>
+        <p style="margin:8px 0; font-size:14px;"><strong>VEÍCULO:</strong> ${VEICULO} | PLACA: ${PLACA}</p>
+        <p style="margin:8px 0; font-size:14px;"><strong>CIDADE:</strong> ${CIDADE}</p>
+    `;
+
+    document.body.appendChild(elemento);
+
+    try {
+        const canvas = await html2canvas(elemento, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: "#ffffff"
+        });
+
+        document.body.removeChild(elemento);
+
+        canvas.toBlob(async (blob) => {
+            const arquivo = new File([blob], `Comprovante_Corrida_${new Date().getTime()}.png`, { type: 'image/png' });
+            
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Comprovante de Corrida',
+                        text: `Corrida finalizada - Valor: R$ ${valorTotal.toFixed(2).replace(".", ",")} | Distância: ${km.toFixed(2)}km`,
+                        files: [arquivo]
+                    });
+                } catch (erro) {
+                    alert("Erro ao compartilhar a imagem!");
+                }
+            } else {
+                const link = document.createElement('a');
+                link.download = `Comprovante_Corrida_${new Date().getTime()}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                alert("Imagem salva na galeria!");
+            }
+        });
+    } catch (erro) {
+        alert("Erro ao gerar a imagem!");
+        if(document.body.contains(elemento)) document.body.removeChild(elemento);
+    }
 }
 
 // FUNÇÃO PARA GERAR COMPROVANTE
@@ -681,7 +1062,8 @@ function salvarHistorico(){
         tempo: document.getElementById("tempo").textContent,
         tempoEspera: document.getElementById("tempoEspera").textContent,
         tarifa: tipoTarifa,
-        valorEspera: `R$ ${(minutosParados * valorMinutoParado).toFixed(2).replace(".", ",")}`
+        valorEspera: `R$ ${(minutosParados * valorMinutoParado).toFixed(2).replace(".", ",")}`,
+        trajeto: historicoTrajeto
     };
 
     historicoCorridas.push(novaCorrida);
@@ -710,11 +1092,29 @@ function abrirHistorico(){
             <p>⏱️ Espera: ${item.tempoEspera}</p>
             <p>📊 ${item.tarifa}</p>
             <p>🚦 Valor Espera: ${item.valorEspera}</p>
+            ${item.trajeto ? `<button class="btn-maps" style="margin-top:10px; padding:8px; font-size:0.9em;" onclick="verTrajetoNoMapa(${indice})">🗺️ Ver Trajeto</button>` : ''}
         `;
         lista.appendChild(div);
     });
 
     document.getElementById("historico").style.display = "block";
+}
+
+// VER TRAJETO NO MAPA - MELHORIA 3
+function verTrajetoNoMapa(indice){
+    const corrida = historicoCorridas[indice];
+    if(!corrida.trajeto || corrida.trajeto.length < 2){
+        alert("Dados de trajeto não disponíveis!");
+        return;
+    }
+
+    let url = "https://www.google.com/maps/dir/?api=1";
+    const pontos = corrida.trajeto.map(p => `${p.lat},${p.lon}`).join('|');
+    url += `&waypoints=${pontos}`;
+    url += "&travelmode=driving";
+    url += "&dir_action=navigate";
+
+    window.open(url, '_blank');
 }
 
 function limparHistorico(){
@@ -744,54 +1144,171 @@ function desativarTempoEspera(){
     tocarSom(500,150);
 }
 
-// LIGAÇÃO DOS BOTÕES - AGORA O BOTÃO DE TABELA DE TARIFAS ESTÁ FUNCIONANDO
-window.addEventListener("load", function(){
-    document.getElementById("btnIniciar").addEventListener("click", iniciar);
-    document.getElementById("btnParar").addEventListener("click", parar);
-    document.getElementById("btnEspera").addEventListener("click", ativarTempoEspera);
-    document.getElementById("btnPararEspera").addEventListener("click", desativarTempoEspera);
-    
-    // CONSERTEI O BOTÃO ADICIONANDO O ID CORRETO
-    document.getElementById("btnAbrirTarifa").addEventListener("click", abrirTabelaTarifas);
-    
-    document.querySelector(".btn-maps").addEventListener("click", abrirMapa);
-    document.querySelector(".btn-history").addEventListener("click", abrirHistorico);
-    
-    document.getElementById("btnCompartilhar").addEventListener("click", compartilhar);
-    document.getElementById("btnGerarPix").addEventListener("click", gerarPixTela);
-    document.getElementById("btnCopiarPix").addEventListener("click", copiarPix);
-    
-    document.querySelector("#historico .btn-clear").addEventListener("click", limparHistorico);
-    
-    document.querySelectorAll(".fechar-btn").forEach(botao => {
-        botao.addEventListener("click", function(){
-            const elementoPai = this.closest("div[id]");
-            fecharJanela(elementoPai.id);
+// MODO ESCURO - MELHORIA 6
+function alternarModoEscuro(){
+    modoEscuro = !modoEscuro;
+    document.body.classList.toggle("dark-mode", modoEscuro);
+    localStorage.setItem("modoEscuroTaximetro", modoEscuro ? "ativo" : "inativo");
+}
+
+// AJUSTE DE FONTE - MELHORIA 7
+function aumentarFonte(){
+    tamanhoFonte = Math.min(tamanhoFonte + 0.15, 1.6);
+    document.documentElement.style.setProperty('--tamanho-fonte', `${tamanhoFonte}em`);
+    localStorage.setItem("tamanhoFonteTaximetro", tamanhoFonte);
+}
+
+function diminuirFonte(){
+    tamanhoFonte = Math.max(tamanhoFonte - 0.15, 0.8);
+    document.documentElement.style.setProperty('--tamanho-fonte', `${tamanhoFonte}em`);
+    localStorage.setItem("t
+amanhoFonteTaximetro", tamanhoFonte);
+    }
+
+    // MODO ECONOMIA DE BATERIA - MELHORIA 2
+    function alternarModoEconomia(){
+        modoEconomiaAtivado = !modoEconomiaAtivado;
+        const botao = document.getElementById("btnModoEconomia");
+        
+        if(modoEconomiaAtivado){
+            botao.style.background = "#2E7D32";
+            botao.textContent = "✅ MODO ECONOMIA ATIVO";
+        }else{
+            botao.style.background = "#00B050";
+            botao.textContent = "⚡ Modo Economia";
+        }
+
+        localStorage.setItem("modoEconomiaTaximetro", modoEconomiaAtivado ? "ativo" : "inativo");
+    }
+
+    // SALVAR CONFIGURAÇÕES - MELHORIA 4 E 5
+    function salvarConfiguracoes(){
+        const dados = {
+            bManha: parseFloat(document.getElementById("confBManha").value) || 3.00,
+            vKMManha: parseFloat(document.getElementById("confVKMManha").value) || 1.30,
+            minManha: parseFloat(document.getElementById("confMinManha").value) || 8.00,
+            bTarde: parseFloat(document.getElementById("confBTarde").value) || 3.00,
+            vKMTarde: parseFloat(document.getElementById("confVKMTarde").value) || 1.50,
+            minTarde: parseFloat(document.getElementById("confMinTarde").value) || 8.00,
+            bNoite: parseFloat(document.getElementById("confBNoite").value) || 3.50,
+            vKMNoite: parseFloat(document.getElementById("confVKMNoite").value) || 1.70,
+            minNoite: parseFloat(document.getElementById("confMinNoite").value) || 9.00,
+            valorEspera: parseFloat(document.getElementById("confValorEspera").value) || 0.30
+        };
+
+        localStorage.setItem("dadosConfiguracaoTaximetro", JSON.stringify(dados));
+        alert("✅ Configurações salvas com sucesso!");
+        document.getElementById("telaConfiguracao").style.display = "none";
+    }
+
+    // CARREGAR CONFIGURAÇÕES SALVAS
+    function carregarConfiguracoes(){
+        const dados = JSON.parse(localStorage.getItem("dadosConfiguracaoTaximetro")) || {
+            bManha: 3.00, vKMManha: 1.30, minManha: 8.00,
+            bTarde: 3.00, vKMTarde: 1.50, minTarde: 8.00,
+            bNoite: 3.50, vKMNoite: 1.70, minNoite: 9.00,
+            valorEspera: 0.30
+        };
+
+        document.getElementById("confBManha").value = dados.bManha;
+        document.getElementById("confVKMManha").value = dados.vKMManha;
+        document.getElementById("confMinManha").value = dados.minManha;
+
+        document.getElementById("confBTarde").value = dados.bTarde;
+        document.getElementById("confVKMTarde").value = dados.vKMTarde;
+        document.getElementById("confMinTarde").value = dados.minTarde;
+
+        document.getElementById("confBNoite").value = dados.bNoite;
+        document.getElementById("confVKMNoite").value = dados.vKMNoite;
+        document.getElementById("confMinNoite").value = dados.minNoite;
+
+        document.getElementById("confValorEspera").value = dados.valorEspera;
+    }
+
+    // ATUALIZAR DADOS NA TELA
+    function atualizarTela(){
+        atualizarCalculo();
+        
+        const horas = Math.floor(segundos / 3600);
+        const minutos = Math.floor((segundos % 3600) / 60);
+        const segundosRestantes = segundos % 60;
+        document.getElementById("tempo").textContent = 
+            `${String(horas).padStart(2,'0')}:${String(minutos).padStart(2,'0')}:${String(segundosRestantes).padStart(2,'0')}`;
+
+        const horasEspera = Math.floor(segundosEspera / 3600);
+        const minutosEspera = Math.floor((segundosEspera % 3600) / 60);
+        const segundosEsperaRestantes = segundosEspera % 60;
+        document.getElementById("tempoEspera").textContent = 
+            `${String(horasEspera).padStart(2,'0')}:${String(minutosEspera).padStart(2,'0')}:${String(segundosEsperaRestantes).padStart(2,'0')}`;
+
+        document.getElementById("distancia").textContent = `${km.toFixed(2)} km`;
+        document.getElementById("tipoTarifa").textContent = tipoTarifa;
+        document.getElementById("valorDisplay").textContent = `R$ ${valorTotal.toFixed(2).replace(".", ",")}`;
+        document.getElementById("valorEspera").textContent = `R$ ${(minutosParados * valorMinutoParado).toFixed(2).replace(".", ",")}`;
+    }
+
+    // CARREGAR PREFERÊNCIAS SALVAS AO ABRIR O APLICATIVO
+    function carregarPreferencias(){
+        // MODO ESCURO
+        const modoSalvo = localStorage.getItem("modoEscuroTaximetro");
+        if(modoSalvo === "ativo"){
+            modoEscuro = true;
+            document.body.classList.add("dark-mode");
+        }
+
+        // TAMANHO DA FONTE
+        const tamanhoSalvo = parseFloat(localStorage.getItem("tamanhoFonteTaximetro"));
+        if(tamanhoSalvo){
+            tamanhoFonte = tamanhoSalvo;
+            document.documentElement.style.setProperty('--tamanho-fonte', `${tamanhoFonte}em`);
+        }
+
+        // MODO ECONOMIA
+        const economiaSalva = localStorage.getItem("modoEconomiaTaximetro");
+        if(economiaSalva === "ativo"){
+            modoEconomiaAtivado = true;
+            const botao = document.getElementById("btnModoEconomia");
+            botao.style.background = "#2E7D32";
+            botao.textContent = "✅ MODO ECONOMIA ATIVO";
+        }
+    }
+
+    // LIGAÇÃO DOS BOTÕES - TODAS AS FUNCIONALIDADES
+    window.addEventListener("load", function(){
+        carregarPreferencias();
+        carregarConfiguracoes();
+
+        document.getElementById("btnIniciar").addEventListener("click", iniciar);
+        document.getElementById("btnParar").addEventListener("click", parar);
+        document.getElementById("btnEspera").addEventListener("click", ativarTempoEspera);
+        document.getElementById("btnPararEspera").addEventListener("click", desativarTempoEspera);
+        
+        document.getElementById("btnAbrirTarifa").addEventListener("click", abrirTabelaTarifas);
+        document.querySelector(".btn-maps").addEventListener("click", abrirMapa);
+        document.querySelector(".btn-history").addEventListener("click", abrirHistorico);
+        
+        document.getElementById("btnCompartilhar").addEventListener("click", compartilhar);
+        document.getElementById("btnCompartilharImagem").addEventListener("click", gerarImagemComprovante);
+        document.getElementById("btnGerarPix").addEventListener("click", gerarPixTela);
+        document.getElementById("btnCopiarPix").addEventListener("click", copiarPix);
+        
+        document.querySelector("#historico .btn-clear").addEventListener("click", limparHistorico);
+        document.getElementById("btnModoEscuro").addEventListener("click", alternarModoEscuro);
+        document.getElementById("btnAumentarFonte").addEventListener("click", aumentarFonte);
+        document.getElementById("btnDiminuirFonte").addEventListener("click", diminuirFonte);
+        document.getElementById("btnModoEconomia").addEventListener("click", alternarModoEconomia);
+        document.getElementById("btnAbrirConfiguracao").addEventListener("click", () => {
+            document.getElementById("telaConfiguracao").style.display = "block";
+        });
+        document.getElementById("btnSalvarConfiguracao").addEventListener("click", salvarConfiguracoes);
+        
+        document.querySelectorAll(".fechar-btn").forEach(botao => {
+            botao.addEventListener("click", function(){
+                const elementoPai = this.closest("div[id]");
+                fecharJanela(elementoPai.id);
+            });
         });
     });
-});
-
-// ATUALIZAR DADOS NA TELA
-function atualizarTela(){
-    atualizarCalculo();
-    
-    const horas = Math.floor(segundos / 3600);
-    const minutos = Math.floor((segundos % 3600) / 60);
-    const segundosRestantes = segundos % 60;
-    document.getElementById("tempo").textContent = 
-        `${String(horas).padStart(2,'0')}:${String(minutos).padStart(2,'0')}:${String(segundosRestantes).padStart(2,'0')}`;
-
-    const horasEspera = Math.floor(segundosEspera / 3600);
-    const minutosEspera = Math.floor((segundosEspera % 3600) / 60);
-    const segundosEsperaRestantes = segundosEspera % 60;
-    document.getElementById("tempoEspera").textContent = 
-        `${String(horasEspera).padStart(2,'0')}:${String(minutosEspera).padStart(2,'0')}:${String(segundosEsperaRestantes).padStart(2,'0')}`;
-
-    document.getElementById("distancia").textContent = `${km.toFixed(2)} km`;
-    document.getElementById("tipoTarifa").textContent = tipoTarifa;
-    document.getElementById("valorDisplay").textContent = `R$ ${valorTotal.toFixed(2).replace(".", ",")}`;
-    document.getElementById("valorEspera").textContent = `R$ ${(minutosParados * valorMinutoParado).toFixed(2).replace(".", ",")}`;
-}
 
 </script>
 
