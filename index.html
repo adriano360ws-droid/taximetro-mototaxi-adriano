@@ -391,84 +391,137 @@ function calcularDistancia(lat1, lon1, lat2, lon2){
 }
 
 function iniciar(){
+    // Verifica se já está em execução para evitar duplicações
     if(rodando) return;
     
+    // Reseta todos os valores para começar do zero
     rodando = true;
-    segundos = 0;
-    segundosEspera = 0;
-    km = 0;
-    minutosParados = 0;
-    tempoParadoAtivo = false;
-    ultimaPosicao = null;
-    ultimaAtualizacao = 0;
+    segundos = 0;                // Contador total de corrida
+    segundosEspera = 0;         // Contador de tempo parado/espera
+    km = 0;                      // Zera a distância percorrida
+    minutosParados = 0;          // Zera o valor cobrado por espera
+    tempoParadoAtivo = false;    // Estado: corrida em andamento
+    ultimaPosicao = null;        // Armazena a última localização registrada
+    ultimaAtualizacao = 0;       // Marca o horário da última atualização válida
     
+    // Atualiza a interface: esconde comprovante, desabilita botão de iniciar, habilita parar
     document.getElementById("comprovante").style.display = "none";
     document.getElementById("btnIniciar").disabled = true;
     document.getElementById("btnParar").disabled = false;
 
-    tocarSom(900,150);
+    // Toca som de aviso de início
+    tocarSom(900, 150);
+    // Mantém a tela acesa durante a corrida
     manterTelaAcesa();
+    // Atualiza os valores na tela imediatamente
     atualizarTela();
 
+    // Contador de tempo: atualiza a cada 1 segundo
     timer = setInterval(() => {
-        segundos++;
+        segundos++; // Incrementa o tempo total
+
+        // Se estiver no modo espera, conta o tempo parado
         if(tempoParadoAtivo) {
             segundosEspera++;
-            minutosParados = segundosEspera / 60;
+            minutosParados = segundosEspera / 60; // Converte segundos para minutos para cálculo
         }
+
+        // Atualiza os valores exibidos na tela
         atualizarTela();
     }, 1000);
 
+    // Verifica se o aparelho suporta acesso ao GPS
     if(!navigator.geolocation){
         alert("Seu celular não suporta acesso ao GPS!");
-        parar();
+        parar(); // Encerra a operação se não tiver suporte
         return;
     }
 
+    // Configura o monitoramento de localização com ajustes precisos
     watchId = navigator.geolocation.watchPosition(
+    // Função executada quando recebe nova localização
     (posicao) => {
+        // Se a corrida foi parada, não processa mais dados
         if(!rodando) return;
         
-        const agora = Date.now();
-        const latitude = posicao.coords.latitude;
-        const longitude = posicao.coords.longitude;
-        const precisao = posicao.coords.accuracy;
+        // Obtém dados da localização atual
+        const agora = Date.now();                // Horário atual em milissegundos
+        const latitude = posicao.coords.latitude; // Latitude atual
+        const longitude = posicao.coords.longitude; // Longitude atual
+        const precisao = posicao.coords.accuracy; // Precisão da leitura em metros
 
-        if(precisao > 80) return;
+        // ✅ FILTRO DE PRECISÃO: ignora leituras com precisão pior que 60 metros
+        // Esse valor é ajustável: quanto menor, mais rigoroso, mas pode perder leituras em locais com sinal fraco
+        if(precisao > 60) return;
 
+        // Se é a primeira leitura, armazena a posição e sai da função
         if(!ultimaPosicao){
-            ultimaPosicao = {lat: latitude, lon: longitude, tempo: agora};
+            ultimaPosicao = {
+                lat: latitude,
+                lon: longitude,
+                tempo: agora // Marca o horário dessa primeira leitura
+            };
             return;
         }
 
-        const distanciaPercorrida = calcularDistancia(ultimaPosicao.lat, ultimaPosicao.lon, latitude, longitude);
+        // Calcula a distância entre a última posição registrada e a atual
+        const distanciaPercorrida = calcularDistancia(
+            ultimaPosicao.lat, 
+            ultimaPosicao.lon, 
+            latitude, 
+            longitude
+        );
 
-        if(distanciaPercorrida > 0.001 && (agora - ultimaAtualizacao) > 250){
+        // ✅ REGRAS DE CONTAGEM DE DISTÂNCIA:
+        // 1. Distância mínima para contagem: 0,0008 km = 0,8 metros
+        //    Esse valor é ideal para capturar movimentos de caminhada e moto sem contar pequenas oscilações do sinal
+        // 2. Tempo mínimo entre leituras: 200 milissegundos
+        //    Evita sobrecarga e leituras duplicadas ou erradas causadas por mudanças rápidas do sinal
+        if(distanciaPercorrida > 0.0008 && (agora - ultimaAtualizacao) > 200){
+            // Soma a distância, arredondando para 3 casas decimais para precisão
             km = parseFloat((km + distanciaPercorrida).toFixed(3));
+            // Atualiza o horário da última contagem válida
             ultimaAtualizacao = agora;
         }
 
-        ultimaPosicao = {lat: latitude, lon: longitude, tempo: agora};
+        // Atualiza a posição armazenada com a nova localização
+        ultimaPosicao = {
+            lat: latitude,
+            lon: longitude,
+            tempo: agora
+        };
+
+        // Atualiza os valores na tela
         atualizarTela();
     },
+    // Função executada quando ocorre erro na obtenção da localização
     (erro) => {
         let msg = "";
         switch(erro.code){
-            case 1: msg = "Permissão negada! Ative a localização e permita o acesso."; break;
-            case 2: msg = "Localização não disponível no momento."; break;
-            case 3: msg = "Tempo esgotado ao buscar localização."; break;
-            default: msg = "Erro desconhecido no acesso ao GPS.";
+            case 1: 
+                msg = "❌ Permissão negada! Acesse as configurações do aparelho e permita o acesso à localização."; 
+                break;
+            case 2: 
+                msg = "❌ Localização não disponível. Verifique se o GPS está ativado e se há sinal."; 
+                break;
+            case 3: 
+                msg = "❌ Tempo esgotado ao tentar obter a localização. Tente novamente."; 
+                break;
+            default: 
+                msg = "❌ Erro desconhecido ao acessar o GPS. Verifique as permissões e conexão.";
         }
-        alert
+        // Exibe mensagem de erro e para a corrida
         alert(msg);
         parar();
     },
+    // CONFIGURAÇÕES AVANÇADAS DO GPS
     {
-        enableHighAccuracy: true,
-        maximumAge: 0,
-        timeout: 12000
+        enableHighAccuracy: true,    // Ativa modo de alta precisão - usa GPS, Wi-Fi e dados móveis
+        maximumAge: 0,               // Não usa dados de localização armazenados em cache - sempre busca dados novos
+        timeout: 15000              // Tempo máximo de espera por uma leitura: 15 segundos, evita travamentos
     });
 }
+
 
 // FUNÇÃO PARA PARAR A CORRIDA E ENCERRAR OS RECURSOS
 function parar(){
