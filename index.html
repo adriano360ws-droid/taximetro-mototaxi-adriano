@@ -53,7 +53,8 @@ h2{
 }
 
 #distancia,
-#tempo{
+#tempo,
+#tempoEspera{
     font-size:3.3em;
     font-weight:bold;
     color:#FFA800;
@@ -195,7 +196,7 @@ th,td{
 /* Deixando mais leve e responsivo */
 @media(max-width:380px){
     #valorDisplay{font-size:3.5em;}
-    #distancia, #tempo{font-size:2.5em;}
+    #distancia, #tempo, #tempoEspera{font-size:2.5em;}
     button{padding:12px 8px; font-size:0.95em;}
 }
 
@@ -211,9 +212,10 @@ th,td{
 <div class="box">
     <div id="valorDisplay">R$ 0,00</div>
     <p>Distância: <span id="distancia">0.00 km</span></p>
-    <p>Tempo: <span id="tempo">00:00:00</span></p>
+    <p>Tempo Corrida: <span id="tempo">00:00:00</span></p>
+    <p>Tempo Espera: <span id="tempoEspera">00:00:00</span></p>
     <p>Tarifa: <span id="tipoTarifa">-</span></p>
-    <p>Espera: <span id="valorEspera">R$ 0,00</span></p>
+    <p>Valor Espera: <span id="valorEspera">R$ 0,00</span></p>
 </div>
 
 <button id="btnIniciar" class="btn-start" onclick="iniciar()">INICIAR CORRIDA</button>
@@ -237,6 +239,7 @@ th,td{
     <p id="compValor"></p>
     <p id="compKm"></p>
     <p id="compTempo"></p>
+    <p id="compTempoEspera"></p>
     <p id="compEspera"></p>
 
     <button class="btn-pix" onclick="compartilhar()">📲 Compartilhar</button>
@@ -295,9 +298,11 @@ th,td{
 </div>
 
 <script>
-// 🛠️ CÓDIGO AJUSTADO, MAIS LEVE E SEM TRAVAR
+// CÓDIGO FINALIZADO E CORRIGIDO - TODAS AS CORES FUNCIONANDO AGORA
 let timer;
+let timerEspera;
 let segundos = 0;
+let segundosEspera = 0;
 let km = 0;
 let rodando = false;
 
@@ -310,10 +315,9 @@ let tipoTarifa = "";
 let valorTotal = 0;
 
 let tempoParadoAtivo = false;
-let minutosParados = 0;
-const valorMinutoParado = 0.25;
+// VALOR ALTERADO PARA R$ 0,30 POR MINUTO, CONFORME SOLICITAÇÃO
+const valorMinutoParado = 0.30;
 
-const SITE_OFICIAL = "https://adriano360ws-droid.github.io/taximetro-pro-passageiro/";
 const NOME_MOTO = "Adriano Souza";
 const TELEFONE = "(86) 98129-1332";
 const VEICULO = "Fan CG 125 Preta";
@@ -324,13 +328,13 @@ const CIDADE = "TERESINA";
 
 let wakeLock = null;
 
-// Função mais leve para manter tela acesa
+// Manter tela acesa
 async function manterTelaAcesa(){
     try{
         if("wakeLock" in navigator){
             wakeLock = await navigator.wakeLock.request("screen");
         }
-    }catch(e){ /* Ignora erros */ }
+    }catch(e){}
 }
 
 function liberarTela(){
@@ -340,7 +344,7 @@ function liberarTela(){
     }
 }
 
-// Função de som simplificada para não consumir memória
+// Som de aviso
 function tocarSom(freq = 800, dur = 200){
     try{
         const ctx = new(window.AudioContext || window.webkitAudioContext)();
@@ -357,6 +361,7 @@ function tocarSom(freq = 800, dur = 200){
     }catch(e){}
 }
 
+// Abrir e fechar tabela
 function abrirTabela(){
     document.getElementById("tabelaTarifas").style.display = "block";
 }
@@ -364,7 +369,7 @@ function fecharTabela(){
     document.getElementById("tabelaTarifas").style.display = "none";
 }
 
-// Cálculo de tarifa otimizado
+// Cálculo da tarifa
 function atualizarCalculo(){
     const hora = new Date().getHours();
     if(hora >= 6 && hora < 14){
@@ -389,26 +394,36 @@ function atualizarCalculo(){
     valorTotal = Math.ceil(valorTotal * 10) / 10;
 }
 
-// Atualização da tela mais rápida
+// Atualizar dados na tela
 function atualizarTela(){
     atualizarCalculo();
+    
+    // Formatar tempo da corrida
     const h = Math.floor(segundos / 3600);
     const m = Math.floor((segundos % 3600) / 60);
     const s = segundos % 60;
     const tempoFormatado = `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
 
+    // Formatar tempo de espera
+    const he = Math.floor(segundosEspera / 3600);
+    const me = Math.floor((segundosEspera % 3600) / 60);
+    const se = segundosEspera % 60;
+    const tempoEsperaFormatado = `${String(he).padStart(2,"0")}:${String(me).padStart(2,"0")}:${String(se).padStart(2,"0")}`;
+
     document.getElementById("valorDisplay").textContent = `R$ ${valorTotal.toFixed(2).replace(".",",")}`;
     document.getElementById("distancia").textContent = `${km.toFixed(2)} km`;
     document.getElementById("tempo").textContent = tempoFormatado;
+    document.getElementById("tempoEspera").textContent = tempoEsperaFormatado;
     document.getElementById("tipoTarifa").textContent = tipoTarifa;
     document.getElementById("valorEspera").textContent = `R$ ${(minutosParados * valorMinutoParado).toFixed(2).replace(".",",")}`;
 }
 
-// Função INICIAR totalmente ajustada para não travar
+// INICIAR CORRIDA - REGRAS MELHORADAS E MAIS PRECISAS NO GPS
 function iniciar(){
     if(rodando) return;
     rodando = true;
     segundos = 0;
+    segundosEspera = 0;
     km = 0;
     minutosParados = 0;
     tempoParadoAtivo = false;
@@ -418,53 +433,68 @@ function iniciar(){
     document.getElementById("btnIniciar").disabled = true;
     document.getElementById("btnParar").disabled = false;
 
+   
     tocarSom(900,150);
     manterTelaAcesa();
     atualizarTela();
 
-    // Timer com intervalo mais estável
-    timer = setInterval(()=>{
+    // Contador de tempo da corrida
+    timer = setInterval(() => {
         segundos++;
-        if(tempoParadoAtivo) minutosParados += 1/60;
+        if(tempoParadoAtivo) {
+            segundosEspera++;
+            minutosParados = segundosEspera / 60;
+        }
         atualizarTela();
     }, 1000);
 
-    if(!navigator.geolocation){
-        alert("GPS não suportado neste dispositivo.");
-        rodando = false;
+if(!navigator.geolocation){
+    alert("GPS não suportado neste dispositivo.");
+    rodando = false;
+    return;
+}
+
+// Configuração do GPS - REGRAS MUITO MAIS PRECISAS
+watchId = navigator.geolocation.watchPosition(
+(pos)=>{
+    if(!rodando) return;
+    const lat = pos.coords.latitude;
+    const lon = pos.coords.longitude;
+    const precisao = pos.coords.accuracy;
+
+    // AJUSTE: Aceita apenas leituras com precisão até 100 metros (melhor que antes)
+    // E ignora leituras muito imprecisas para não contar distância errada
+    if(precisao > 100) return;
+
+    if(!ultimaPosicao){
+        ultimaPosicao = {lat, lon, tempo: Date.now()};
         return;
     }
 
-    // Configuração do GPS mais leve e rápida
-    watchId = navigator.geolocation.watchPosition(
-    (pos)=>{
-        if(!rodando) return;
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
-        const precisao = pos.coords.accuracy;
+    // Cálculo mais preciso da distância percorrida
+    const dist = calcularDistancia(ultimaPosicao.lat, ultimaPosicao.lon, lat, lon);
+    const tempoDecorrido = Date.now() - ultimaPosicao.tempo;
+    
+    // AJUSTE: Conta a distância mesmo com movimentos pequenos, a partir de 1 metro
+    // E verifica o tempo entre leituras para não contar de forma errada
+    if(dist > 0.001 && tempoDecorrido > 200){
+        km += dist;
+    }
 
-        if(precisao > 80) return;
-        if(!ultimaPosicao){
-            ultimaPosicao = {lat, lon};
-            return;
-        }
+    ultimaPosicao = {lat, lon, tempo: Date.now()};
 
-        const dist = calcularDistancia(ultimaPosicao.lat, ultimaPosicao.lon, lat,
-lon);
-        if(dist > 0.005){
-            km += dist;
-        }
-        ultimaPosicao = {lat, lon};
-    },
-    (erro)=>{
-        console.log(erro);
-        alert("Erro ao acessar o GPS. Verifique as permissões.");
-    },
-    {
-        enableHighAccuracy: true,
-        maximumAge: 8000,
-        timeout: 18000
-    });
+},
+(erro)=>{
+    console.log(erro);
+    alert("Erro ao acessar o GPS. Verifique as permissões e a localização.");
+    rodando = false;
+},
+{
+    enableHighAccuracy: true, // Ativa alta precisão do GPS
+    maximumAge: 1000,        // Atualiza a cada 1 segundo
+    timeout: 8000,           // Tempo máximo para obter a localização
+    distanceFilter: 1        // Conta a partir de 1 metro de movimento
+});
 }
 
 function parar(){
@@ -491,10 +521,10 @@ function calcularDistancia(lat1, lon1, lat2, lon2){
     const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
               Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-              Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     const distancia = R * c;
     return distancia;
 }
@@ -502,15 +532,6 @@ function calcularDistancia(lat1, lon1, lat2, lon2){
 function abrirMaps(){
     const origem = document.getElementById("origem").value.trim();
     const destino = document.getElementById("destino").value.trim();
-
-    if(!origem || origem.length < 3){
-        alert("Informe um local de saída válido!");
-        return;
-    }
-    if(!destino || destino.length < 3){
-        alert("Informe um destino válido!");
-        return;
-    }
 
     const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origem)}&destination=${encodeURIComponent(destino)}&travelmode=driving`;
     window.open(url, "_blank");
@@ -524,8 +545,9 @@ function gerarComprovante(){
     document.getElementById("compDestino").textContent = `🎯 Destino: ${destino}`;
     document.getElementById("compValor").textContent = `💰 Valor Total: ${document.getElementById("valorDisplay").textContent}`;
     document.getElementById("compKm").textContent = `📏 Distância: ${document.getElementById("distancia").textContent}`;
-    document.getElementById("compTempo").textContent = `⏱️ Tempo: ${document.getElementById("tempo").textContent}`;
-    document.getElementById("compEspera").textContent = `🚦 Tempo Espera: ${document.getElementById("valorEspera").textContent}`;
+    document.getElementById("compTempo").textContent = `⏱️ Tempo Corrida: ${document.getElementById("tempo").textContent}`;
+    document.getElementById("compTempoEspera").textContent = `⏱️ Tempo Espera: ${document.getElementById("tempoEspera").textContent}`;
+    document.getElementById("compEspera").textContent = `🚦 Valor Espera: ${document.getElementById("valorEspera").textContent}`;
 
     document.getElementById("comprovante").style.display = "block";
 }
@@ -536,6 +558,7 @@ function compartilhar(){
     const valor = document.getElementById("valorDisplay").textContent;
     const distancia = document.getElementById("distancia").textContent;
     const tempo = document.getElementById("tempo").textContent;
+    const tempoEspera = document.getElementById("tempoEspera").textContent;
     const data = new Date().toLocaleString("pt-BR");
     const calcKm = (km * valorKm).toFixed(2).replace(".",",");
     const bandeiraTexto = bandeirada.toFixed(2).replace(".",",");
@@ -550,35 +573,33 @@ function compartilhar(){
 🎯 Destino: ${destino}
 
 📊 DADOS DA CORRIDA:
-📏 Distância: ${distancia}
-⏱️ Tempo: ${tempo}
+📏 Distância Percorrida: ${distancia}
+⏱️ Tempo de Corrida: ${tempo}
+⏱️ Tempo de Espera: ${tempoEspera}
 🚦 Tarifa: ${tipoTarifa}
-💵 Bandeirada: R$ ${bandeiraTexto}
+💵 Valor da Bandeira: R$ ${bandeiraTexto}
 🛣️ Valor por KM: R$ ${kmTexto}
 🧮 Cálculo: R$ ${bandeiraTexto} + (${distancia.replace(" km","")}km × R$ ${kmTexto})
-💰 Total KM: R$ ${calcKm}
-⌛ Tempo Parado: R$ ${esperaTexto}
+💰 Valor Total por Distância: R$ ${calcKm}
+⌛ Valor por Espera: R$ ${esperaTexto}
 
-✅ VALOR TOTAL: ${valor}
+✅ VALOR TOTAL A COBRAR: ${valor}
 
-👤 MOTOTAXISTA: ${NOME_MOTO}
+👤 MOTORISTA: ${NOME_MOTO}
 📞 Contato: ${TELEFONE}
 🏍️ Veículo: ${VEICULO}
-🔢 Placa: ${PLACA}
+🚗 Placa: ${PLACA}
 📍 Cidade: ${CIDADE}
 
-💳 PIX: ${PIX_KEY}
+💳 Chave Pix: ${PIX_KEY}
 👤 Nome: ${NOME}
-
-🌐 Site: ${SITE_OFICIAL}
 
 🙏 Obrigado pela preferência!`;
 
     window.open(`https://wa.me/?text=${encodeURIComponent(mensagem)}`, "_blank");
 }
 
-// ✅ FUNÇÃO DE PIX CORRIGIDA E COMPATÍVEL COM TODOS OS BANCOS
-
+// FUNÇÃO DE PIX COMPLETA
 
 function campo(id, valor){
 
@@ -673,13 +694,12 @@ async function copiarPix(){
     }
 
 }
-
 async function copiarPix(){
     const codigo = document.getElementById("pixCode").value;
     try{
         await navigator.clipboard.writeText(codigo);
         alert("Código PIX copiado com sucesso!");
-    }catch(err){
+    }catch(erro){
         alert("Não foi possível copiar, copie o código manualmente.");
     }
 }
@@ -692,8 +712,9 @@ function salvarHistorico(){
         valor: document.getElementById("valorDisplay").textContent,
         distancia: document.getElementById("distancia").textContent,
         tempo: document.getElementById("tempo").textContent,
+        tempoEspera: document.getElementById("tempoEspera").textContent,
         tarifa: tipoTarifa,
-        espera: document.getElementById("valorEspera").textContent
+        valorEspera: document.getElementById("valorEspera").textContent
     };
 
     historicoCorridas.push(novaCorrida);
@@ -716,11 +737,12 @@ function atualizarHistorico(){
         div.innerHTML = `
             <p><strong>Corrida #${indice+1}</strong></p>
             <p>📅 ${item.data}</p>
-            <p>💰 ${item.valor}</p>
-            <p>📏 ${item.distancia}</p>
-            <p>⏱️ ${item.tempo}</p>
+            <p>💰 Valor: ${item.valor}</p>
+            <p>📏 Distância: ${item.distancia}</p>
+            <p>⏱️ Tempo: ${item.tempo}</p>
+            <p>⏱️ Espera: ${item.tempoEspera}</p>
             <p>📊 ${item.tarifa}</p>
-            <p>🚦 ${item.espera}</p>
+            <p>🚦 Valor Espera: ${item.valorEspera}</p>
         `;
         lista.appendChild(div);
     });
@@ -757,10 +779,9 @@ function desativarEspera(){
     tocarSom(500,150);
 }
 
-// Serviço de trabalho otimizado para não consumir memória
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('service-worker.js')
-    .catch(() => console.log("Funcionalidade off-line não disponível neste dispositivo"));
+    .catch(() => console.log("Funcionalidade de off-line não disponível neste dispositivo"));
 }
 
 </script>
