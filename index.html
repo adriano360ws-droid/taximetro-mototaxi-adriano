@@ -819,22 +819,26 @@
             }, 1000);
         }
 
-        function parar() {
-            if (!corridaAtiva) return;
-            corridaAtiva = false;
-            clearInterval(tempoIntervalo);
-            clearInterval(rastreamento);
+        
+function parar() {
+    if (!corridaAtiva) return;
+    corridaAtiva = false;
+    clearInterval(tempoIntervalo);
+    clearInterval(rastreamento);
 
-            document.getElementById('btnIniciar').disabled = false;
-            document.getElementById('btnParar').disabled = true;
-            document.getElementById('btnAtivarEspera').disabled = true;
-            document.getElementById('btnDesativarEspera').style.display = 'none';
+    document.getElementById('btnIniciar').disabled = false;
+    document.getElementById('btnParar').disabled = true;
+    document.getElementById('btnAtivarEspera').disabled = true;
+    document.getElementById('btnDesativarEspera').style.display = 'none';
 
-            calcularValorTotal();
-            gerarComprovante();
-            salvarHistorico();   // <-- salva a corrida
-        }
+    calcularValorTotal();
+    gerarComprovante();
 
+    // Diagnóstico
+    alert('Chamando salvarHistorico...');
+    salvarHistorico();
+    alert('Salvamento concluído.');
+}
         function compartilharWhatsapp() {
             const origem = document.getElementById('campoOrigem').value || 'Não informado';
             const destino = document.getElementById('campoDestino').value || 'Não informado';
@@ -910,11 +914,10 @@
         }
 
         function abrirHistorico() {
-            // Mostra diagnóstico
-            alert('Quantidade de corridas salvas: ' + historicoCorridas.length);
-            atualizarListaHistorico();
-            document.getElementById('historico').style.display = 'block';
-        }
+    alert('Histórico atual tem ' + (historicoCorridas ? historicoCorridas.length : 'erro') + ' corrida(s).');
+    atualizarListaHistorico();
+    document.getElementById('historico').style.display = 'block';
+}
 
         function abrirTabelaTarifas() {
             document.getElementById('tabelaTarifas').style.display = 'block';
@@ -1031,37 +1034,43 @@
 
         // ---------- HISTÓRICO ----------
         function salvarHistorico() {
-            try {
-                const agora = new Date();
-                const data = agora.toLocaleDateString('pt-BR');
-                const hora = agora.toLocaleTimeString('pt-BR');
-                const origem = document.getElementById('campoOrigem').value || 'Não informado';
-                const destino = document.getElementById('campoDestino').value || 'Não informado';
-                const distancia = document.getElementById('distancia').textContent;
-                const tempoTotal = formatarTempo(tempoCorrida);
-                const tempoEsperaTotal = formatarTempo(tempoEspera);
-                const valor = document.getElementById('valorDisplay').textContent;
-                const tarifa = document.getElementById('tipoTarifa').textContent;
-
-                const corrida = {
-                    data: `${data} ${hora}`,
-                    origem: origem,
-                    destino: destino,
-                    distancia: distancia,
-                    tempo: tempoTotal,
-                    tempoEspera: tempoEsperaTotal,
-                    tarifa: tarifa,
-                    valor: valor
-                };
-
-                historicoCorridas.push(corrida);
-                salvarDadosLocalStorage();
-                alert('✅ Corrida salva no histórico com sucesso! Total agora: ' + historicoCorridas.length);
-            } catch (e) {
-                alert('❌ Erro ao salvar histórico: ' + e.message);
-            }
+    alert('Entrou em salvarHistorico');
+    try {
+        if (!historicoCorridas || !Array.isArray(historicoCorridas)) {
+            historicoCorridas = [];
+            alert('historicoCorridas estava inválido, foi corrigido.');
         }
 
+        const agora = new Date();
+        const data = agora.toLocaleDateString('pt-BR');
+        const hora = agora.toLocaleTimeString('pt-BR');
+        const origem = document.getElementById('campoOrigem').value || 'Não informado';
+        const destino = document.getElementById('campoDestino').value || 'Não informado';
+        const distancia = document.getElementById('distancia').textContent;
+        const tempoTotal = formatarTempo(tempoCorrida);
+        const tempoEsperaTotal = formatarTempo(tempoEspera);
+        const valor = document.getElementById('valorDisplay').textContent;
+        const tarifa = document.getElementById('tipoTarifa').textContent;
+
+        const corrida = {
+            data: `${data} ${hora}`,
+            origem: origem,
+            destino: destino,
+            distancia: distancia,
+            tempo: tempoTotal,
+            tempoEspera: tempoEsperaTotal,
+            tarifa: tarifa,
+            valor: valor
+        };
+
+        historicoCorridas.push(corrida);
+        alert('Corrida adicionada ao array. Total: ' + historicoCorridas.length);
+        salvarDadosLocalStorage();
+        alert('✅ Corrida salva no histórico com sucesso! Total: ' + historicoCorridas.length);
+    } catch (e) {
+        alert('❌ ERRO em salvarHistorico: ' + e.message);
+    }
+}
         function limparHistorico() {
             if (confirm('⚠️ Tem certeza que deseja limpar todo o histórico de corridas? Essa ação não pode ser desfeita!')) {
                 historicoCorridas = [];
