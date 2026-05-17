@@ -1039,26 +1039,7 @@
             salvarDadosLocalStorage();
         }
 
-        function atualizarListaHistorico() {
-            const lista = document.getElementById('listaHistorico');
-            lista.innerHTML = '';
-            if (historicoCorridas.length === 0) {
-                lista.innerHTML = '<p style="text-align:center; color:#666; padding:20px;">Nenhuma corrida registrada ainda</p>';
-                return;
-            }
-            historicoCorridas.forEach((corrida, index) => {
-                const item = document.createElement('div');
-                item.className = 'item-historico';
-                item.innerHTML = `
-                    <p><strong>Corrida ${index + 1}</strong></p>
-                    <p>📅 Data: ${corrida.data}</p>
-                    <p>⏱️ Tempo total: ${corrida.tempo}</p>
-                    <p>📏 Distância: ${corrida.distancia}</p>
-                    <p>💰 Valor: ${corrida.valor}</p>
-                `;
-                lista.appendChild(item);
-            });
-        }
+        
 
         function limparHistorico() {
             if (confirm('⚠️ Tem certeza que deseja limpar todo o histórico de corridas? Essa ação não pode ser desfeita!')) {
