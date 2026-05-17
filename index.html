@@ -1082,29 +1082,26 @@
             }));
         }
 
-        function carregarDadosSalvos() {
-            const historicoSalvo = localStorage.getItem('historicoCorridas');
-            if (historicoSalvo) historicoCorridas = JSON.parse(historicoSalvo);
-
-            const tarifasSalvas = localStorage.getItem('configuracoesTarifas');
-            if (tarifasSalvas) Object.assign(tarifas, JSON.parse(tarifasSalvas));
-
-            const dadosSalvos = localStorage.getItem('dadosUsuario');
-            if (dadosSalvos) {
-                const dados = JSON.parse(dadosSalvos);
-                NOME_MOTO = dados.nomeMoto || NOME_MOTO;
-                NOME_COMERCIAL = dados.nomeComercial || NOME_COMERCIAL;
-                TELEFONE = dados.telefone || TELEFONE;
-                VEICULO = dados.veiculo || VEICULO;
-                PLACA = dados.placa || PLACA;
-                CIDADE = dados.cidade || CIDADE;
-            }
-
-            definirTarifaPorHorario();
-            atualizarListaHistorico();
-            document.getElementById('comprovante').style.display = 'none';
-            document.getElementById('pixModal').style.display = 'none';
-        }
+        function atualizarListaHistorico() {
+    const lista = document.getElementById('listaHistorico');
+    lista.innerHTML = '';
+    if (historicoCorridas.length === 0) {
+        lista.innerHTML = '<p style="text-align:center; color:#666; padding:20px;">Nenhuma corrida registrada ainda</p>';
+        return;
+    }
+    historicoCorridas.forEach((corrida, index) => {
+        const item = document.createElement('div');
+        item.className = 'item-historico';
+        item.innerHTML = `
+            <p><strong>Corrida ${index + 1}</strong></p>
+            <p>📅 Data: ${corrida.data}</p>
+            <p>⏱️ Tempo total: ${corrida.tempo}</p>
+            <p>📏 Distância: ${corrida.distancia}</p>
+            <p>💰 Valor: ${corrida.valor}</p>
+        `;
+        lista.appendChild(item);
+    });
+}
 
         // ---------- SERVICE WORKER ----------
         if ('serviceWorker' in navigator) {
