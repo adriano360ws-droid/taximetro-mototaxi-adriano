@@ -1028,102 +1028,129 @@
         }
 
         // ---------- HISTÓRICO ----------
-        function salvarHistorico() {
-            const agora = new Date();
-            const data = agora.toLocaleDateString('pt-BR');
-            const hora = agora.toLocaleTimeString('pt-BR');
-            const origem = document.getElementById('campoOrigem').value || 'Não informado';
-            const destino = document.getElementById('campoDestino').value || 'Não informado';
-            const distancia = document.getElementById('distancia').textContent;
-            const tempoTotal = formatarTempo(tempoCorrida);
-            const tempoEsperaTotal = formatarTempo(tempoEspera);
-            const valor = document.getElementById('valorDisplay').textContent;
-            const tarifa = document.getElementById('tipoTarifa').textContent;
+function salvarHistorico() {
+    try {
+        const agora = new Date();
+        const data = agora.toLocaleDateString('pt-BR');
+        const hora = agora.toLocaleTimeString('pt-BR');
+        const origem = document.getElementById('campoOrigem').value || 'Não informado';
+        const destino = document.getElementById('campoDestino').value || 'Não informado';
+        const distancia = document.getElementById('distancia').textContent;
+        const tempoTotal = formatarTempo(tempoCorrida);
+        const tempoEsperaTotal = formatarTempo(tempoEspera);
+        const valor = document.getElementById('valorDisplay').textContent;
+        const tarifa = document.getElementById('tipoTarifa').textContent;
 
-            historicoCorridas.push({
-                data: `${data} ${hora}`,
-                origem: origem,
-                destino: destino,
-                distancia: distancia,
-                tempo: tempoTotal,
-                tempoEspera: tempoEsperaTotal,
-                tarifa: tarifa,
-                valor: valor
-            });
-            salvarDadosLocalStorage();
-        }
+        const corrida = {
+            data: `${data} ${hora}`,
+            origem: origem,
+            destino: destino,
+            distancia: distancia,
+            tempo: tempoTotal,
+            tempoEspera: tempoEsperaTotal,
+            tarifa: tarifa,
+            valor: valor
+        };
 
-        function limparHistorico() {
-            if (confirm('⚠️ Tem certeza que deseja limpar todo o histórico de corridas? Essa ação não pode ser desfeita!')) {
-                historicoCorridas = [];
-                localStorage.removeItem('historicoCorridas');
-                atualizarListaHistorico();
-                alert('✅ Histórico limpo com sucesso!');
-            }
-        }
+        historicoCorridas.push(corrida);
+        salvarDadosLocalStorage();
+        alert('✅ Corrida salva no histórico com sucesso!');
+    } catch (e) {
+        alert('❌ Erro ao salvar histórico: ' + e.message);
+    }
+}
 
-        function salvarDadosLocalStorage() {
-            localStorage.setItem('historicoCorridas', JSON.stringify(historicoCorridas));
-            localStorage.setItem('configuracoesTarifas', JSON.stringify(tarifas));
-            localStorage.setItem('dadosUsuario', JSON.stringify({
-                nomeMoto: NOME_MOTO,
-                nomeComercial: NOME_COMERCIAL,
-                telefone: TELEFONE,
-                veiculo: VEICULO,
-                placa: PLACA,
-                cidade: CIDADE
-            }));
-        }
-
-        function atualizarListaHistorico() {
-            const lista = document.getElementById('listaHistorico');
-            lista.innerHTML = '';
-            if (historicoCorridas.length === 0) {
-                lista.innerHTML = '<p style="text-align:center; color:#666; padding:20px;">Nenhuma corrida registrada ainda</p>';
-                return;
-            }
-            historicoCorridas.forEach((corrida, index) => {
-                const item = document.createElement('div');
-                item.className = 'item-historico';
-                item.innerHTML = `
-                    <p><strong>🏍️ Corrida ${index + 1}</strong></p>
-                    <p>📅 Data: ${corrida.data}</p>
-                    <p>📍 Origem: ${corrida.origem || 'Não informado'}</p>
-                    <p>🏁 Destino: ${corrida.destino || 'Não informado'}</p>
-                    <p>📏 Distância: ${corrida.distancia}</p>
-                    <p>⏱️ Tempo percurso: ${corrida.tempo}</p>
-                    <p>⏳ Tempo espera: ${corrida.tempoEspera || '00:00:00'}</p>
-                    <p>🔥 Tarifa: ${corrida.tarifa || '-'}</p>
-                    <p>💰 Valor: ${corrida.valor}</p>
-                `;
-                lista.appendChild(item);
-            });
-        }
-
-        // ---------- CARREGAR DADOS SALVOS ----------
-        function carregarDadosSalvos() {
-            const historicoSalvo = localStorage.getItem('historicoCorridas');
-            if (historicoSalvo) historicoCorridas = JSON.parse(historicoSalvo);
-
-            const tarifasSalvas = localStorage.getItem('configuracoesTarifas');
-            if (tarifasSalvas) Object.assign(tarifas, JSON.parse(tarifasSalvas));
-
-            const dadosSalvos = localStorage.getItem('dadosUsuario');
-            if (dadosSalvos) {
-                const dados = JSON.parse(dadosSalvos);
-                NOME_MOTO = dados.nomeMoto || NOME_MOTO;
-                NOME_COMERCIAL = dados.nomeComercial || NOME_COMERCIAL;
-                TELEFONE = dados.telefone || TELEFONE;
-                VEICULO = dados.veiculo || VEICULO;
-                PLACA = dados.placa || PLACA;
-                CIDADE = dados.cidade || CIDADE;
-            }
-
-            definirTarifaPorHorario();
+function limparHistorico() {
+    if (confirm('⚠️ Tem certeza que deseja limpar todo o histórico de corridas? Essa ação não pode ser desfeita!')) {
+        historicoCorridas = [];
+        try {
+            localStorage.removeItem('historicoCorridas');
             atualizarListaHistorico();
-            document.getElementById('comprovante').style.display = 'none';
-            document.getElementById('pixModal').style.display = 'none';
+            alert('✅ Histórico limpo com sucesso!');
+        } catch (e) {
+            alert('❌ Não foi possível limpar o histórico. Verifique as permissões do navegador.');
         }
+    }
+}
+
+function salvarDadosLocalStorage() {
+    try {
+        localStorage.setItem('historicoCorridas', JSON.stringify(historicoCorridas));
+        localStorage.setItem('configuracoesTarifas', JSON.stringify(tarifas));
+        localStorage.setItem('dadosUsuario', JSON.stringify({
+            nomeMoto: NOME_MOTO,
+            nomeComercial: NOME_COMERCIAL,
+            telefone: TELEFONE,
+            veiculo: VEICULO,
+            placa: PLACA,
+            cidade: CIDADE
+        }));
+    } catch (e) {
+        alert('❌ Erro ao acessar armazenamento local. Verifique se o modo anônimo está desativado e os cookies permitidos.');
+    }
+}
+
+function atualizarListaHistorico() {
+    const lista = document.getElementById('listaHistorico');
+    if (!lista) return;
+    lista.innerHTML = '';
+    if (!historicoCorridas || historicoCorridas.length === 0) {
+        lista.innerHTML = '<p style="text-align:center; color:#666; padding:20px;">Nenhuma corrida registrada ainda</p>';
+        return;
+    }
+    historicoCorridas.forEach((corrida, index) => {
+        const item = document.createElement('div');
+        item.className = 'item-historico';
+        item.innerHTML = `
+            <p><strong>🏍️ Corrida ${index + 1}</strong></p>
+            <p>📅 Data: ${corrida.data || '-'}</p>
+            <p>📍 Origem: ${corrida.origem || 'Não informado'}</p>
+            <p>🏁 Destino: ${corrida.destino || 'Não informado'}</p>
+            <p>📏 Distância: ${corrida.distancia || '0.00 km'}</p>
+            <p>⏱️ Tempo percurso: ${corrida.tempo || '00:00:00'}</p>
+            <p>⏳ Tempo espera: ${corrida.tempoEspera || '00:00:00'}</p>
+            <p>🔥 Tarifa: ${corrida.tarifa || '-'}</p>
+            <p>💰 Valor: ${corrida.valor || 'R$ 0,00'}</p>
+        `;
+        lista.appendChild(item);
+    });
+}
+
+// ---------- CARREGAR DADOS SALVOS ----------
+function carregarDadosSalvos() {
+    try {
+        const historicoSalvo = localStorage.getItem('historicoCorridas');
+        if (historicoSalvo) {
+            historicoCorridas = JSON.parse(historicoSalvo);
+        } else {
+            historicoCorridas = [];
+        }
+
+        const tarifasSalvas = localStorage.getItem('configuracoesTarifas');
+        if (tarifasSalvas) Object.assign(tarifas, JSON.parse(tarifasSalvas));
+
+        const dadosSalvos = localStorage.getItem('dadosUsuario');
+        if (dadosSalvos) {
+            const dados = JSON.parse(dadosSalvos);
+            NOME_MOTO = dados.nomeMoto || NOME_MOTO;
+            NOME_COMERCIAL = dados.nomeComercial || NOME_COMERCIAL;
+            TELEFONE = dados.telefone || TELEFONE;
+            VEICULO = dados.veiculo || VEICULO;
+            PLACA = dados.placa || PLACA;
+            CIDADE = dados.cidade || CIDADE;
+        }
+    } catch (e) {
+        historicoCorridas = [];
+        alert('⚠️ Não foi possível carregar dados salvos. O histórico pode estar vazio.');
+    }
+
+    definirTarifaPorHorario();
+    atualizarListaHistorico();
+    const comp = document.getElementById('comprovante');
+    const pix = document.getElementById('pixModal');
+    if (comp) comp.style.display = 'none';
+    if (pix) pix.style.display = 'none';
+}
 
         // ---------- SERVICE WORKER ----------
         if ('serviceWorker' in navigator) {
