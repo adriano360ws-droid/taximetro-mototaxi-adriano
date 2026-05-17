@@ -36,19 +36,14 @@
 
         body.dark-mode .box,
         body.dark-mode #comprovante,
-        body.dark-mode #historico,
         body.dark-mode #tabelaTarifas,
         body.dark-mode #telaConfiguracoes,
         body.dark-mode #pixModal,
-        body.dark-mode #corridasHoje {
+        body.dark-mode #corridasHoje,
+        body.dark-mode #simulacaoTarifas {
             background: #1E1E1E;
             color: #FFFFFF;
             border: 1px solid #333;
-        }
-
-        body.dark-mode .item-historico {
-            background: #292929;
-            color: #FFF;
         }
 
         body.dark-mode .fechar-btn {
@@ -60,11 +55,6 @@
         body.dark-mode .btn-tabela {
             background: #FFC107;
             color: #000;
-        }
-
-        body.dark-mode .btn-historico {
-            background: #9C27B0;
-            color: #FFF;
         }
 
         body.dark-mode .tarifa-verde {
@@ -91,13 +81,8 @@
         }
 
         body.dark-mode #distancia,
-        body.dark-mode #tempo,
-        body.dark-mode #tempoEspera {
+        body.dark-mode #tempo {
             color: #FFD54F;
-        }
-
-        body.dark-mode #valorEspera {
-            color: #4CAF50;
         }
 
         body.dark-mode #tipoTarifa {
@@ -156,21 +141,12 @@
         }
 
         #distancia,
-        #tempo,
-        #tempoEspera {
+        #tempo {
             font-size: calc(var(--tamanho-fonte, 1em) * 3.2);
             font-weight: bold;
             color: #F57F17;
             line-height: 1;
             text-shadow: 0 3px 6px rgba(245, 127, 23, 0.3);
-        }
-
-        #valorEspera {
-            font-size: calc(var(--tamanho-fonte, 1em) * 2.8);
-            font-weight: bold;
-            color: #2E7D32;
-            line-height: 1;
-            text-shadow: 0 3px 6px rgba(46, 125, 50, 0.3);
         }
 
         #tipoTarifa {
@@ -221,12 +197,6 @@
             width: 46%;
         }
 
-        .btn-historico {
-            background: #673AB7;
-            color: #FFF;
-            width: 100%;
-        }
-
         .btn-tabela {
             background: #FF9800;
             color: #FFF;
@@ -247,12 +217,6 @@
 
         .btn-rota {
             background: #4285F4;
-            color: #FFF;
-            width: 100%;
-        }
-
-        .btn-limpar {
-            background: #D32F2F;
             color: #FFF;
             width: 100%;
         }
@@ -278,10 +242,10 @@
         }
 
         #comprovante,
-        #historico,
         #tabelaTarifas,
         #telaConfiguracoes,
-        #pixModal {
+        #pixModal,
+        #simulacaoTarifas {
             display: none;
             background: #FFF;
             padding: 20px;
@@ -289,6 +253,7 @@
             border-radius: 16px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             border: 2px solid #E0F2F1;
+            text-align: left;
         }
 
         #corridasHoje {
@@ -301,27 +266,12 @@
             text-align: left;
         }
 
-        #tabelaTarifas,
-        #tabelaTarifas th,
-        #tabelaTarifas td {
-            font-size: var(--tamanho-fonte, 1em) !important;
-        }
-
         #comprovante p {
             font-size: var(--tamanho-fonte, 1.2em);
             margin: 8px 0;
             font-weight: 500;
             color: #263238;
             text-align: left;
-        }
-
-        .item-historico {
-            background: #F1F8E9;
-            padding: 15px;
-            border-radius: 12px;
-            margin: 10px 0;
-            text-align: left;
-            border-left: 4px solid #4CAF50;
         }
 
         table {
@@ -428,13 +378,8 @@
             }
 
             #distancia,
-            #tempo,
-            #tempoEspera {
+            #tempo {
                 font-size: calc(var(--tamanho-fonte, 1em) * 2.2);
-            }
-
-            #valorEspera {
-                font-size: calc(var(--tamanho-fonte, 1em) * 2.0);
             }
 
             button {
@@ -466,14 +411,11 @@
             <div id="valorDisplay">R$ 0,00</div>
             <p>Distância: <span id="distancia">0.00 km</span></p>
             <p>Tempo Corrida: <span id="tempo">00:00:00</span></p>
-            <p>Tempo Espera: <span id="tempoEspera">00:00:00</span></p>
             <p>Tarifa: <span id="tipoTarifa">-</span></p>
         </div>
 
         <button id="btnIniciar" class="btn-iniciar" onclick="iniciar()">INICIAR CORRIDA</button>
         <button id="btnParar" class="btn-parar" disabled onclick="parar()">PARAR CORRIDA</button>
-        <button id="btnAtivarEspera" class="btn-tabela" onclick="ativarTempoEspera()">⏳ ATIVAR ESPERA</button>
-        <button id="btnDesativarEspera" class="btn-parar" style="display:none;width:100%;margin-top:8px;" onclick="desativarTempoEspera()">⏹️ PARAR ESPERA</button>
 
         <div class="box">
             <input type="text" id="campoOrigem" placeholder="Local de saída" value="Rua Bartolomeu Soares 115 Demerval Lobão cep: 64390-00 PI">
@@ -482,13 +424,13 @@
 
         <button class="btn-rota" onclick="abrirRotaGoogleMaps()">🗺️ VER ROTA NO GOOGLE MAPS</button>
 
-        <button class="btn-historico" onclick="abrirHistorico()">📋 HISTÓRICO DE CORRIDAS</button>
         <button class="btn-tabela" id="botaoTabelaTarifas" onclick="abrirTabelaTarifas()">📊 TABELA DE TARIFAS</button>
+        <button class="btn-tabela" onclick="abrirSimulacao()">📈 SIMULAÇÃO DE PREÇOS</button>
 
         <button class="btn-whatsapp" onclick="compartilharWhatsapp()">💬 COMPARTILHAR WHATSAPP</button>
         <button class="btn-pix" onclick="gerarCodigoPix()">💳 GERAR CÓDIGO PIX</button>
 
-        <!-- Corridas de Hoje (visível na tela inicial) -->
+        <!-- Corridas de Hoje -->
         <div id="corridasHoje" style="margin-top:20px; text-align:left;">
             <h4>📋 Corridas de Hoje</h4>
             <div id="listaCorridasHoje"></div>
@@ -526,14 +468,11 @@
             <h4>🧮 CÁLCULO DETALHADO</h4>
             <p>🔹 Valor da Bandeira: R$ <span id="valorBandeira">0,00</span></p>
             <p>🔹 Valor por KM percorrido: R$ <span id="valorKm">0,00</span></p>
-            <p>🔹 Valor por tempo de percurso: R$ <span id="valorTempo">0,00</span></p>
-            <p>🔹 Valor por tempo de espera: R$ <span id="valorEsperaDetalhado">0,00</span></p>
             <p style="font-size:1.4em; font-weight:bold; color:#009688; margin-top:10px;">💰 VALOR TOTAL A PAGAR: <span id="dadosValor"></span></p>
 
             <h4>ℹ️ INFORMAÇÕES ADICIONAIS</h4>
             <p id="dadosDistancia"></p>
             <p id="dadosTempo"></p>
-            <p id="dadosValorEspera"></p>
 
             <p style="margin-top:25px; font-style:italic; color:#2E7D32; text-align:center;">
                 ✅ Agradecemos pela preferência! Estamos à disposição para sua próxima viagem com segurança, agilidade e preço justo.<br>
@@ -542,11 +481,11 @@
             <button class="fechar-btn" onclick="fecharJanela('comprovante')">❌ Fechar</button>
         </div>
 
-        <div id="historico">
-            <h3>📋 HISTÓRICO DE CORRIDAS</h3>
-            <div id="listaHistorico"></div>
-            <button class="btn-limpar" onclick="limparHistorico()">🗑️ Limpar Histórico</button>
-            <button class="fechar-btn" onclick="fecharJanela('historico')">❌ Fechar</button>
+        <!-- Simulação de Preços -->
+        <div id="simulacaoTarifas">
+            <h3>📈 SIMULAÇÃO DE PREÇOS (1 a 31 km)</h3>
+            <div id="tabelaSimulacao"></div>
+            <button class="fechar-btn" onclick="fecharJanela('simulacaoTarifas')">❌ Fechar</button>
         </div>
 
         <div id="tabelaTarifas">
@@ -557,48 +496,36 @@
                     <th>HORÁRIO DE FUNCIONAMENTO</th>
                     <th>BANDEIRADA</th>
                     <th>VALOR/KM</th>
-                    <th>COBRANÇA</th>
-                    <th>VALOR MÍNIMO</th>
                 </tr>
                 <tr>
                     <td class="tarifa-verde">🌿 Manhã (dias úteis)</td>
                     <td>06h às 14h</td>
                     <td>R$ 3,00</td>
                     <td>R$ 1,30</td>
-                    <td>Por quilômetro percorrido</td>
-                    <td>R$ 7,50</td>
                 </tr>
                 <tr>
                     <td class="tarifa-amarela">☀️ Tarde/Noite Normal (dias úteis)</td>
                     <td>14h às 19h</td>
                     <td>R$ 3,00</td>
                     <td>R$ 1,50</td>
-                    <td>Por quilômetro percorrido</td>
-                    <td>R$ 8,00</td>
                 </tr>
                 <tr>
                     <td class="tarifa-vermelha">🔥 Noite (dias úteis)</td>
                     <td>19h às 00h</td>
                     <td>R$ 3,50</td>
                     <td>R$ 1,70</td>
-                    <td>Por quilômetro percorrido</td>
-                    <td>R$ 8,50</td>
                 </tr>
                 <tr>
                     <td class="tarifa-amarela">🌙 Madrugada (dias úteis)</td>
                     <td>00h às 06h</td>
                     <td>R$ 3,20</td>
                     <td>R$ 1,60</td>
-                    <td>Por quilômetro percorrido</td>
-                    <td>R$ 8,50</td>
                 </tr>
                 <tr>
                     <td class="tarifa-vermelha">🔥 Sábado, Domingo e Feriados</td>
                     <td>O dia todo</td>
                     <td>R$ 3,50</td>
                     <td>R$ 1,70</td>
-                    <td>Por quilômetro percorrido</td>
-                    <td>R$ 8,50</td>
                 </tr>
             </table>
             <button class="fechar-btn" onclick="fecharJanela('tabelaTarifas')">❌ Fechar</button>
@@ -607,13 +534,9 @@
         <div id="telaConfiguracoes">
             <h3>⚙️ CONFIGURAÇÕES</h3>
             <label>Taxa por KM (R$):</label>
-            <input type="number" id="inputKmValor" step="0.01" value="3,00">
+            <input type="number" id="inputKmValor" step="0.01" value="1.30">
             <label>Valor da Bandeira (R$):</label>
-            <input type="number" id="inputBandeiraValor" step="0.01" value="3,00">
-            <label>Valor mínimo da corrida (R$):</label>
-            <input type="number" id="inputValorMinimo" step="0.01" value="8,00">
-            <label>Taxa de espera por minuto (R$):</label>
-            <input type="number" id="inputTaxaEspera" step="0.01" value="0,30">
+            <input type="number" id="inputBandeiraValor" step="0.01" value="3.00">
             <label>Tipo de Percurso:</label>
             <select id="tipoPercurso" style="width:100%; padding:16px; margin:10px 0; border-radius:12px; border:1px solid #DDD; font-size:1em;">
                 <option value="moto">🏍️ Moto</option>
@@ -628,9 +551,7 @@
     <script>
         // ---------- VARIÁVEIS GLOBAIS ----------
         let corridaAtiva = false;
-        let tempoCorrida = 0;
-        let tempoEspera = 0;
-        let tempoIntervalo;
+        let tempoCorrida = 0; // segundos totais (só incrementa quando há movimento)
         let modoEscuro = false;
         let modoEconomia = false;
 
@@ -638,7 +559,7 @@
         let ultimaPosicao = null;
         let rastreamento;
         let tipoVeiculo = 'moto';
-        let velocidadeMediaMoto = 25;
+        let velocidadeMediaMoto = 25; // fallback
         let velocidadeMediaPe = 4;
 
         let NOME_MOTO = "Adriano Alves de Oliveira";
@@ -652,23 +573,23 @@
         let CIDADE = "TERESINA - PI";
 
         const tarifas = {
-            verde: { bandeira: 3.00, km: 1.30, minimo: 7.50, espera: 0.30 },
-            amarela: { bandeira: 3.00, km: 1.50, minimo: 8.00, espera: 0.30 },
-            vermelha: { bandeira: 3.50, km: 1.70, minimo: 8.50, espera: 0.30 },
-            madrugada: { bandeira: 3.20, km: 1.60, minimo: 8.50, espera: 0.30 }
+            verde: { bandeira: 3.00, km: 1.30 },
+            amarela: { bandeira: 3.00, km: 1.50 },
+            vermelha: { bandeira: 3.50, km: 1.70 },
+            madrugada: { bandeira: 3.20, km: 1.60 }
         };
         let tarifaAtual = tarifas.verde;
         let historicoCorridas = [];
 
         // ---------- FUNÇÕES ----------
         function abrirRotaGoogleMaps() {
-            const origem = document.getElementById('campoOrigem').value.replace(/ /g, '+');
-            const destino = document.getElementById('campoDestino').value.replace(/ /g, '+');
+            const origem = document.getElementById('campoOrigem').value.trim();
+            const destino = document.getElementById('campoDestino').value.trim();
             if (!origem || !destino) {
                 alert('⚠️ Preencha o local de saída e o destino primeiro!');
                 return;
             }
-            const linkRota = `https://www.google.com/maps/dir/?api=1&origin=${origem}&destination=${destino}&travelmode=driving`;
+            const linkRota = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origem)}&destination=${encodeURIComponent(destino)}&travelmode=driving`;
             window.open(linkRota, '_blank');
         }
 
@@ -702,7 +623,7 @@
                     if (document.getElementById('tipoTarifaComprovante')) document.getElementById('tipoTarifaComprovante').textContent = '🌙 Tarifa Madrugada (00h às 06h)';
                 }
             }
-            document.getElementById('valorDisplay').textContent = `R$ ${tarifaAtual.minimo.toFixed(2).replace('.', ',')}`;
+            document.getElementById('valorDisplay').textContent = `R$ ${tarifaAtual.bandeira.toFixed(2).replace('.', ',')}`;
         }
 
         function definirTipoVeiculo(tipo) {
@@ -715,10 +636,7 @@
         }
 
         function iniciarRastreamentoGPS() {
-            if (!navigator.geolocation) {
-                alert('⚠️ Seu celular não suporta rastreamento por GPS! Usando cálculo por tempo.');
-                return;
-            }
+            if (!navigator.geolocation) return;
             rastreamento = setInterval(() => {
                 navigator.geolocation.getCurrentPosition((posicao) => {
                     const posicaoAtual = {
@@ -736,120 +654,70 @@
                             Math.sin(dLon / 2) * Math.sin(dLon / 2);
                         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
                         const distancia = 6371 * c;
-                        distanciaPercorrida += distancia;
-                        document.getElementById('distancia').textContent = `${distanciaPercorrida.toFixed(2)} km`;
+                        if (distancia > 0.001) {
+                            distanciaPercorrida += distancia;
+                            document.getElementById('distancia').textContent = `${distanciaPercorrida.toFixed(2)} km`;
+                            tempoCorrida += 0.6;
+                            document.getElementById('tempo').textContent = formatarTempo(Math.floor(tempoCorrida));
+                            calcularValorTotal();
+                        }
                     }
                     ultimaPosicao = posicaoAtual;
                 }, (erro) => {
                     console.log('Erro no GPS: ', erro);
-                    calcularDistanciaPorTempo();
                 }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
-            }, 5000);
+            }, 1000);
         }
 
-        function calcularDistanciaPorTempo() {
-            const tempoHoras = tempoCorrida / 3600;
-            if (tipoVeiculo === 'moto') {
-                distanciaPercorrida = tempoHoras * velocidadeMediaMoto;
-            } else {
-                distanciaPercorrida = tempoHoras * velocidadeMediaPe;
-            }
-            document.getElementById('distancia').textContent = `${distanciaPercorrida.toFixed(2)} km`;
-        }
-
-        function atualizarTempos() {
-            document.getElementById('tempo').textContent = formatarTempo(tempoCorrida);
-            document.getElementById('tempoEspera').textContent = formatarTempo(tempoEspera);
-            if (!ultimaPosicao) calcularDistanciaPorTempo();
-            if (distanciaPercorrida <= 0.01) {
-                document.getElementById('valorDisplay').textContent = `R$ ${tarifaAtual.minimo.toFixed(2).replace('.', ',')}`;
-            } else {
-                calcularValorTotal();
-            }
+        function arredondarParaCima10cent(valor) {
+            return Math.ceil(valor * 10) / 10;
         }
 
         function calcularValorTotal() {
             const valorBandeira = tarifaAtual.bandeira;
             const valorPorKm = tarifaAtual.km;
-            const valorPorMinuto = tarifaAtual.espera;
             const distanciaKm = distanciaPercorrida;
-            const tempoMinutos = tempoCorrida / 60;
-            const tempoEsperaMinutos = tempoEspera / 60;
-
             const valorDistancia = distanciaKm * valorPorKm;
-            const valorTempo = tempoMinutos * (valorPorKm / 2);
-            const valorEsperaTotal = tempoEsperaMinutos * valorPorMinuto;
-
-            let valorTotal = valorBandeira + valorDistancia + valorTempo + valorEsperaTotal;
-            if (valorTotal < tarifaAtual.minimo) valorTotal = tarifaAtual.minimo;
-
+            let valorTotal = valorBandeira + valorDistancia;
+            valorTotal = arredondarParaCima10cent(valorTotal);
             document.getElementById('valorDisplay').textContent = `R$ ${valorTotal.toFixed(2).replace('.', ',')}`;
             document.getElementById('valorBandeira').textContent = valorBandeira.toFixed(2).replace('.', ',');
-            document.getElementById('valorKm').textContent = valorPorKm.toFixed(2).replace('.', ',');
-            document.getElementById('valorTempo').textContent = (valorPorKm / 2).toFixed(2).replace('.', ',');
-            document.getElementById('valorEsperaDetalhado').textContent = valorEsperaTotal.toFixed(2).replace('.', ',');
-            document.getElementById('valorEspera').textContent = `R$ ${valorEsperaTotal.toFixed(2).replace('.', ',')}`;
-
+            document.getElementById('valorKm').textContent = valorDistancia.toFixed(2).replace('.', ',');
             return valorTotal;
-        }
-
-        function ativarTempoEspera() {
-            if (!corridaAtiva) {
-                alert('⚠️ Inicie a corrida primeiro!');
-                return;
-            }
-            document.getElementById('btnAtivarEspera').style.display = 'none';
-            document.getElementById('btnDesativarEspera').style.display = 'block';
-            tempoIntervalo = setInterval(() => {
-                tempoEspera++;
-                atualizarTempos();
-            }, 1000);
-        }
-
-        function desativarTempoEspera() {
-            clearInterval(tempoIntervalo);
-            document.getElementById('btnDesativarEspera').style.display = 'none';
-            document.getElementById('btnAtivarEspera').style.display = 'block';
-            calcularValorTotal();
         }
 
         function iniciar() {
             if (corridaAtiva) return;
             corridaAtiva = true;
             tempoCorrida = 0;
-            tempoEspera = 0;
             distanciaPercorrida = 0;
             ultimaPosicao = null;
             definirTarifaPorHorario();
 
             document.getElementById('btnIniciar').disabled = true;
             document.getElementById('btnParar').disabled = false;
-            document.getElementById('btnAtivarEspera').disabled = false;
 
             iniciarRastreamentoGPS();
 
-            document.getElementById('valorDisplay').textContent = `R$ ${tarifaAtual.minimo.toFixed(2).replace('.', ',')}`;
+            document.getElementById('valorDisplay').textContent = `R$ ${tarifaAtual.bandeira.toFixed(2).replace('.', ',')}`;
+            document.getElementById('tempo').textContent = '00:00:00';
+            document.getElementById('distancia').textContent = '0.00 km';
 
-            tempoIntervalo = setInterval(() => {
-                tempoCorrida++;
-                atualizarTempos();
-            }, 1000);
+            solicitarWakeLock();
         }
 
         function parar() {
             if (!corridaAtiva) return;
             corridaAtiva = false;
-            clearInterval(tempoIntervalo);
             clearInterval(rastreamento);
+            liberarWakeLock();
 
             document.getElementById('btnIniciar').disabled = false;
             document.getElementById('btnParar').disabled = true;
-            document.getElementById('btnAtivarEspera').disabled = true;
-            document.getElementById('btnDesativarEspera').style.display = 'none';
 
             calcularValorTotal();
             gerarComprovante();
-            salvarHistorico();   // <-- salva a corrida
+            salvarHistorico();
         }
 
         function compartilharWhatsapp() {
@@ -926,30 +794,38 @@
             document.getElementById(idJanela).style.display = 'none';
         }
 
-        function abrirHistorico() {
-            atualizarListaHistorico();
-            document.getElementById('historico').style.display = 'block';
-        }
-
         function abrirTabelaTarifas() {
             document.getElementById('tabelaTarifas').style.display = 'block';
+        }
+
+        function abrirSimulacao() {
+            const div = document.getElementById('simulacaoTarifas');
+            const tabela = document.getElementById('tabelaSimulacao');
+            let html = '<table><tr><th>Km</th><th>🌿 Manhã</th><th>☀️ Tarde/Noite</th><th>🔥 Noite</th><th>🌙 Madrugada</th><th>🔥 Fim de Semana</th></tr>';
+            for (let km = 1; km <= 31; km++) {
+                const vManha = arredondarParaCima10cent(3.00 + km * 1.30);
+                const vTarde = arredondarParaCima10cent(3.00 + km * 1.50);
+                const vNoite = arredondarParaCima10cent(3.50 + km * 1.70);
+                const vMadru = arredondarParaCima10cent(3.20 + km * 1.60);
+                const vFimSem = arredondarParaCima10cent(3.50 + km * 1.70);
+                html += `<tr><td>${km}</td><td>R$ ${vManha.toFixed(2).replace('.', ',')}</td><td>R$ ${vTarde.toFixed(2).replace('.', ',')}</td><td>R$ ${vNoite.toFixed(2).replace('.', ',')}</td><td>R$ ${vMadru.toFixed(2).replace('.', ',')}</td><td>R$ ${vFimSem.toFixed(2).replace('.', ',')}</td></tr>`;
+            }
+            html += '</table>';
+            tabela.innerHTML = html;
+            div.style.display = 'block';
         }
 
         function abrirTelaConfiguracoes() {
             document.getElementById('inputKmValor').value = tarifaAtual.km.toFixed(2).replace('.', ',');
             document.getElementById('inputBandeiraValor').value = tarifaAtual.bandeira.toFixed(2).replace('.', ',');
-            document.getElementById('inputValorMinimo').value = tarifaAtual.minimo.toFixed(2).replace('.', ',');
-            document.getElementById('inputTaxaEspera').value = tarifaAtual.espera.toFixed(2).replace('.', ',');
             document.getElementById('telaConfiguracoes').style.display = 'block';
         }
 
         function salvarConfiguracoes() {
             const km = parseFloat(document.getElementById('inputKmValor').value.replace(',', '.')) || 1.30;
             const bandeira = parseFloat(document.getElementById('inputBandeiraValor').value.replace(',', '.')) || 3.00;
-            const minimo = parseFloat(document.getElementById('inputValorMinimo').value.replace(',', '.')) || 8.00;
-            const espera = parseFloat(document.getElementById('inputTaxaEspera').value.replace(',', '.')) || 0.30;
 
-            tarifaAtual = { ...tarifaAtual, km, bandeira, minimo, espera };
+            tarifaAtual = { ...tarifaAtual, km, bandeira };
             alert('✅ Configurações salvas com sucesso!');
             fecharJanela('telaConfiguracoes');
             salvarDadosLocalStorage();
@@ -972,8 +848,7 @@
             if (document.getElementById('tipoTarifaComprovante')) document.getElementById('tipoTarifaComprovante').innerHTML = `🔹 Tipo de Tarifa: ${document.getElementById('tipoTarifa').textContent}`;
 
             document.getElementById('dadosDistancia').innerHTML = `🔹 Distância percorrida: ${document.getElementById('distancia').textContent}`;
-            document.getElementById('dadosTempo').innerHTML = `🔹 Tempo de percurso: ${formatarTempo(tempoCorrida)}`;
-            document.getElementById('dadosValorEspera').innerHTML = `🔹 Tempo de espera: ${formatarTempo(tempoEspera)}`;
+            document.getElementById('dadosTempo').innerHTML = `🔹 Tempo de percurso: ${formatarTempo(Math.floor(tempoCorrida))}`;
             document.getElementById('dadosValor').innerHTML = `💰 VALOR TOTAL A PAGAR: ${document.getElementById('valorDisplay').textContent}`;
 
             document.getElementById('comprovante').style.display = 'block';
@@ -1018,7 +893,7 @@
 
         function gerarCodigoPix() {
             const valorTexto = document.getElementById('valorDisplay').textContent.replace('R$ ', '').replace(',', '.');
-            const valor = parseFloat(valorTexto) || tarifaAtual.minimo;
+            const valor = parseFloat(valorTexto) || tarifaAtual.bandeira;
             const codigo = gerarPIX(valor);
 
             document.getElementById('pixValorDisplay').textContent = `R$ ${valor.toFixed(2).replace('.', ',')}`;
@@ -1044,9 +919,8 @@
             });
         }
 
-        // ---------- HISTÓRICO (ATUALIZADO) ----------
+        // ---------- HISTÓRICO ----------
         function salvarHistorico() {
-            // Garante que o array exista
             if (!historicoCorridas || !Array.isArray(historicoCorridas)) {
                 historicoCorridas = [];
             }
@@ -1058,8 +932,7 @@
                 const origem = document.getElementById('campoOrigem').value || 'Não informado';
                 const destino = document.getElementById('campoDestino').value || 'Não informado';
                 const distancia = document.getElementById('distancia').textContent;
-                const tempoTotal = formatarTempo(tempoCorrida);
-                const tempoEsperaTotal = formatarTempo(tempoEspera);
+                const tempoTotal = formatarTempo(Math.floor(tempoCorrida));
                 const valor = document.getElementById('valorDisplay').textContent;
                 const tarifa = document.getElementById('tipoTarifa').textContent;
 
@@ -1069,28 +942,23 @@
                     destino: destino,
                     distancia: distancia,
                     tempo: tempoTotal,
-                    tempoEspera: tempoEsperaTotal,
                     tarifa: tarifa,
                     valor: valor
                 };
 
                 historicoCorridas.push(corrida);
-                // Tenta salvar no localStorage
                 try {
                     localStorage.setItem('historicoCorridas', JSON.stringify(historicoCorridas));
                 } catch (e) {
-                    console.warn('Não foi possível salvar no localStorage (pode estar bloqueado).');
+                    console.warn('Não foi possível salvar no localStorage.');
                 }
 
-                // Atualiza a lista na tela principal
                 atualizarCorridasHoje();
-                alert('✅ Corrida salva! Total hoje: ' + historicoCorridas.length);
             } catch (e) {
                 alert('❌ Erro ao salvar histórico: ' + e.message);
             }
         }
 
-        // Mostra as corridas de hoje na tela principal
         function atualizarCorridasHoje() {
             const container = document.getElementById('listaCorridasHoje');
             if (!container) return;
@@ -1118,47 +986,6 @@
             container.innerHTML = html;
         }
 
-        // Atualiza a lista do modal histórico
-        function atualizarListaHistorico() {
-            const lista = document.getElementById('listaHistorico');
-            if (!lista) return;
-            lista.innerHTML = '';
-            if (!historicoCorridas || historicoCorridas.length === 0) {
-                lista.innerHTML = '<p style="text-align:center; color:#666; padding:20px;">Nenhuma corrida registrada ainda</p>';
-                return;
-            }
-            historicoCorridas.forEach((corrida, index) => {
-                const item = document.createElement('div');
-                item.className = 'item-historico';
-                item.innerHTML = `
-                    <p><strong>🏍️ Corrida ${index + 1}</strong></p>
-                    <p>📅 Data: ${corrida.data || '-'}</p>
-                    <p>📍 Origem: ${corrida.origem || 'Não informado'}</p>
-                    <p>🏁 Destino: ${corrida.destino || 'Não informado'}</p>
-                    <p>📏 Distância: ${corrida.distancia || '0.00 km'}</p>
-                    <p>⏱️ Tempo percurso: ${corrida.tempo || '00:00:00'}</p>
-                    <p>⏳ Tempo espera: ${corrida.tempoEspera || '00:00:00'}</p>
-                    <p>🔥 Tarifa: ${corrida.tarifa || '-'}</p>
-                    <p>💰 Valor: ${corrida.valor || 'R$ 0,00'}</p>
-                `;
-                lista.appendChild(item);
-            });
-        }
-
-        function limparHistorico() {
-            if (confirm('⚠️ Tem certeza que deseja limpar todo o histórico de corridas? Essa ação não pode ser desfeita!')) {
-                historicoCorridas = [];
-                try {
-                    localStorage.removeItem('historicoCorridas');
-                    atualizarListaHistorico();
-                    atualizarCorridasHoje(); // atualiza também a tela inicial
-                    alert('✅ Histórico limpo com sucesso!');
-                } catch (e) {
-                    alert('❌ Não foi possível limpar o histórico. Verifique as permissões do navegador.');
-                }
-            }
-        }
-
         function salvarDadosLocalStorage() {
             try {
                 localStorage.setItem('historicoCorridas', JSON.stringify(historicoCorridas));
@@ -1172,11 +999,10 @@
                     cidade: CIDADE
                 }));
             } catch (e) {
-                alert('❌ Erro ao acessar armazenamento local. Verifique se o modo anônimo está desativado e os cookies permitidos.');
+                alert('❌ Erro ao acessar armazenamento local.');
             }
         }
 
-        // ---------- CARREGAR DADOS SALVOS ----------
         function carregarDadosSalvos() {
             try {
                 const historicoSalvo = localStorage.getItem('historicoCorridas');
@@ -1201,28 +1027,42 @@
                 }
             } catch (e) {
                 historicoCorridas = [];
-                alert('⚠️ Não foi possível carregar dados salvos. O histórico pode estar vazio.');
             }
 
             definirTarifaPorHorario();
-            atualizarListaHistorico();
-            atualizarCorridasHoje();   // <-- NOVA LINHA
+            atualizarCorridasHoje();
             const comp = document.getElementById('comprovante');
             const pix = document.getElementById('pixModal');
             if (comp) comp.style.display = 'none';
             if (pix) pix.style.display = 'none';
         }
 
+        // ---------- WAKE LOCK ----------
+        let wakeLock = null;
+        async function solicitarWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    wakeLock.addEventListener('release', () => {
+                        if (corridaAtiva) solicitarWakeLock();
+                    });
+                }
+            } catch (err) {
+                console.log('Wake Lock erro:', err);
+            }
+        }
+        function liberarWakeLock() {
+            if (wakeLock !== null) {
+                wakeLock.release().then(() => { wakeLock = null; });
+            }
+        }
+
         // ---------- SERVICE WORKER ----------
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('service-worker.js')
-                    .then(registration => {
-                        console.log('Service Worker registrado com sucesso:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.log('Falha ao registrar o Service Worker:', error);
-                    });
+                    .then(registration => console.log('SW registrado:', registration.scope))
+                    .catch(error => console.log('Falha no SW:', error));
             });
         }
 
