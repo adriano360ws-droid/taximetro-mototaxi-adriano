@@ -1,4 +1,4 @@
-const CACHE_NAME = 'taximetro-v2';
+const CACHE_NAME = 'taximetro-v3';
 const urlsToCache = [
   './',
   './index.html',
